@@ -65,8 +65,7 @@ $(function() {
            expanded = "[\"" + expanded + "\"]"
            expanded = expanded.replace(/(?:\r\n|\r|\n)/g, "\",\"");
 
-//           OctoPrint.control.sendGcode(expanded);
-           OctoPrint.control.sendGcode(["G28","G28"])
+           OctoPrint.control.sendGcode(expanded);
         }
     }
 
