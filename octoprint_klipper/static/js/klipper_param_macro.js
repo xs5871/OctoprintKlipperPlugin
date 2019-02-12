@@ -62,8 +62,10 @@ $(function() {
            }
            
            expanded = self.macro.replace(paramObjRegex, replaceParams)
-           expanded = "[\"" + expanded + "\"]"
-           expanded = expanded.replace(/(?:\r\n|\r|\n)/g, "\",\"");
+//           expanded = "[\"" + expanded + "\"]"
+//           expanded = expanded.replace(/(?:\r\n|\r|\n)/g, "\",\"");
+           // Split using RegEx - cleaner
+           expanded = expanded.split(/\r\n|\r|\n/);
 
            OctoPrint.control.sendGcode(expanded);
         }
