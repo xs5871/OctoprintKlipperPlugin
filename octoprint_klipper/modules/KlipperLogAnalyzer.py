@@ -83,7 +83,7 @@ class KlipperLogAnalyzer():
             if last_runoff_start:
                runoff_samples[last_runoff_start][0] = True
          last_print_stall = print_stall
-      sample_resets = {sampletime: 1 for stall, samples in runoff_samples.values()
+      sample_resets = {sampletime: 1 for stall, samples in list(runoff_samples.values())
                         for sampletime in samples if not stall}
       return sample_resets
 
@@ -143,7 +143,7 @@ class KlipperLogAnalyzer():
       basetime = lasttime = data[0]['#sampletime']
       for d in data:
          st = d['#sampletime']
-         for key, (times, values) in graph_keys.items():
+         for key, (times, values) in list(graph_keys.items()):
             val = d.get(key)
             if val not in (None, '0', '1'):
                times.append(st)

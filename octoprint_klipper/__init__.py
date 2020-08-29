@@ -5,7 +5,7 @@
 #
 # This file may be distributed under the terms of the GNU GPLv3 license.
 
-from __future__ import absolute_import
+
 import datetime
 import logging
 import octoprint.plugin
@@ -23,7 +23,7 @@ class KlipperPlugin(
       octoprint.plugin.AssetPlugin,
       octoprint.plugin.SimpleApiPlugin,
       octoprint.plugin.EventHandlerPlugin):
-   
+
    _parsing_response = False
    _message = ""
 
@@ -93,7 +93,7 @@ class KlipperPlugin(
                self._settings.get(["configuration", "path"])
             )
             # Check for Unicode config file and convert to String, if so.
-            if type(data["config"]) == unicode:
+            if type(data["config"]) == str:
                data["config"] = data["config"].encode('utf-8')
 
             f = open(filepath, "w")
@@ -339,10 +339,12 @@ class KlipperPlugin(
    def logError(self, error):
       self.sendMessage("log", "error", error)
 
+__plugin_name__ = "OctoKlipper"
+__plugin_pythoncompat__ = ">=2.7,<4"
+
 def __plugin_load__():
    global __plugin_implementation__
    global __plugin_hooks__
-
    __plugin_implementation__ = KlipperPlugin()
    __plugin_hooks__ = {
       "octoprint.comm.protocol.gcode.received": __plugin_implementation__.on_parse_gcode,
