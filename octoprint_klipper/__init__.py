@@ -35,7 +35,7 @@ class KlipperPlugin(
    _message = ""
 
    #-- Startup Plugin
-   
+
    def on_after_startup(self):
       klipper_port = self._settings.get(["connection", "port"])
       additional_ports = self._settings.global_get(["serial", "additionalPorts"])
@@ -76,10 +76,10 @@ class KlipperPlugin(
             reload_command="RESTART"
          )
       )
-   
+
    def on_settings_load(self):
       data = octoprint.plugin.SettingsPlugin.on_settings_load(self)
-      
+
       filepath = os.path.expanduser(
          self._settings.get(["configuration", "path"])
       )
@@ -99,9 +99,7 @@ class KlipperPlugin(
             filepath = os.path.expanduser(
                self._settings.get(["configuration", "path"])
             )
-            # Check for Unicode config file and convert to String, if so.
-            if type(data["config"]) == str:
-               data["config"] = data["config"].encode('utf-8')
+            data["config"] = data["config"].encode('utf-8')
 
             f = open(filepath, "w")
             f.write(data["config"])
