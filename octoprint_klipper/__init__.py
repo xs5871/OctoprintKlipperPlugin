@@ -315,12 +315,12 @@ class KlipperPlugin(
             displayVersion=self._plugin_version,
             type="github_release",
             current=self._plugin_version,
-            user="mmone",
+            user="AliceGrey",
             repo="OctoprintKlipperPlugin",
-            pip="https://github.com/mmone/OctoPrintKlipper/archive/{target_version}.zip"
+            pip="https://github.com/AliceGrey/OctoPrintKlipper/archive/{target_version}.zip"
          )
       )
-    
+
    #-- Helpers
    def sendMessage(self, type, subtype, payload):
       self._plugin_manager.send_plugin_message(
