@@ -319,7 +319,7 @@ class KlipperPlugin(
             current=self._plugin_version,
             user="AliceGrey",
             repo="OctoprintKlipperPlugin",
-            pip="https://github.com/AliceGrey/OctoPrintKlipper/archive/{target_version}.zip"
+            pip="https://github.com/AliceGrey/OctoprintKlipperPlugin/archive/{target_version}.zip"
          )
       )
 
