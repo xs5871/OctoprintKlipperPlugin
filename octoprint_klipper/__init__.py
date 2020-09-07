@@ -81,41 +81,55 @@ class KlipperPlugin(
    def on_settings_load(self):
       data = octoprint.plugin.SettingsPlugin.on_settings_load(self)
 
-      filepath = os.path.expanduser(
+      configpath = os.path.expanduser(
          self._settings.get(["configuration", "configpath"])
       )
+      
+      logpath = os.path.expanduser(
+         self._settings.get(["configuration", "logpath"])
+      )
+
       try:
-         f = open(filepath, "r")
+         f = open(configpath, "r")
          data["config"] = f.read()
          f.close()
       except IOError:
          self._logger.error(
-            "Error: Klipper config file not found at: {}".format(filepath)
+            "Error: Klipper config file not found at: {}".format(configpath)
          )
       return data
 
    def on_settings_save(self, data):
+      if self.keyexists(data, "configuration", "configpath"):
+         configpath = os.path.expanduser(
+          data["configuration"]["configpath"]
+          )
+         self.checkFile("config",configpath)
+       
+      if self.keyexists(data, "configuration", "logpath"):
+          logpath = os.path.expanduser(
+             data["configuration"]["logpath"]
+             )
+          self.checkFile("log",logpath)
+       
       if "config" in data:
          try:
-            filepath = os.path.expanduser(
-               self._settings.get(["configuration", "configpath"])
-            )
             data["config"] = data["config"].encode('utf-8')
 
-            f = open(filepath, "w")
+            f = open(configpath, "w")
             f.write(data["config"])
             f.close()
-            self._logger.info(
-               "Writing Klipper config to {}".format(filepath)
+            self._logger.error(
+               "Writing Klipper config to {}".format(configpath)
             )
             # Restart klipply to reload config
             self._printer.commands(self._settings.get(["configuration", "reload_command"]))
             self.logInfo("Reloading Klipper Configuration.")
          except IOError:
             self._logger.error(
-               "Error: Couldn't write Klipper config file: {}".format(filepath)
+               "Error: Couldn't write Klipper config file: {}".format(configpath)
             )
-         data.pop("config", None) # we dont want to write the klipper conf to the octoprint settings
+            data.pop("config", None) # we dont want to write the klipper conf to the octoprint settings
       else:
          octoprint.plugin.SettingsPlugin.on_settings_save(self, data)
 
@@ -324,13 +338,14 @@ class KlipperPlugin(
       )
 
    #-- Helpers
-   def sendMessage(self, type, subtype, payload):
+   def sendMessage(self, type, subtype, title, payload):
       self._plugin_manager.send_plugin_message(
          self._identifier,
          dict(
             time=datetime.datetime.now().strftime("%H:%M:%S"),
             type=type,
             subtype=subtype,
+            title=title,
             payload=payload
          )
       )
@@ -339,13 +354,25 @@ class KlipperPlugin(
       self._printer.commands("STATUS")
 
    def updateStatus(self, type, status):
-      self.sendMessage("status", type, status)
+      self.sendMessage("status", type, status, status)
 
    def logInfo(self, message):
-      self.sendMessage("log", "info", message)
+      self.sendMessage("log", "info", message, message)
 
    def logError(self, error):
-      self.sendMessage("log", "error", error)
+      self.sendMessage("log", "error", error, error)
+
+   def checkFile(self,filetype,filepath):
+      if not os.path.isfile(filepath):
+         self.sendMessage("errorPopUp","warning", "OctoKlipper Settings", "Klipper " + filepath + " does not exist!")
+         
+   def keyexists(self, dict, key1, key2):
+      try:
+         dict[key1][key2]
+      except KeyError:
+         return False
+      else:
+         return True
 
 __plugin_name__ = "OctoKlipper"
 __plugin_pythoncompat__ = ">=2.7,<4"
