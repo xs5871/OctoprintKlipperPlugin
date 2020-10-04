@@ -22,6 +22,7 @@ import os
 from octoprint.util.comm import parse_firmware_line
 from .modules import KlipperLogAnalyzer
 import flask
+import configparser
 
 class KlipperPlugin(
       octoprint.plugin.StartupPlugin,
@@ -115,6 +116,17 @@ class KlipperPlugin(
       if "config" in data:
          try:
             data["config"] = data["config"].encode('utf-8')
+
+            # Basic validation of config file - makes sure it parses
+            try:
+                parser = configparser.RawConfigParser()
+                parser.read_string(data["config"])
+            except configParser.Error as error:
+                self._logger.error(
+                   "Error: Invalid Klipper config file: {}".format(str(error))
+                )
+                self.sendMessage("errorPopUp","warning", "OctoKlipper Settings", "Invalid Klipper config file: " + str(error))
+
 
             f = open(configpath, "w")
             f.write(data["config"])
