@@ -36,8 +36,48 @@
    margin-top: 6px;
 }
 
+#level .add-on {
+   padding: 5px;
+}
+
+#level .controls {
+   padding: 1px;
+}
+
+ul#klipper-settings { 
+   margin: 0;
+}
+
+#klipper-settings a{ 
+   margin: 5px;
+}
+
 #plugin-klipper-config {
+   height: 100%;
    font-family: monospace;
+}
+
+#settings_plugin_klipper {
+   height: 100%;
+}
+
+#settings_plugin_klipper form {
+   margin: 0px;
+   height: 100%;
+}
+
+#settings_plugin_klipper form .tab-content {
+   height: calc(100% - 40px);
+   overflow: auto;
+}
+
+#settings_plugin_klipper form .tab-content .tab-pane {
+   height: 100%;
+}
+
+#settings_plugin_klipper form .tab-content .tap-pane#conf .control-group {
+   margin-bottom: 0px;
+   height: 99%;
 }
 
 #klipper_graph_dialog form {

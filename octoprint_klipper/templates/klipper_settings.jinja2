@@ -105,13 +105,13 @@
         </span>
     </div>
     <div class="control-group">
-<pre>
-PID_CALIBRATE
-HEATER={label:Heater, default:extruder, options:extruder|extruder1}
-TARGET={label:Target Temperature, unit:°C, default:190}
-WRITE_FILE={label:Write to File, default:0, options:0|1}
-</pre>
-     </div>
+      <pre>
+        PID_CALIBRATE
+        HEATER={label:Heater, default:extruder, options:extruder|extruder1}
+        TARGET={label:Target Temperature, unit:°C, default:190}
+        WRITE_FILE={label:Write to File, default:0, options:0|1}
+      </pre>
+    </div>
   </div>
   <!-- Leveling -->
   <div class="tab-pane" id="level">
@@ -194,34 +194,6 @@ WRITE_FILE={label:Write to File, default:0, options:0|1}
   <!-- Klipper Conf -->
   <div class="tab-pane" id="conf">
    <div class="control-group">
-    <style type="text/css" media="screen">
-
-        #plugin-klipper-config {
-          height: 100%;
-        }
-
-        #settings_plugin_klipper {
-          height: 100%;
-        }
-
-        #settings_plugin_klipper form {
-          height: 100%;
-        }
-
-        #settings_plugin_klipper form .tab-content {
-          height: 100%;
-          overflow: auto;
-        }
-
-        #settings_plugin_klipper form .tab-content .tab-pane {
-          height: 100%;
-        }
-
-        #settings_plugin_klipper form .tab-content .tab-pane .control-group {
-          max-height: 1200px;
-        }
-
-    </style>
     <script src="plugin/klipper/static/js/lib/ace/ace.min.js" type="text/javascript" charset="utf-8"></script>
     <script src="plugin/klipper/static/js/lib/ace/theme-monokai.min.js" type="text/javascript" charset="utf-8"></script>
     <script src="plugin/klipper/static/js/lib/ace/mode-klipper_config.js" type="text/javascript"></script>
