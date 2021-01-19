@@ -26,6 +26,7 @@ $(function() {
         
         self.shortStatus = ko.observable();
         self.logMessages = ko.observableArray();
+        self.hasRight = ko.observable(false);
         
         self.showLevelingDialog = function() {
            var dialog = $("#klipper_leveling_dialog");
@@ -126,7 +127,12 @@ $(function() {
         };
         
         self.isActive = function() {
-           return self.connectionState.isOperational() && self.loginState.isUser();
+           return self.connectionState.isOperational() && self.loginState.hasPermission(self.access.permissions.PLUGIN_KLIPPER_CONFIG); //was: && self.loginState.isUser();
+        }
+
+        self.hasRight = function (right_role) {
+           var arg = eval("access.permissions.PLUGIN_KLIPPER_"+right_role);
+           return self.loginState.hasPermissionKo(arg);
         }
 
         // OctoKlipper settings link

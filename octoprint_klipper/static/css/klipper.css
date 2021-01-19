@@ -80,6 +80,14 @@ ul#klipper-settings {
    height: 99%;
 }
 
+#macros #item.control-group {
+   margin-bottom: 5px;
+   border: 1px solid #ddd;
+   border-radius: 3px;
+   background-color: #eeeeef;
+   color: #333;
+}
+
 #klipper_graph_dialog form {
 	margin: 0;
 }
