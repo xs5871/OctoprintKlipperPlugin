@@ -57,6 +57,24 @@ ul#klipper-settings {
    font-family: monospace;
 }
 
+#tab_plugin_klipper_main .row-fluid {
+   display: flex;
+   flex-direction: row;
+   flex-wrap: wrap;
+}
+
+#tab_plugin_klipper_main .span8 {
+   min-width: 50%;
+   width: auto;
+   flex-grow: 6;
+}
+
+#tab_plugin_klipper_main .span4 {
+   flex-grow: 1;
+   flex-shrink: 1;
+   width: auto;
+}
+
 #settings_plugin_klipper {
    height: 100%;
 }

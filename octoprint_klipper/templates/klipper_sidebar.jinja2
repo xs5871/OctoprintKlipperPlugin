@@ -5,7 +5,7 @@
       <button class="btn btn-block" data-bind="click: connectionState.connect, text: connectionState.buttonText(), enable: loginState.isUser()">{{ _('Connect') }}</button>
    </div>
 </div>
-<div class="control-group">
+<div class="control-group" data-bind="visible: hasRight('MACRO', 'Ko')">
    <div class="controls">
       <button class="btn btn-block" data-bind="visible: loginState.hasPermissionKo(access.permissions.PLUGIN_KLIPPER_CONFIG), click: function() {openOctoKlipperSettings('klipper-config');}">{{ _('Open Klipper config') }}</button>
    </div>
