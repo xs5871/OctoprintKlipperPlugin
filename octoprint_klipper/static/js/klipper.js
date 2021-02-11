@@ -134,7 +134,7 @@ $(function () {
         };
 
         self.isActive = function () {
-            return self.connectionState.isOperational() && hasRight("CONFIG");
+            return self.connectionState.isOperational() && this.hasRight("CONFIG");
         };
 
         self.hasRight = function (right_role, type) {
