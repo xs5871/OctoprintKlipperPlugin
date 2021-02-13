@@ -66,7 +66,7 @@ $(function () {
         self.executeMacro = function (macro) {
             var paramObjRegex = /{(.*?)}/g;
 
-            if (!this.hasRight("MACROS")) return;
+            if (!this.hasRight("MACRO")) return;
 
             if (macro.macro().match(paramObjRegex) == null) {
                 OctoPrint.control.sendGcode(
