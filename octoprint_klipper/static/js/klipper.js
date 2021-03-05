@@ -66,7 +66,7 @@ $(function () {
         self.executeMacro = function (macro) {
             var paramObjRegex = /{(.*?)}/g;
 
-            if (!this.hasRight("MACRO")) return;
+            if (!self.hasRight("MACRO")) return;
 
             if (macro.macro().match(paramObjRegex) == null) {
                 OctoPrint.control.sendGcode(
@@ -150,7 +150,7 @@ $(function () {
 
         // OctoKlipper settings link
         self.openOctoKlipperSettings = function (profile_type) {
-            if (!this.hasRight("CONFIG")) return;
+            if (!self.hasRight("CONFIG")) return;
 
             $("a#navbar_show_settings").click();
             $("li#settings_plugin_klipper_link a").click();
