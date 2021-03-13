@@ -19,15 +19,15 @@ plugin_package = "octoprint_klipper"
 
 plugin_name = "OctoKlipper"
 
-plugin_version = "0.3.2"
+plugin_version = "0.3.3"
 
 plugin_description = """A plugin for OctoPrint to configure,control and monitor the Klipper 3D printer software."""
 
-plugin_author = "Alice Weigt"
+plugin_author = "thelastWallE"
 
-plugin_author_email = "alice@grey.systems"
+plugin_author_email = "thelastwalle.github@gmail.com"
 
-plugin_url = ""
+plugin_url = "https://github.com/thelastWallE/OctoprintKlipperPlugin"
 
 plugin_license = "AGPLv3"
 

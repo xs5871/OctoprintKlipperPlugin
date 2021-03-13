@@ -333,9 +333,21 @@ class KlipperPlugin(
             displayVersion=self._plugin_version,
             type="github_release",
             current=self._plugin_version,
-            user="AliceGrey",
+            user="thelastWallE",
             repo="OctoprintKlipperPlugin",
-            pip="https://github.com/AliceGrey/OctoprintKlipperPlugin/archive/{target_version}.zip"
+            pip="https://github.com/thelastWallE/OctoprintKlipperPlugin/archive/{target_version}.zip",
+            stable_branch=dict(
+               name="Stable", 
+               branch="master", 
+               comittish=["master"]
+            ),
+            prerelease_branches=[
+               dict(
+                  name="Release Candidate",
+                  branch="rc",
+                  comittish=["rc", "master"],
+               )
+            ]
          )
       )
 
