@@ -23,7 +23,7 @@
                <button class="btn btn-block btn-small" data-bind="click: onGetStatus, enable: isActive()" title="Query Klipper for its current status">
                   <i class="fa icon-black fa-info-circle"></i> {{ _('Get Status') }}
                </button>
-               <button class="btn btn-block btn-small" data-bind="visible: loginState.hasPermissionKo(access.permissions.PLUGIN_KLIPPER_CONFIG), click: function() {openOctoKlipperSettings('klipper-config');}" title="Open the Klipper configurationfile">
+               <button class="btn btn-block btn-small" data-bind="visible: hasRight('CONFIG', 'Ko'), click: function() {openOctoKlipperSettings('klipper-config');}" title="Open the Klipper configurationfile">
                   <i class="fa icon-black fa-file-code-o"></i> {{ _('Open Klipper config') }}
                </button>
             </div>
@@ -62,7 +62,7 @@
                </button>
             </div>
          </div>
-         <div class="controls">
+         <div class="controls" data-bind="visible: hasRight('MACRO', 'Ko')">
             <label class="control-label"><i class="icon-list-alt"></i> {{ _('Macros') }}</label>
             <div data-bind="foreach: settings.settings.plugins.klipper.macros">
                <!-- ko if: tab -->

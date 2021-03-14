@@ -53,13 +53,22 @@ class KlipperPlugin(
 
    def get_additional_permissions(self, *args, **kwargs):
         return [
-            dict(key="CONFIG",
-                name="Config Klipper",
-                description=gettext("Allows to config klipper"),
-                default_groups=[ADMIN_GROUP],
-                dangerous=True,
-                roles=["admin"]
-            )
+           {
+               "key": "CONFIG",
+               "name": "Config Klipper",
+               "description": gettext("Allows to config klipper"),
+               "default_groups": [ADMIN_GROUP],
+               "dangerous": True,
+               "roles": ["admin"],
+            },
+            {
+               "key": "MACRO",
+               "name": "Use Klipper Macros",
+               "description": gettext("Allows to use klipper macros"),
+               "default_groups": [ADMIN_GROUP],
+               "dangerous": True,
+               "roles": ["admin"],
+            },
         ]
    
    def get_settings_defaults(self):
@@ -100,7 +109,7 @@ class KlipperPlugin(
          self._settings.get(["configuration", "configpath"])
       )
       try:
-         f = open(filepath, "r")
+         f = open(filepath, "r", encoding="utf-8")
          data["config"] = f.read()
          f.close()
       except IOError:
@@ -116,9 +125,9 @@ class KlipperPlugin(
                self._settings.get(["configuration", "configpath"])
             )
             if sys.version_info[0] < 3:
-                data["config"] = data["config"].encode('utf-8')
+               data["config"] = data["config"].encode('utf-8')
 
-            f = open(filepath, "w")
+            f = open(filepath, "w", encoding="utf-8")
             f.write(data["config"])
             f.close()
             self._logger.info(
