@@ -31,7 +31,7 @@ $(function () {
             dialog.modal({
                 show: "true",
                 backdrop: "static",
-                keyboard: false,
+                keyboard: false
             });
             self.levelingViewModel.initView();
         };
@@ -41,7 +41,7 @@ $(function () {
             dialog.modal({
                 show: "true",
                 backdrop: "static",
-                keyboard: false,
+                keyboard: false
             });
         };
 
@@ -49,7 +49,7 @@ $(function () {
             var dialog = $("#klipper_offset_dialog");
             dialog.modal({
                 show: "true",
-                backdrop: "static",
+                backdrop: "static"
             });
         };
 
@@ -58,7 +58,7 @@ $(function () {
             dialog.modal({
                 show: "true",
                 minHeight: "500px",
-                maxHeight: "600px",
+                maxHeight: "600px"
             });
         };
 
@@ -79,7 +79,7 @@ $(function () {
                 var dialog = $("#klipper_macro_dialog");
                 dialog.modal({
                     show: "true",
-                    backdrop: "static",
+                    backdrop: "static"
                 });
             }
         };
@@ -124,7 +124,7 @@ $(function () {
             self.logMessages.push({
                 time: timestamp,
                 type: type,
-                msg: message.replace(/\n/gi, "<br>"),
+                msg: message.replace(/\n/gi, "<br>")
             });
         };
 
@@ -137,14 +137,12 @@ $(function () {
         };
 
         self.hasRight = function (right_role, type) {
-            var arg = eval(
-				"self.access.permissions.PLUGIN_KLIPPER_" + right_role		
-            );
+            var arg = eval("self.access.permissions.PLUGIN_KLIPPER_" + right_role);
 
             if (type == "Ko") {
                 return self.loginState.hasPermissionKo(arg);
-			}
-			return self.loginState.hasPermission(arg);
+            }
+            return self.loginState.hasPermission(arg);
         };
 
         // OctoKlipper settings link
@@ -155,9 +153,7 @@ $(function () {
             $("li#settings_plugin_klipper_link a").click();
             if (profile_type) {
                 var query =
-                    "#klipper-settings a[data-profile-type='" +
-                    profile_type +
-                    "']";
+                    "#klipper-settings a[data-profile-type='" + profile_type + "']";
                 $(query).click();
             }
         };
@@ -171,12 +167,12 @@ $(function () {
             "connectionViewModel",
             "klipperLevelingViewModel",
             "klipperMacroDialogViewModel",
-            "accessViewModel",
+            "accessViewModel"
         ],
         elements: [
             "#tab_plugin_klipper_main",
             "#sidebar_plugin_klipper",
-            "#navbar_plugin_klipper",
-        ],
+            "#navbar_plugin_klipper"
+        ]
     });
 });

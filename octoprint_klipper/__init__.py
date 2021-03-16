@@ -59,7 +59,7 @@ class KlipperPlugin(
                "description": gettext("Allows to config klipper"),
                "default_groups": [ADMIN_GROUP],
                "dangerous": True,
-               "roles": ["admin"],
+               "roles": ["admin"]
             },
             {
                "key": "MACRO",
@@ -67,10 +67,10 @@ class KlipperPlugin(
                "description": gettext("Allows to use klipper macros"),
                "default_groups": [ADMIN_GROUP],
                "dangerous": True,
-               "roles": ["admin"],
+               "roles": ["admin"]
             },
         ]
-   
+
    def get_settings_defaults(self):
       return dict(
          connection = dict(
@@ -117,6 +117,20 @@ class KlipperPlugin(
             "Error: Klipper config file not found at: {}".format(filepath)
          )
       return data
+
+    def reloadConfigfile(self):
+        data = octoprint.plugin.SettingsPlugin.on_settings_load(self)
+
+        filepath = os.path.expanduser(
+            self._settings.get(["configuration", "configpath"]))
+        try:
+            f = open(filepath, "r", encoding="utf-8")
+            data["config"] = f.read()
+            f.close()
+        except IOError:
+            self._logger.error(
+                "Error: Klipper config file not found at: {}".format(filepath))
+        return data
 
    def on_settings_save(self, data):
       if "config" in data:
@@ -346,8 +360,8 @@ class KlipperPlugin(
             repo="OctoprintKlipperPlugin",
             pip="https://github.com/thelastWallE/OctoprintKlipperPlugin/archive/{target_version}.zip",
             stable_branch=dict(
-               name="Stable", 
-               branch="master", 
+               name="Stable",
+               branch="master",
                comittish=["master"]
             ),
             prerelease_branches=[
@@ -396,4 +410,3 @@ def __plugin_load__():
       "octoprint.comm.protocol.gcode.received": __plugin_implementation__.on_parse_gcode,
       "octoprint.plugin.softwareupdate.check_config": __plugin_implementation__.get_update_information
    }
-

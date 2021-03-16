@@ -38,10 +38,6 @@
    margin-bottom: 6px;
 }
 
-#level .add-on {
-   padding: 5px;
-}
-
 #level .controls {
    padding: 1px;
 }
@@ -80,7 +76,7 @@ ul#klipper-settings {
 #tab_plugin_klipper_main .span4 {
    flex-grow: 0;
    flex-shrink: 1;
-   max-width: 13%;
+   /* max-width: 13%; */
    float: left;
    box-sizing: border-box;
 }
@@ -109,15 +105,17 @@ ul#klipper-settings {
 }
 
 #macros #item.control-group {
-   margin-bottom: 5px;
-   border: 1px solid #ddd;
+   margin-bottom: 2px;
+   border: 2px solid #ccc;
    border-radius: 3px;
-   background-color: #eeeeef;
+   background-color: #eeeeee;
    color: #333;
+   padding-bottom: 2px;
+   padding-top: 2px;
 }
 
 #klipper_graph_dialog form {
-	margin: 0;
+   margin: 0;
 }
 
 #klipper_graph_dialog .graph-footer {
