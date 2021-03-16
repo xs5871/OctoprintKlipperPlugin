@@ -23,9 +23,20 @@ $(function () {
         self.levelingViewModel = parameters[3];
         self.paramMacroViewModel = parameters[4];
         self.access = parameters[5];
+      
         self.shortStatus = ko.observable();
         self.logMessages = ko.observableArray();
 
+        self.showPopUp = function(popupType, popupTitle, message){
+        var title = popupType.toUpperCase() + ":  " + popupTitle;
+        new PNotify({
+            title: title,
+            text: message,
+            type: popupType,
+            hide: false
+            });
+        };
+      
         self.showLevelingDialog = function () {
             var dialog = $("#klipper_leveling_dialog");
             dialog.modal({
@@ -106,17 +117,21 @@ $(function () {
             );
         };
 
-        self.onDataUpdaterPluginMessage = function (plugin, message) {
-            if (plugin == "klipper") {
-                if (message["type"] == "status") {
-                    self.shortStatus(message["payload"]);
-                } else {
-                    self.logMessage(
-                        message["time"],
-                        message["subtype"],
-                        message["payload"]
-                    );
-                }
+        self.onDataUpdaterPluginMessage = function(plugin, data) {
+          if(plugin == "klipper") {
+             if ("warningPopUp" == data.type){
+                self.showPopUp(data.subtype, data.title, data.payload);
+                return;
+               }
+            if ("errorPopUp" == data.type){
+               self.showPopUp(data.subtype, data.title, data.payload);
+            return;
+               }
+            if(data.type == "status") {
+               self.shortStatus(data.payload);
+             } else {
+                self.logMessage(data.time, data.subtype, data.payload);
+             }
             }
         };
 
