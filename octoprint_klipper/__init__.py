@@ -118,19 +118,19 @@ class KlipperPlugin(
          )
       return data
 
-    def reloadConfigfile(self):
-        data = octoprint.plugin.SettingsPlugin.on_settings_load(self)
+   def reloadConfigfile(self):
+      data = octoprint.plugin.SettingsPlugin.on_settings_load(self)
 
-        filepath = os.path.expanduser(
-            self._settings.get(["configuration", "configpath"]))
-        try:
-            f = open(filepath, "r", encoding="utf-8")
-            data["config"] = f.read()
-            f.close()
-        except IOError:
-            self._logger.error(
-                "Error: Klipper config file not found at: {}".format(filepath))
-        return data
+      filepath = os.path.expanduser(
+         self._settings.get(["configuration", "configpath"]))
+      try:
+         f = open(filepath, "r", encoding="utf-8")
+         data["config"] = f.read()
+         f.close()
+      except IOError:
+         self._logger.error(
+            "Error: Klipper config file not found at: {}".format(filepath))
+      return data
 
    def on_settings_save(self, data):
       if "config" in data:

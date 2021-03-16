@@ -42,11 +42,11 @@
    padding: 1px;
 }
 
-ul#klipper-settings { 
+ul#klipper-settings {
    margin: 0;
 }
 
-#klipper-settings a{ 
+#klipper-settings a{
    margin: 5px;
 }
 
@@ -62,8 +62,6 @@ ul#klipper-settings {
 }
 
 #tab_plugin_klipper_main .span8 {
-   min-width: 50%;
-   width: unset;
    flex-grow: 8;
    float: left;
    box-sizing: border-box;
