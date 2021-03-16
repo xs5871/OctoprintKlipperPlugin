@@ -3,6 +3,7 @@
    overflow-y: scroll;
    height: 400px;
    border: 1px solid #eee;
+   width: 100%;
 }
 
 .plugin-klipper-log .log-item {
@@ -34,14 +35,85 @@
 
 .clear-btn {
    margin-top: 6px;
+   margin-bottom: 6px;
+}
+
+#level .controls {
+   padding: 1px;
+}
+
+ul#klipper-settings {
+   margin: 0;
+}
+
+#klipper-settings a{
+   margin: 5px;
 }
 
 #plugin-klipper-config {
+   height: 100%;
    font-family: monospace;
 }
 
+#tab_plugin_klipper_main .row-fluid {
+   display: flex;
+   flex-direction: row;
+   flex-wrap: wrap;
+}
+
+#tab_plugin_klipper_main .span8 {
+   flex-grow: 8;
+   float: left;
+   box-sizing: border-box;
+}
+
+#tab_plugin_klipper_main .span8 label {
+   float: left;
+}
+
+#tab_plugin_klipper_main .span4 {
+   flex-grow: 0;
+   flex-shrink: 1;
+   /* max-width: 13%; */
+   float: left;
+   box-sizing: border-box;
+}
+
+#settings_plugin_klipper {
+   height: 100%;
+}
+
+#settings_plugin_klipper form {
+   margin: 0px;
+   height: 100%;
+}
+
+#settings_plugin_klipper form .tab-content {
+   height: calc(100% - 40px);
+   overflow: auto;
+}
+
+#settings_plugin_klipper form .tab-content .tab-pane {
+   height: 100%;
+}
+
+#settings_plugin_klipper form .tab-content .tap-pane#conf .control-group {
+   margin-bottom: 0px;
+   height: 99%;
+}
+
+#macros #item.control-group {
+   margin-bottom: 2px;
+   border: 2px solid #ccc;
+   border-radius: 3px;
+   background-color: #eeeeee;
+   color: #333;
+   padding-bottom: 2px;
+   padding-top: 2px;
+}
+
 #klipper_graph_dialog form {
-	margin: 0;
+   margin: 0;
 }
 
 #klipper_graph_dialog .graph-footer {

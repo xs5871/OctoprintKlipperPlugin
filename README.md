@@ -1,12 +1,12 @@
 ## Fork information:
 - This is forked from [the original](https://github.com/mmone/OctoprintKlipperPlugin) version 0.2.5
 - The fork now supports Python3 (hopefully without any new bugs)
-- The current version is 0.3.1 and includes the pull requests left on the old plugin page that fixes several bugs and Themify support.
+- The current version is 0.3.3 and includes the pull requests left on the old plugin page that fixes several bugs and Themify support.
 
 ## Fork Installation Information:
 - Uninstall any other versions of the plugin using Plugin Manager or other means, as necessary.
 - Install this version by using Plugin Manager's "From Url" option and entering this URL:
-`https://github.com/AliceGrey/OctoprintKlipperPlugin/archive/master.zip`
+`https://github.com/thelastWallE/OctoprintKlipperPlugin/archive/master.zip`
 
 
 # OctoKlipper Plugin
@@ -31,7 +31,7 @@ Search for "Klipper" in OctoPrints Plugin Manager.
 
 or install manually using this URL / zip:
 
-    https://github.com/AliceGrey/OctoprintKlipperPlugin/archive/master.zip
+    https://github.com/thelastWallE/OctoprintKlipperPlugin/archive/master.zip
 
 ## Update
 

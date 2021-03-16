@@ -19,10 +19,13 @@ import octoprint.plugin
 import octoprint.plugin.core
 import glob
 import os
+import sys
 from octoprint.util.comm import parse_firmware_line
+from octoprint.access.permissions import Permissions, ADMIN_GROUP, USER_GROUP
 from .modules import KlipperLogAnalyzer
 import flask
 import configparser
+from flask_babel import gettext
 
 class KlipperPlugin(
       octoprint.plugin.StartupPlugin,
@@ -48,6 +51,26 @@ class KlipperPlugin(
           self._logger.info("Added klipper serial port {} to list of additional ports.".format(klipper_port))
 
    #-- Settings Plugin
+
+   def get_additional_permissions(self, *args, **kwargs):
+        return [
+           {
+               "key": "CONFIG",
+               "name": "Config Klipper",
+               "description": gettext("Allows to config klipper"),
+               "default_groups": [ADMIN_GROUP],
+               "dangerous": True,
+               "roles": ["admin"]
+            },
+            {
+               "key": "MACRO",
+               "name": "Use Klipper Macros",
+               "description": gettext("Allows to use klipper macros"),
+               "default_groups": [ADMIN_GROUP],
+               "dangerous": True,
+               "roles": ["admin"]
+            },
+        ]
 
    def get_settings_defaults(self):
       return dict(
@@ -75,7 +98,8 @@ class KlipperPlugin(
          configuration = dict(
             configpath="~/printer.cfg",
             logpath="/tmp/klippy.log",
-            reload_command="RESTART"
+            reload_command="RESTART",
+            navbar=True
          )
       )
 
@@ -92,12 +116,27 @@ class KlipperPlugin(
 
       try:
          f = open(configpath, "r")
+
          data["config"] = f.read()
          f.close()
       except IOError:
          self._logger.error(
             "Error: Klipper config file not found at: {}".format(configpath)
          )
+      return data
+
+   def reloadConfigfile(self):
+      data = octoprint.plugin.SettingsPlugin.on_settings_load(self)
+
+      filepath = os.path.expanduser(
+         self._settings.get(["configuration", "configpath"]))
+      try:
+         f = open(filepath, "r", encoding="utf-8")
+         data["config"] = f.read()
+         f.close()
+      except IOError:
+         self._logger.error(
+            "Error: Klipper config file not found at: {}".format(filepath))
       return data
 
    def on_settings_save(self, data):
@@ -129,6 +168,7 @@ class KlipperPlugin(
 
 
             f = open(configpath, "w")
+
             f.write(data["config"])
             f.close()
             self._logger.error(
@@ -343,9 +383,21 @@ class KlipperPlugin(
             displayVersion=self._plugin_version,
             type="github_release",
             current=self._plugin_version,
-            user="AliceGrey",
+            user="thelastWallE",
             repo="OctoprintKlipperPlugin",
-            pip="https://github.com/AliceGrey/OctoprintKlipperPlugin/archive/{target_version}.zip"
+            pip="https://github.com/thelastWallE/OctoprintKlipperPlugin/archive/{target_version}.zip",
+            stable_branch=dict(
+               name="Stable",
+               branch="master",
+               comittish=["master"]
+            ),
+            prerelease_branches=[
+               dict(
+                  name="Release Candidate",
+                  branch="rc",
+                  comittish=["rc", "master"],
+               )
+            ]
          )
       )
 
@@ -394,7 +446,7 @@ def __plugin_load__():
    global __plugin_hooks__
    __plugin_implementation__ = KlipperPlugin()
    __plugin_hooks__ = {
+      "octoprint.access.permissions": __plugin_implementation__.get_additional_permissions,
       "octoprint.comm.protocol.gcode.received": __plugin_implementation__.on_parse_gcode,
       "octoprint.plugin.softwareupdate.check_config": __plugin_implementation__.get_update_information
    }
-
