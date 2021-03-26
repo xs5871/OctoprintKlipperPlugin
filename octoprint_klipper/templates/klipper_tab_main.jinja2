@@ -10,7 +10,7 @@
          </div>
       </div>
       &nbsp;
-      <button class="btn btn-mini pull-right clear-btn" data-bind="click: onClearLog, enable: isActive()"
+      <button class="btn btn-mini pull-right clear-btn" data-bind="click: onClearLog"
          title="Clear Log">
          <i class="fa fa-trash"></i> {{ _('Clear') }}
       </button>
@@ -56,9 +56,9 @@
                   title="Sets a offset for subsequent GCODE coordinates.">
                   {{ _('Coordinate Offset') }}
                </button>
-               <button class="btn btn-block btn-small" data-bind="click: showGraphDialog, enable: isActive()"
+               <button class="btn btn-block btn-small" data-bind="click: showGraphDialog"
                   title="Assists in debugging performance issues by analyzing the Klipper log files.">
-                  {{ _('Performance Graph') }}
+                  {{ _('Analyze Klipper Logfiles') }}
                </button>
             </div>
          </div>

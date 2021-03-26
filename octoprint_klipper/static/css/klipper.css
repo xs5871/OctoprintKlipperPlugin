@@ -112,8 +112,21 @@ ul#klipper-settings {
    padding-top: 2px;
 }
 
+#klipper_graph_dialog {
+   width: 1050px;
+}
+
+#klipper_graph_dialog .full-sized-box{
+   width: 1000px;
+   margin: 0 auto;
+}
+
 #klipper_graph_dialog form {
    margin: 0;
+}
+
+#klipper_graph_dialog select {
+   width: auto;
 }
 
 #klipper_graph_dialog .graph-footer {
@@ -133,8 +146,14 @@ ul#klipper-settings {
 #klipper_graph_dialog .fill-checkbox {
    display: block;
    position: absolute;
-   bottom: 5px;
-   margin-left: 10px;
+   top: 0%;
+   left: 50%;
+}
+
+#klipper_graph_dialog .help-inline {
+   display: block;
+   position: absolute;
+   top: 0px;
 }
 
 #klipper_graph_canvas {
