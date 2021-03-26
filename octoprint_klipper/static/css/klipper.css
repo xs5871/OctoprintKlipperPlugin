@@ -38,19 +38,15 @@
    margin-bottom: 6px;
 }
 
-#level .add-on {
-   padding: 5px;
-}
-
 #level .controls {
    padding: 1px;
 }
 
-ul#klipper-settings { 
+ul#klipper-settings {
    margin: 0;
 }
 
-#klipper-settings a{ 
+#klipper-settings a{
    margin: 5px;
 }
 
@@ -66,8 +62,6 @@ ul#klipper-settings {
 }
 
 #tab_plugin_klipper_main .span8 {
-   min-width: 50%;
-   width: unset;
    flex-grow: 8;
    float: left;
    box-sizing: border-box;
@@ -80,7 +74,7 @@ ul#klipper-settings {
 #tab_plugin_klipper_main .span4 {
    flex-grow: 0;
    flex-shrink: 1;
-   max-width: 13%;
+   /* max-width: 13%; */
    float: left;
    box-sizing: border-box;
 }
@@ -109,15 +103,30 @@ ul#klipper-settings {
 }
 
 #macros #item.control-group {
-   margin-bottom: 5px;
-   border: 1px solid #ddd;
+   margin-bottom: 2px;
+   border: 2px solid #ccc;
    border-radius: 3px;
-   background-color: #eeeeef;
+   background-color: #eeeeee;
    color: #333;
+   padding-bottom: 2px;
+   padding-top: 2px;
+}
+
+#klipper_graph_dialog {
+   width: 1050px;
+}
+
+#klipper_graph_dialog .full-sized-box{
+   width: 1000px;
+   margin: 0 auto;
 }
 
 #klipper_graph_dialog form {
-	margin: 0;
+   margin: 0;
+}
+
+#klipper_graph_dialog select {
+   width: auto;
 }
 
 #klipper_graph_dialog .graph-footer {
@@ -137,8 +146,14 @@ ul#klipper-settings {
 #klipper_graph_dialog .fill-checkbox {
    display: block;
    position: absolute;
-   bottom: 5px;
-   margin-left: 10px;
+   top: 0%;
+   left: 50%;
+}
+
+#klipper_graph_dialog .help-inline {
+   display: block;
+   position: absolute;
+   top: 0px;
 }
 
 #klipper_graph_canvas {

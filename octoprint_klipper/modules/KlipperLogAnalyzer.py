@@ -4,12 +4,12 @@
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
- 
+
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Affero General Public License for more details.
- 
+
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
@@ -27,12 +27,24 @@ class KlipperLogAnalyzer():
    def __init__(self, log_file):
       self.log_file = log_file
 
+   def read_log_file(self, logname):
+      try:
+         f = open(logname, 'r')
+         logdata = f.read()
+         f.close()
+      except IOError:
+         print("Couldn't open log file")
+      return logdata
+
    def analyze(self):
       data = self.parse_log(self.log_file, None)
       if not data:
-         result = dict(error= "No relevant data available in \"{}\"".format(self.log_file))
+         result1 = dict(error= "No relevant data available in \"{}\"".format(self.log_file))
       else:
-         result = self.plot_mcu(data, self.MAXBANDWIDTH)
+         result1 = self.plot_mcu(data, self.MAXBANDWIDTH)
+      result = dict(plot = result1,
+                    logfiledata = self.read_log_file(self.log_file)
+                  )
       return result
 
    def parse_log(self, logname, mcu):
