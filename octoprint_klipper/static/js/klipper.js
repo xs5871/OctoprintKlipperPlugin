@@ -131,30 +131,37 @@ $(function () {
 
         self.onDataUpdaterPluginMessage = function(plugin, data) {
             if(plugin == "klipper") {
-                if ("warningPopUp" == data.type){
-                    self.showPopUp(data.subtype, data.title, data.payload);
-                    return;
+                switch(data.type) {
+                    case "PopUp":
+                        self.showPopUp(data.subtype, data.title, data.payload);
+                        break;
+                    case "reload":
+                        break;
+                    case "console":
+                        self.consoleMessage(data.subtype, data.payload);
+                        break;
+                    case "status":
+                        self.shortStatus(data.payload);
+                        break;
+                    default:
+                        self.logMessage(data.time, data.subtype, data.payload);
                 }
 
-                if ("errorPopUp" == data.type){
-                    self.showPopUp(data.subtype, data.title, data.payload);
-                    return;
-                }
-
-                if ("console" == data.type) {
-                    self.consoleMessage(data.subtype, data.payload);
-                    return;
-                }
-
-                if ("reload" == data.type){
-                    return;
-                }
-
-                if(data.type == "status") {
-                    self.shortStatus(data.payload);
-                } else {
-                    self.logMessage(data.time, data.subtype, data.payload);
-                }
+                //if ("warningPopUp" == data.type){
+                //    self.showPopUp(data.subtype, data.title, data.payload);
+                //    return;
+                //} else if ("errorPopUp" == data.type){
+                //    self.showPopUp(data.subtype, data.title, data.payload);
+                //    return;
+                //} else if ("reload" == data.type){
+                //    return;
+                //} else if ("console" == data.type) {
+                //    self.consoleMessage(data.subtype, data.payload);
+                //} else if (data.type == "status") {
+                //    self.shortStatus(data.payload);
+                //} else {
+                //        self.logMessage(data.time, data.subtype, data.payload);
+                //}
             }
         };
 
@@ -164,6 +171,19 @@ $(function () {
                 type: type,
                 msg: message.replace(/\n/gi, "<br>")
             });
+        };
+
+        self.consoleMessage = function (type, message) {
+            if (type == "info"){
+                console.info("OctoKlipper : " + message);
+            } else if (type == "debug"){
+                if (console_debug){
+                    console.debug("OctoKlipper : " + message);
+                }
+            } else {
+                console.error("OctoKlipper : " + message);
+            }
+            return
         };
 
         self.reloadConfig = function() {
@@ -182,19 +202,6 @@ $(function () {
                     "debug",
                     "Reloaded from Backend " + response);
             });
-        }
-
-        self.consoleMessage = function (type, message) {
-            if (type == "info"){
-                console.info("OctoKlipper : " + message);
-            } else {
-                if (console_debug){
-                    console.debug("OctoKlipper : " + message);
-                } else {
-                    return
-                }
-            }
-            return
         }
 
         self.onClearLog = function () {
@@ -230,17 +237,17 @@ $(function () {
     OCTOPRINT_VIEWMODELS.push({
         construct: KlipperViewModel,
         dependencies: [
-            "settingsViewModel",
-            "loginStateViewModel",
-            "connectionViewModel",
-            "klipperLevelingViewModel",
-            "klipperMacroDialogViewModel",
-            "accessViewModel"
-        ],
-        elements: [
-            "#tab_plugin_klipper_main",
-            "#sidebar_plugin_klipper",
-            "#navbar_plugin_klipper"
-        ]
+                        "settingsViewModel",
+                        "loginStateViewModel",
+                        "connectionViewModel",
+                        "klipperLevelingViewModel",
+                        "klipperMacroDialogViewModel",
+                        "accessViewModel"
+                    ],
+        elements:  [
+                        "#tab_plugin_klipper_main",
+                        "#sidebar_plugin_klipper",
+                        "#navbar_plugin_klipper"
+                    ]
     });
 });
