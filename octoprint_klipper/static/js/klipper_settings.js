@@ -29,6 +29,25 @@ $(function() {
 
         self.apiUrl = OctoPrint.getSimpleApiUrl("klipper");
 
+        self.onSettingsBeforeSave = function () {
+            if (editor.session) {
+                //console.debug("OctoKlipper : onSettingsBeforeSave:" + editor.session.getValue())
+                var settings = {
+                    "crossDomain": true,
+                    "url": self.apiUrl,
+                    "method": "POST",
+                    "headers": self.header,
+                    "processData": false,
+                    "dataType": "json",
+                    "data": JSON.stringify({command: "checkConfig",
+                                            config: editor.session.getValue()})
+                }
+
+                $.ajax(settings).done(function (response) {
+                });
+            }
+        }
+
         self.addMacro = function() {
             self.settings.settings.plugins.klipper.macros.push({
                 name: 'Macro',
@@ -84,6 +103,35 @@ $(function() {
             if (i > 0) {
                 var rawList = list();
                 list.splice(i-1, 2, rawList[i], rawList[i-1]);
+            }
+        }
+
+        self.loadLastSession = function () {
+            if (self.settings.settings.plugins.klipper.configuration.old_config() != "") {
+                console.debug("OctoKlipper : lastSession:" + self.settings.settings.plugins.klipper.configuration.old_config())
+                if (editor.session) {
+                    editor.session.setValue(self.settings.settings.plugins.klipper.configuration.old_config());
+                    editor.clearSelection();
+                }
+            }
+        }
+
+        self.reloadFromFile = function () {
+            if (editor.session) {
+                var settings = {
+                    "crossDomain": true,
+                    "url": self.apiUrl,
+                    "method": "POST",
+                    "headers": self.header,
+                    "processData": false,
+                    "dataType": "json",
+                    "data": JSON.stringify({command: "reloadConfig"})
+                }
+
+                $.ajax(settings).done(function (response) {
+                    editor.session.setValue(response["data"]);
+                    editor.clearSelection();
+                });
             }
         }
 

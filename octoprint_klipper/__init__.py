@@ -41,9 +41,25 @@ class KlipperPlugin(
         octoprint.plugin.EventHandlerPlugin):
 
     _parsing_response = False
+    _parsing_check_response = False
     _message = ""
 
+    def __init__(self):
+        self._logger = logging.getLogger("octoprint.plugins.klipper")
+        self._octoklipper_logger = logging.getLogger("octoprint.plugins.klipper.debug")
+
     # -- Startup Plugin
+    def on_startup(self, host, port):
+        from octoprint.logging.handlers import CleaningTimedRotatingFileHandler
+        octoklipper_logging_handler = CleaningTimedRotatingFileHandler(
+            self._settings.get_plugin_logfile_path(postfix="debug"), when="D", backupCount=3)
+        octoklipper_logging_handler.setFormatter(logging.Formatter("[%(asctime)s] %(levelname)s: %(message)s"))
+        octoklipper_logging_handler.setLevel(logging.DEBUG)
+
+        self._octoklipper_logger.addHandler(octoklipper_logging_handler)
+        self._octoklipper_logger.setLevel(
+            logging.DEBUG if self._settings.get_boolean(["debug_logging"]) else logging.INFO)
+        self._octoklipper_logger.propagate = False
 
     def on_after_startup(self):
         klipper_port = self._settings.get(["connection", "port"])
@@ -55,7 +71,7 @@ class KlipperPlugin(
             self._settings.global_set(
                 ["serial", "additionalPorts"], additional_ports)
             self._settings.save()
-            self._logger.info(
+            self.log_info(
                 "Added klipper serial port {} to list of additional ports.".format(klipper_port))
 
     # -- Settings Plugin
@@ -104,7 +120,9 @@ class KlipperPlugin(
                 )]
             ),
             configuration=dict(
+                debug_logging=False,
                 configpath="~/printer.cfg",
+                old_config="",
                 logpath="/tmp/klippy.log",
                 reload_command="RESTART",
                 navbar=True
@@ -123,7 +141,7 @@ class KlipperPlugin(
             data["config"] = f.read()
             f.close()
         except IOError:
-            self._logger.error(
+            self.log_error(
                 "Error: Klipper config file not found at: {}".format(
                     configpath)
             )
@@ -134,8 +152,7 @@ class KlipperPlugin(
 
     def on_settings_save(self, data):
 
-        self.log_console(
-            "debug",
+        self.log_debug(
             "Save klipper configs"
         )
 
@@ -154,8 +171,7 @@ class KlipperPlugin(
                     configpath = os.path.expanduser(
                         self._settings.get(["configuration", "configpath"])
                     )
-
-                if self.file_exist(configpath) and self.validate_configfile(data["config"]):
+                if self.file_exist(configpath) and self._parsing_check_response:
                     f = open(configpath, "w")
                     f.write(data["config"])
                     f.close()
@@ -163,22 +179,24 @@ class KlipperPlugin(
                     self._printer.commands(self._settings.get(
                         ["configuration", "reload_command"]))
                     self.log_info("Reloading Klipper Configuration.")
-                    self.log_console(
-                        "debug",
-                        ("Writing Klipper config to {}".format(configpath))
-                    )
-
+                    self.log_debug("Writing Klipper config to {}".format(configpath))
             except IOError:
-                self._logger.error(
-                    "Error: Couldn't write Klipper config file: {}".format(
-                        configpath)
-                )
+                self.log_error("Error: Couldn't write Klipper config file: {}".format(configpath))
             else:
                 # we dont want to write the klipper conf to the octoprint settings
                 data.pop("config", None)
 
         # save the rest of changed settings into config.yaml of octoprint
+        old_debug_logging = self._settings.get_boolean(["configuration", "debug_logging"])
+
         octoprint.plugin.SettingsPlugin.on_settings_save(self, data)
+
+        new_debug_logging = self._settings.get_boolean(["configuration", "debug_logging"])
+        if old_debug_logging != new_debug_logging:
+            if new_debug_logging:
+                self._octoklipper_logger.setLevel(logging.DEBUG)
+            else:
+                self._octoklipper_logger.setLevel(logging.INFO)
 
     def get_settings_restricted_paths(self):
         return dict(
@@ -357,7 +375,8 @@ class KlipperPlugin(
         return dict(
             listLogFiles=[],
             getStats=["logFile"],
-            reloadConfig=[]
+            reloadConfig=[],
+            checkConfig=["config"]
         )
 
     def on_api_command(self, command, data):
@@ -395,15 +414,25 @@ class KlipperPlugin(
                 data["config"] = f.read()
                 f.close()
             except IOError:
-                self._logger.error(
+                self.log_error(
                     "Error: Klipper config file not found at: {}".format(
                         configpath)
                 )
             else:
                 self._settings.set(["config"], data["config"])
-                self.send_message("reload", "config", "", data["config"])
+                # self.send_message("reload", "config", "", data["config"])
                 # send the configdata to frontend to update ace editor
-            return
+            return flask.jsonify(data=data["config"])
+        elif command == "checkConfig":
+            if "config" in data:
+                self.log_debug("config in ")
+                if not self.validate_configfile(data["config"]):
+                    self.log_debug("validateConfig ->" + data["config"])
+                    self._settings.set(["configuration", "old_config"], data["config"])
+                    return flask.jsonify(checkConfig="not OK")
+                else:
+                    self._settings.set(["configuration", "old_config"], "")
+                    return flask.jsonify(checkConfig="OK")
 
     def get_update_information(self):
         return dict(
@@ -449,19 +478,24 @@ class KlipperPlugin(
         self.send_message("status", type, status, status)
 
     def log_info(self, message):
+        self._octoklipper_logger.info(message)
         self.send_message("log", "info", message, message)
+        self.send_message("console", "info", message, message)
 
-    def log_console(self, consoletype, message):
+    def log_debug(self, message):
+        self._octoklipper_logger.debug(message)
         # sends a message to frontend(in klipper.js -> self.onDataUpdaterPluginMessage) and write it to the console.
         # _mtype, subtype=debug/info, title of message, message)
-        self.send_message("console", consoletype, message, message)
+        self.send_message("console", "debug", message, message)
 
     def log_error(self, error):
+        self._octoklipper_logger.error(error)
         self.send_message("log", "error", error, error)
+        self.send_message("console", "error", error, error)
 
     def file_exist(self, filepath):
         if not os.path.isfile(filepath):
-            self.send_message("errorPopUp", "warning", "OctoKlipper Settings",
+            self.send_message("PopUp", "warning", "OctoKlipper Settings",
                               "Klipper " + filepath + " does not exist!")
             return False
         else:
@@ -498,15 +532,22 @@ class KlipperPlugin(
         try:
             dataToValidated = configparser.RawConfigParser()
             dataToValidated.read_string(dataToBeValidated)
-        except dataToValidated.Error as error:
-            self._logger.error(
-                "Error: Invalid Klipper config file: {}".format(str(error))
+        except configparser.Error as error:
+            error.message = error.message.replace("\n","")
+            error.source = "Klipper config"
+            self.log_error(
+                "Error: Invalid Klipper config file:\n" +
+                "{}".format(str(error))
             )
-            self.send_message("errorPopUp", "warning", "OctoKlipper Settings",
-                              "Invalid Klipper config file: " + str(error))
-            return "False"
+            self.send_message("PopUp", "warning", "Invalid Config",
+                            "Config got not saved!\n" +
+                            "You can reload your last changes\n" +
+                            "on the file editor tab.\n\n" + str(error))
+            self._parsing_check_response = False
+            return
         else:
-            return "True"
+            self._parsing_check_response = True
+            return
 
         #incorrectlines = []
         # for section in dataToValidated.sections():

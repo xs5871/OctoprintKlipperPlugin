@@ -197,8 +197,14 @@
     <script src="plugin/klipper/static/js/lib/ace/ace.min.js" type="text/javascript" charset="utf-8"></script>
     <script src="plugin/klipper/static/js/lib/ace/theme-monokai.min.js" type="text/javascript" charset="utf-8"></script>
     <script src="plugin/klipper/static/js/lib/ace/mode-klipper_config.js" type="text/javascript"></script>
+    <button class="btn btn-small" data-bind='click: loadLastSession'
+            title="Reloads the last changes">
+            <i class="fas fa-redo"></i> {{ _('Reload last changes') }}
+    </button><button class="btn btn-small" data-bind='click: reloadFromFile'>
+            <i class="fas fa-upload"></i></a> {{ _('Reload from file') }}
+    </button>
     <!--
-    <a href='#' data-bind='click: onReloadConfig'><i class="icon-refresh"></i></a> {{ _('Reload Configfile') }}
+    <a href='#' data-bind='click: loadLastSession'><i class="fas fa-redo"></i></a> {{ _('Reload last changes') }}<a href='#' data-bind='click: loadLastSession'><i class="fas fa-upload"></i></a> {{ _('Reload from file') }}
     -->
     <input id="hdnLoadKlipperConfig" type="hidden" data-bind="value: configBound(settings.settings.plugins.klipper.config)" />
     <div id="plugin-klipper-config"></div>

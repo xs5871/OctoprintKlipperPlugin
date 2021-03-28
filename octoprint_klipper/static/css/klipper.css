@@ -102,6 +102,12 @@ ul#klipper-settings {
    height: 99%;
 }
 
+div#settings_plugin_klipper form div.tab-content #confdiv.tap-pane div.control-group button {
+   width: 30%;
+   display: inline-block;
+   margin: 2px;
+}
+
 #macros #item.control-group {
    margin-bottom: 2px;
    border: 2px solid #ccc;
