@@ -203,11 +203,10 @@
     </button><button class="btn btn-small" data-bind='click: reloadFromFile'>
             <i class="fas fa-upload"></i></a> {{ _('Reload from file') }}
     </button>
-    <!--
-    <a href='#' data-bind='click: loadLastSession'><i class="fas fa-redo"></i></a> {{ _('Reload last changes') }}<a href='#' data-bind='click: loadLastSession'><i class="fas fa-upload"></i></a> {{ _('Reload from file') }}
-    -->
-    <input id="hdnLoadKlipperConfig" type="hidden" data-bind="value: configBound(settings.settings.plugins.klipper.config)" />
-    <div id="plugin-klipper-config"></div>
+      <div class="conf-editor">
+         <input id="hdnLoadKlipperConfig" type="hidden" data-bind="value: configBound(settings.settings.plugins.klipper.config)" />
+         <div id="plugin-klipper-config"></div>
+      </div>
    </div>
   </div>
 </div>

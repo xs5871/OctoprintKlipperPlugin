@@ -94,18 +94,23 @@ ul#klipper-settings {
 }
 
 #settings_plugin_klipper form .tab-content .tab-pane {
-   height: 100%;
+   height: calc(100% - 35px);
 }
 
 #settings_plugin_klipper form .tab-content .tap-pane#conf .control-group {
    margin-bottom: 0px;
-   height: 99%;
+   height: 100%;
 }
 
-div#settings_plugin_klipper form div.tab-content #confdiv.tap-pane div.control-group button {
+div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content div#conf.tab-pane.active div.control-group div.conf-editor {
+   height: 100%;
+   overflow: auto;
+}
+
+div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content div#conf.tab-pane.active div.control-group button.btn.btn-small {
    width: 30%;
    display: inline-block;
-   margin: 2px;
+   margin: 0px 2px 2px 2px;
 }
 
 #macros #item.control-group {
