@@ -97,7 +97,7 @@ ul#klipper-settings {
    height: calc(100% - 35px);
 }
 
-#settings_plugin_klipper form .tab-content .tap-pane#conf .control-group {
+div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content div#conf.tab-pane.active div.control-group {
    margin-bottom: 0px;
    height: 100%;
 }

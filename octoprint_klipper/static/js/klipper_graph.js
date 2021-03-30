@@ -35,7 +35,6 @@ function KlipperGraphViewModel(parameters) {
    self.canvas;
    self.canvasContext;
    self.chart;
-   self.chart.update;
    self.spinnerDialog;
 
    self.onStartup = function() {
@@ -217,7 +216,9 @@ function KlipperGraphViewModel(parameters) {
          for (i=0; i < self.datasets().length; i++) {
             self.datasets()[i].fill = self.datasetFill();
          }
-         self.chart.update();
+         if (self.chart) {
+            self.chart.update();
+         }
       }
       return true
    }
