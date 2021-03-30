@@ -35,6 +35,7 @@ function KlipperGraphViewModel(parameters) {
    self.canvas;
    self.canvasContext;
    self.chart;
+   self.chart.update;
    self.spinnerDialog;
 
    self.onStartup = function() {
@@ -92,16 +93,6 @@ function KlipperGraphViewModel(parameters) {
       } else {
          self.spinnerDialog.modal("hide");
       }
-   }
-
-   self.toggleDatasetFill = function() {
-      if(self.datasets) {
-         for (i=0; i < self.datasets().length; i++) {
-            self.datasets()[i].fill = self.datasetFill();
-         }
-         self.chart.update();
-      }
-      return true
    }
 
    self.convertTime = function(val) {
@@ -219,6 +210,16 @@ function KlipperGraphViewModel(parameters) {
             });
          }
       });
+   }
+
+   self.toggleDatasetFill = function() {
+      if(self.datasets) {
+         for (i=0; i < self.datasets().length; i++) {
+            self.datasets()[i].fill = self.datasetFill();
+         }
+         self.chart.update();
+      }
+      return true
    }
 }
 
