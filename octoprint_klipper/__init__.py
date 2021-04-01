@@ -425,7 +425,6 @@ class KlipperPlugin(
             return flask.jsonify(data=data["config"])
         elif command == "checkConfig":
             if "config" in data:
-                self.log_debug("config in ")
                 if not self.validate_configfile(data["config"]):
                     self.log_debug("validateConfig ->" + data["config"])
                     self._settings.set(["configuration", "old_config"], data["config"])
@@ -533,7 +532,9 @@ class KlipperPlugin(
             dataToValidated = configparser.RawConfigParser()
             dataToValidated.read_string(dataToBeValidated)
         except configparser.Error as error:
-            error.message = error.message.replace("\n","")
+            error.message = error.message.replace("\\n","")
+            error.message = error.message.replace("file:","Klipper Configuration", 1)
+            error.message = error.message.replace("'","", 2)
             error.source = "Klipper config"
             self.log_error(
                 "Error: Invalid Klipper config file:\n" +
@@ -542,7 +543,7 @@ class KlipperPlugin(
             self.send_message("PopUp", "warning", "Invalid Config",
                             "Config got not saved!\n" +
                             "You can reload your last changes\n" +
-                            "on the file editor tab.\n\n" + str(error))
+                            "on the 'Klipper Configuration' tab.\n\n" + str(error))
             self._parsing_check_response = False
             return
         else:
