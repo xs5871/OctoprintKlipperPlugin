@@ -4,12 +4,12 @@
 // it under the terms of the GNU Affero General Public License as
 // published by the Free Software Foundation, either version 3 of the
 // License, or (at your option) any later version.
- 
+
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Affero General Public License for more details.
- 
+
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
@@ -18,16 +18,17 @@ $(function() {
 function KlipperGraphViewModel(parameters) {
    var self = this;
    self.loginState = parameters[0];
-   
+
    self.header = OctoPrint.getRequestHeaders({
       "content-type": "application/json",
       "cache-control": "no-cache"
    });
-   
+
    self.apiUrl = OctoPrint.getSimpleApiUrl("klipper");
-   
+
    self.availableLogFiles = ko.observableArray();
    self.logFile = ko.observable();
+   self.klippylogFile = ko.observable();
    self.status = ko.observable();
    self.datasets = ko.observableArray();
    self.datasetFill = ko.observable(false);
@@ -40,24 +41,24 @@ function KlipperGraphViewModel(parameters) {
       self.canvas = $("#klipper_graph_canvas")[0]
       self.canvasContext = self.canvas.getContext("2d");
       self.spinnerDialog = $("#klipper_graph_spinner");
-      
+
       Chart.defaults.global.elements.line.borderWidth=1;
       Chart.defaults.global.elements.line.fill= false;
       Chart.defaults.global.elements.point.radius= 0;
-      
+
       var myChart = new Chart(self.canvas, {
          type: "line"
       });
-      
+
       if(self.loginState.loggedIn()) {
          self.listLogFiles();
       }
    }
-   
+
    self.onUserLoggedIn = function(user) {
       self.listLogFiles();
    }
-   
+
    self.listLogFiles = function() {
       var settings = {
         "crossDomain": true,
@@ -68,45 +69,35 @@ function KlipperGraphViewModel(parameters) {
         "dataType": "json",
         "data": JSON.stringify({command: "listLogFiles"})
       }
-      
+
       $.ajax(settings).done(function (response) {
          self.availableLogFiles.removeAll();
          self.availableLogFiles(response["data"]);
       });
    }
-   
+
    self.saveGraphToPng = function() {
       button =  $('#download-btn');
       var dataURL = self.canvas.toDataURL("image/png");//.replace("image/png", "image/octet-stream");
       button.attr("href", dataURL);
    }
-   
+
    self.showSpinner = function(showDialog) {
       if (showDialog) {
          self.spinnerDialog.modal({
             show: true,
             keyboard: false,
-            backdrop: "static" 
+            backdrop: "static"
          });
       } else {
          self.spinnerDialog.modal("hide");
       }
    }
-   
-   self.toggleDatasetFill = function() {
-      if(self.datasets) {
-         for (i=0; i < self.datasets().length; i++) {
-            self.datasets()[i].fill = self.datasetFill();
-         }
-         self.chart.update();
-      }
-      return true
-   }
-   
+
    self.convertTime = function(val) {
       return moment(val, "X");
    }
-   
+
    self.loadData = function() {
       var settings = {
         "crossDomain": true,
@@ -122,17 +113,18 @@ function KlipperGraphViewModel(parameters) {
            }
         )
       }
-      
+
       self.showSpinner(true);
-      
+
       $.ajax(settings).done(function (response) {
          self.status("")
          self.datasetFill(false);
-         
+
          self.showSpinner(false);
-         
-         if("error" in response) {
-            self.status(response.error);
+         self.klippylogFile(response.logfiledata);
+
+         if("error" in response.plot) {
+            self.status(response.plot.error);
          } else {
             self.datasets.removeAll();
             self.datasets.push(
@@ -141,40 +133,40 @@ function KlipperGraphViewModel(parameters) {
                backgroundColor: "rgba(199, 44, 59, 0.5)",
                borderColor: "rgb(199, 44, 59)",
                yAxisID: 'y-axis-1',
-               data: response.loads
+               data: response.plot.loads
             });
-            
+
             self.datasets.push(
             {
                label: "Bandwith",
                backgroundColor: "rgba(255, 130, 1, 0.5)",
                borderColor: "rgb(255, 130, 1)",
                yAxisID: 'y-axis-1',
-               data: response.bwdeltas
+               data: response.plot.bwdeltas
             });
-            
+
             self.datasets.push(
             {
                label: "Host Buffer",
                backgroundColor: "rgba(0, 145, 106, 0.5)",
                borderColor: "rgb(0, 145, 106)",
                yAxisID: 'y-axis-1',
-               data: response.buffers
+               data: response.plot.buffers
             });
-            
+
             self.datasets.push(
             {
                label: "Awake Time",
                backgroundColor: "rgba(33, 64, 95, 0.5)",
                borderColor: "rgb(33, 64, 95)",
                yAxisID: 'y-axis-1',
-               data: response.awake
+               data: response.plot.awake
             });
-            
+
             self.chart = new Chart(self.canvas, {
                type: "line",
                data: {
-                  labels: response.times,
+                  labels: response.plot.times,
                   datasets: self.datasets()
                },
                options: {
@@ -211,12 +203,24 @@ function KlipperGraphViewModel(parameters) {
                      ]
                   },
                   legend: {
-                     
+
                   }
                }
             });
          }
       });
+   }
+
+   self.toggleDatasetFill = function() {
+      if(self.datasets) {
+         for (i=0; i < self.datasets().length; i++) {
+            self.datasets()[i].fill = self.datasetFill();
+         }
+         if (self.chart) {
+            self.chart.update();
+         }
+      }
+      return true
    }
 }
 

@@ -3,6 +3,7 @@
    overflow-y: scroll;
    height: 400px;
    border: 1px solid #eee;
+   width: 100%;
 }
 
 .plugin-klipper-log .log-item {
@@ -34,14 +35,109 @@
 
 .clear-btn {
    margin-top: 6px;
+   margin-bottom: 6px;
+}
+
+#level .controls {
+   padding: 1px;
+}
+
+ul#klipper-settings {
+   margin: 0;
+}
+
+#klipper-settings a{
+   margin: 5px;
 }
 
 #plugin-klipper-config {
+   height: 100%;
    font-family: monospace;
 }
 
+#tab_plugin_klipper_main .row-fluid {
+   display: flex;
+   flex-direction: row;
+   flex-wrap: wrap;
+}
+
+#tab_plugin_klipper_main .span8 {
+   flex-grow: 8;
+   float: left;
+   box-sizing: border-box;
+}
+
+#tab_plugin_klipper_main .span8 label {
+   float: left;
+}
+
+#tab_plugin_klipper_main .span4 {
+   flex-grow: 0;
+   flex-shrink: 1;
+   /* max-width: 13%; */
+   float: left;
+   box-sizing: border-box;
+}
+
+#settings_plugin_klipper {
+   height: 100%;
+}
+
+#settings_plugin_klipper form {
+   margin: 0px;
+   height: 100%;
+}
+
+#settings_plugin_klipper form .tab-content {
+   height: calc(100% - 40px);
+   overflow: auto;
+}
+
+#settings_plugin_klipper form .tab-content .tab-pane {
+   height: calc(100% - 35px);
+}
+
+div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content div#conf.tab-pane.active div.control-group {
+   margin-bottom: 0px;
+   height: 100%;
+}
+
+div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content div#conf.tab-pane.active div.control-group div.conf-editor {
+   height: 100%;
+   overflow: auto;
+}
+
+div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content div#conf.tab-pane.active div.control-group button.btn.btn-small {
+   width: 30%;
+   display: inline-block;
+   margin: 0px 2px 2px 2px;
+}
+
+#macros #item.control-group {
+   margin-bottom: 2px;
+   border: 2px solid #ccc;
+   border-radius: 3px;
+   background-color: #eeeeee;
+   color: #333;
+   padding-bottom: 2px;
+   padding-top: 2px;
+}
+
+#klipper_graph_dialog {
+   width: 1050px;
+}
+
+#klipper_graph_dialog .full-sized-box{
+   width: 1000px;
+   margin: 0 auto;
+}
+
 #klipper_graph_dialog form {
-	margin: 0;
+   margin: 0;
+}
+
+#klipper_graph_dialog select {
+   width: auto;
 }
 
 #klipper_graph_dialog .graph-footer {
@@ -61,8 +157,14 @@
 #klipper_graph_dialog .fill-checkbox {
    display: block;
    position: absolute;
-   bottom: 5px;
-   margin-left: 10px;
+   top: 0%;
+   left: 50%;
+}
+
+#klipper_graph_dialog .help-inline {
+   display: block;
+   position: absolute;
+   top: 0px;
 }
 
 #klipper_graph_canvas {
