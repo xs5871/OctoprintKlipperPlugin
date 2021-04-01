@@ -33,7 +33,7 @@ $(function () {
 
     self.setOffset = function () {
       if (self.adjust()) {
-        self.klipperViewModel.logMessage("","info", "SET_GCODE_OFFSET X_ADJUST=" +
+        self.klipperViewModel.logMessage("","info", "SET_GCODE_OFFSET\n X_ADJUST=" +
         self.offsetX() +
         " Y_ADJUST=" +
         self.offsetY() +
@@ -48,7 +48,7 @@ $(function () {
             self.offsetZ()
         );
       } else {
-        self.klipperViewModel.logMessage("","info", "SET_GCODE_OFFSET X=" +
+        self.klipperViewModel.logMessage("","info", "SET_GCODE_OFFSET\n X=" +
         self.offsetX() +
         " Y=" +
         self.offsetY() +
