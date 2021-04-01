@@ -165,7 +165,11 @@ $(function () {
             }
         };
 
-        self.logMessage = function (timestamp, type, message) {
+        self.logMessage = function (timestamp, type="info", message) {
+            if (!timestamp) {
+                var today = new Date();
+                var timestamp = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+            }
             self.logMessages.push({
                 time: timestamp,
                 type: type,
