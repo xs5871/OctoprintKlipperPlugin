@@ -175,10 +175,19 @@ class KlipperPlugin(
                     f = open(configpath, "w")
                     f.write(data["config"])
                     f.close()
-                    # Restart klippy to reload config
-                    self._printer.commands(self._settings.get(
-                        ["configuration", "reload_command"]))
-                    self.log_info("Reloading Klipper Configuration.")
+                    #load the reload command from changed data if it is not existing load the saved setting
+                    if self.key_exist(data, "configuration", "reload_command"):
+                        reload_command = os.path.expanduser(
+                            data["configuration"]["reload_command"]
+                        )
+                    else:
+                        reload_command = self._settings.get(["configuration", "reload_command"])
+
+                    if reload_command != "manually":
+                        # Restart klippy to reload config
+                        self._printer.commands(reload_command)
+                        self.log_info("Reloading Klipper Configuration.")
+
                     self.log_debug("Writing Klipper config to {}".format(configpath))
             except IOError:
                 self.log_error("Error: Couldn't write Klipper config file: {}".format(configpath))

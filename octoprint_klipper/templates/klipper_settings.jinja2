@@ -50,9 +50,11 @@
            <select data-bind="value: settings.settings.plugins.klipper.configuration.reload_command">
               <option value="RESTART">RESTART</option>
               <option value="FIRMWARE_RESTART">FIRMWARE_RESTART</option>
+              <option value="manually">Manually</option>
            </select>
            <span class="help-block">
-              The command that is executed when the Klipper configuration changed and needs to be reloaded.
+              The command that is executed when the Klipper configuration changed and needs to be reloaded.<br>
+              Set this to "Manually" if you don't want to immediately restart klipper.
            </span>
         </div>
     </div>
