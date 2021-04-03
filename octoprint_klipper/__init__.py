@@ -32,6 +32,9 @@ try:
 except ImportError:
     import ConfigParser as configparser
 
+if sys.version_info[0] < 3:
+    import StringIO
+
 class KlipperPlugin(
         octoprint.plugin.StartupPlugin,
         octoprint.plugin.TemplatePlugin,
@@ -175,10 +178,19 @@ class KlipperPlugin(
                     f = open(configpath, "w")
                     f.write(data["config"])
                     f.close()
-                    # Restart klippy to reload config
-                    self._printer.commands(self._settings.get(
-                        ["configuration", "reload_command"]))
-                    self.log_info("Reloading Klipper Configuration.")
+                    #load the reload command from changed data if it is not existing load the saved setting
+                    if self.key_exist(data, "configuration", "reload_command"):
+                        reload_command = os.path.expanduser(
+                            data["configuration"]["reload_command"]
+                        )
+                    else:
+                        reload_command = self._settings.get(["configuration", "reload_command"])
+
+                    if reload_command != "manually":
+                        # Restart klippy to reload config
+                        self._printer.commands(reload_command)
+                        self.log_info("Reloading Klipper Configuration.")
+
                     self.log_debug("Writing Klipper config to {}".format(configpath))
             except IOError:
                 self.log_error("Error: Couldn't write Klipper config file: {}".format(configpath))
@@ -419,9 +431,12 @@ class KlipperPlugin(
                         configpath)
                 )
             else:
+
                 self._settings.set(["config"], data["config"])
                 # self.send_message("reload", "config", "", data["config"])
                 # send the configdata to frontend to update ace editor
+            if sys.version_info[0] < 3:
+                data["config"] = data["config"].decode('utf-8')
             return flask.jsonify(data=data["config"])
         elif command == "checkConfig":
             if "config" in data:
@@ -530,12 +545,23 @@ class KlipperPlugin(
 
         try:
             dataToValidated = configparser.RawConfigParser()
-            dataToValidated.read_string(dataToBeValidated)
+            #
+            if sys.version_info[0] < 3:
+                buf = StringIO.StringIO(dataToBeValidated)
+                dataToValidated.readfp(buf)
+            else:
+                dataToValidated.read_string(dataToBeValidated)
         except configparser.Error as error:
-            error.message = error.message.replace("\\n","")
-            error.message = error.message.replace("file:","Klipper Configuration", 1)
-            error.message = error.message.replace("'","", 2)
-            error.source = "Klipper config"
+            if sys.version_info[0] < 3:
+                error.message = error.message.replace("\\n","")
+                error.message = error.message.replace("file: u","Klipper Configuration", 1)
+                error.message = error.message.replace("'","", 2)
+                error.message = error.message.replace("u'","'", 1)
+
+            else:
+                error.message = error.message.replace("\\n","")
+                error.message = error.message.replace("file:","Klipper Configuration", 1)
+                error.message = error.message.replace("'","", 2)
             self.log_error(
                 "Error: Invalid Klipper config file:\n" +
                 "{}".format(str(error))

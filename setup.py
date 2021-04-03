@@ -19,7 +19,7 @@ plugin_package = "octoprint_klipper"
 
 plugin_name = "OctoKlipper"
 
-plugin_version = "0.3.5"
+plugin_version = "0.3.7"
 
 plugin_description = """A plugin for OctoPrint to configure,control and monitor the Klipper 3D printer software."""
 
