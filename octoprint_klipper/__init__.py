@@ -553,7 +553,6 @@ class KlipperPlugin(
                 dataToValidated.read_string(dataToBeValidated)
         except configparser.DuplicateSectionError:
             self._parsing_check_response = True
-            pass
         except configparser.Error as error:
             if sys.version_info[0] < 3:
                 error.message = error.message.replace("\\n","")
@@ -574,6 +573,8 @@ class KlipperPlugin(
                             "You can reload your last changes\n" +
                             "on the 'Klipper Configuration' tab.\n\n" + str(error))
             self._parsing_check_response = False
+        else:
+            self._parsing_check_response = True
         return
 
         #incorrectlines = []
