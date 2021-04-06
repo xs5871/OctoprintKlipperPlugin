@@ -16,7 +16,6 @@
 $(function () {
     function KlipperViewModel(parameters) {
         var self = this;
-        var console_debug = false;
 
         self.header = OctoPrint.getRequestHeaders({
             "content-type": "application/json",
@@ -145,6 +144,7 @@ $(function () {
                         break;
                     default:
                         self.logMessage(data.time, data.subtype, data.payload);
+                        self.consoleMessage(data.subtype, data.payload);
                 }
 
                 //if ("warningPopUp" == data.type){
@@ -178,14 +178,14 @@ $(function () {
         };
 
         self.consoleMessage = function (type, message) {
-            if (type == "info"){
-                console.info("OctoKlipper : " + message);
-            } else if (type == "debug"){
-                if (console_debug){
-                    console.debug("OctoKlipper : " + message);
+            if (self.settings.settings.plugins.klipper.configuration.debug_logging() === true) {
+                if (type == "info"){
+                    console.info("OctoKlipper : " + message);
+                } else if (type == "debug"){
+                        console.debug("OctoKlipper : " + message);
+                } else {
+                    console.error("OctoKlipper : " + message);
                 }
-            } else {
-                console.error("OctoKlipper : " + message);
             }
             return
         };
@@ -204,7 +204,7 @@ $(function () {
             $.ajax(settings).done(function (response) {
                 self.consoleMessage(
                     "debug",
-                    "Reloaded from Backend " + response);
+                    "Reloaded config file from Backend");
             });
         }
 

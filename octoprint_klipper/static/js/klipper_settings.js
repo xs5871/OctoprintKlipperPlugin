@@ -21,6 +21,7 @@ $(function() {
         var editor = null;
 
         self.settings = parameters[0];
+        self.klipperViewModel = parameters[1];
 
         self.header = OctoPrint.getRequestHeaders({
             "content-type": "application/json",
@@ -30,8 +31,8 @@ $(function() {
         self.apiUrl = OctoPrint.getSimpleApiUrl("klipper");
 
         self.onSettingsBeforeSave = function () {
-            if (editor.session) {
-                //console.debug("OctoKlipper : onSettingsBeforeSave:" + editor.session.getValue())
+            if (editor.session && self.settings.settings.plugins.klipper.configuration.parse_check() === true) {
+                self.klipperViewModel.consoleMessage("debug", "onSettingsBeforeSave:")
                 var settings = {
                     "crossDomain": true,
                     "url": self.apiUrl,
@@ -108,7 +109,7 @@ $(function() {
 
         self.loadLastSession = function () {
             if (self.settings.settings.plugins.klipper.configuration.old_config() != "") {
-                console.debug("OctoKlipper : lastSession:" + self.settings.settings.plugins.klipper.configuration.old_config())
+                self.klipperViewModel.consoleMessage("info","lastSession:" + self.settings.settings.plugins.klipper.configuration.old_config())
                 if (editor.session) {
                     editor.session.setValue(self.settings.settings.plugins.klipper.configuration.old_config());
                     editor.clearSelection();
@@ -194,7 +195,10 @@ $(function() {
 
     OCTOPRINT_VIEWMODELS.push({
         construct: KlipperSettingsViewModel,
-        dependencies: ["settingsViewModel"],
+        dependencies: [
+                "settingsViewModel",
+                "klipperViewModel"
+                ],
         elements: ["#settings_plugin_klipper"]
     });
 });

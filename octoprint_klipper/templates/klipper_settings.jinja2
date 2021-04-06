@@ -153,19 +153,19 @@
     <div class="control-group">
       <label class="control-label">{{ _('Probe Feedrate Z') }}</label>
       <div class="controls">
-         <div class="input-append">
-           <input type="text" class="input-block-level span3" data-bind="value: settings.settings.plugins.klipper.probe.speed_z">
-           <span class="add-on">mm/min</span>
-         </div>
+        <div class="input-append">
+          <input type="text" class="input-block-level span3" data-bind="value: settings.settings.plugins.klipper.probe.speed_z">
+          <span class="add-on">mm/min</span>
+        </div>
       </div>
     </div>
     <div class="control-group">
       <label class="control-label">{{ _('Feedrate X/Y') }}</label>
       <div class="controls">
-         <div class="input-append">
-           <input type="text" class="input-block-level span3" data-bind="value: settings.settings.plugins.klipper.probe.speed_xy">
-           <span class="add-on">mm/min</span>
-         </div>
+        <div class="input-append">
+          <input type="text" class="input-block-level span3" data-bind="value: settings.settings.plugins.klipper.probe.speed_xy">
+          <span class="add-on">mm/min</span>
+        </div>
       </div>
     </div>
     <div class="control-group">
@@ -180,43 +180,45 @@
       </div>
     </div>
     <div data-bind="foreach: settings.settings.plugins.klipper.probe.points" class="control-group">
-       <label class="control-label" data-bind="text: $index"></label>
-       <div class="controls">
-           <div class="row-fluid">
-              <div class="span3"><input type="text" class="input-block-level" data-bind="value: name"></div>
-              <div class="span3"><input type="text" class="input-block-level" data-bind="value: x"></div>
-              <div class="span3"><input type="text" class="input-block-level" data-bind="value: y"></div>
-              <div class="span3">
-                 <a href='#' data-bind='click: $parent.moveProbePointUp' class="fa fa-chevron-up"></a>
-                 <a href='#' data-bind='click: $parent.moveProbePointDown' class="fa fa-chevron-down"></a>
-                 <a href='#' data-bind='click: $parent.removeProbePoint' class="fa fa-trash-o"></a>
-              </div>
-           </div>
+      <label class="control-label" data-bind="text: $index"></label>
+      <div class="controls">
+        <div class="row-fluid">
+          <div class="span3"><input type="text" class="input-block-level" data-bind="value: name"></div>
+          <div class="span3"><input type="text" class="input-block-level" data-bind="value: x"></div>
+          <div class="span3"><input type="text" class="input-block-level" data-bind="value: y"></div>
+          <div class="span3">
+            <a href='#' data-bind='click: $parent.moveProbePointUp' class="fa fa-chevron-up"></a>
+            <a href='#' data-bind='click: $parent.moveProbePointDown' class="fa fa-chevron-down"></a>
+            <a href='#' data-bind='click: $parent.removeProbePoint' class="fa fa-trash-o"></a>
+          </div>
+        </div>
       </div>
-   </div>
-   <div class="control-group">
-     <div class="controls">
-       <a href='#' data-bind='click: addProbePoint' class="fa fa-plus-circle"></a> {{ _('Add Point') }}
-     </div>
-   </div>
+    </div>
+    <div class="control-group">
+      <div class="controls">
+        <a href='#' data-bind='click: addProbePoint' class="fa fa-plus-circle"></a> {{ _('Add Point') }}
+      </div>
+    </div>
   </div>
   <!-- Klipper Conf -->
   <div class="tab-pane" id="conf">
-   <div class="control-group">
-    <script src="plugin/klipper/static/js/lib/ace/ace.min.js" type="text/javascript" charset="utf-8"></script>
-    <script src="plugin/klipper/static/js/lib/ace/theme-monokai.min.js" type="text/javascript" charset="utf-8"></script>
-    <script src="plugin/klipper/static/js/lib/ace/mode-klipper_config.js" type="text/javascript"></script>
-    <button class="btn btn-small" data-bind='click: loadLastSession'
-            title="Reloads the last changes">
-            <i class="fas fa-redo"></i> {{ _('Reload last changes') }}
-    </button><button class="btn btn-small" data-bind='click: reloadFromFile'>
-            <i class="fas fa-upload"></i></a> {{ _('Reload from file') }}
-    </button>
+    <div class="control-group">
+      <script src="plugin/klipper/static/js/lib/ace/ace.min.js" type="text/javascript" charset="utf-8"></script>
+      <script src="plugin/klipper/static/js/lib/ace/theme-monokai.min.js" type="text/javascript" charset="utf-8"></script>
+      <script src="plugin/klipper/static/js/lib/ace/mode-klipper_config.js" type="text/javascript"></script>
+      <button class="btn btn-small" data-bind='click: loadLastSession'
+         title="Reloads the last changes">
+         <i class="fas fa-redo"></i> {{ _('Reload last changes') }}
+      </button>
+      <button class="btn btn-small" data-bind='click: reloadFromFile'>
+         <i class="fas fa-upload"></i></a> {{ _('Reload from file') }}
+      </button>
+      <label class="inline"><input class="inline-checkbox" type="checkbox" data-bind="checked: settings.settings.plugins.klipper.configuration.parse_check"> {{ _('Check parsing on save') }}</label>
       <div class="conf-editor">
-         <input id="hdnLoadKlipperConfig" type="hidden" data-bind="value: configBound(settings.settings.plugins.klipper.config)" />
-         <div id="plugin-klipper-config"></div>
+        <input id="hdnLoadKlipperConfig" type="hidden" data-bind="value: configBound(settings.settings.plugins.klipper.config)" />
+        <div id="plugin-klipper-config"></div>
       </div>
-   </div>
+    </div>
   </div>
 </div>
 </form>
