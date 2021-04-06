@@ -32,6 +32,9 @@ try:
 except ImportError:
     import ConfigParser as configparser
 
+if sys.version_info[0] < 3:
+    import StringIO
+
 class KlipperPlugin(
         octoprint.plugin.StartupPlugin,
         octoprint.plugin.TemplatePlugin,
@@ -41,7 +44,7 @@ class KlipperPlugin(
         octoprint.plugin.EventHandlerPlugin):
 
     _parsing_response = False
-    _parsing_check_response = False
+    _parsing_check_response = True
     _message = ""
 
     def __init__(self):
@@ -125,7 +128,8 @@ class KlipperPlugin(
                 old_config="",
                 logpath="/tmp/klippy.log",
                 reload_command="RESTART",
-                navbar=True
+                navbar=True,
+                parse_check=False
             )
         )
 
@@ -157,34 +161,49 @@ class KlipperPlugin(
         )
 
         if "config" in data:
-            try:
-                if sys.version_info[0] < 3:
-                    data["config"] = data["config"].encode('utf-8')
+            if self.key_exist(data, "configuration", "parse_check"):
+                check_parse = data["configuration"]["parse_check"]
+            else:
+                check_parse = self._settings.get(["configuration", "parse_check"])
 
-                # check for configpath if it was changed during changing of the configfile
-                if self.key_exist(data, "configuration", "configpath"):
-                    configpath = os.path.expanduser(
-                        data["configuration"]["configpath"]
-                    )
-                else:
-                    # if the configpath was not changed during changing the printer.cfg. Then the configpath would not be in data[]
-                    configpath = os.path.expanduser(
-                        self._settings.get(["configuration", "configpath"])
-                    )
-                if self.file_exist(configpath) and self._parsing_check_response:
+            if sys.version_info[0] < 3:
+                data["config"] = data["config"].encode('utf-8')
+
+            # check for configpath if it was changed during changing of the configfile
+            if self.key_exist(data, "configuration", "configpath"):
+                configpath = os.path.expanduser(
+                    data["configuration"]["configpath"]
+                )
+            else:
+                # if the configpath was not changed during changing the printer.cfg. Then the configpath would not be in data[]
+                configpath = os.path.expanduser(
+                    self._settings.get(["configuration", "configpath"])
+                )
+            if self.file_exist(configpath) and (self._parsing_check_response or not check_parse):
+                try:
                     f = open(configpath, "w")
                     f.write(data["config"])
                     f.close()
-                    # Restart klippy to reload config
-                    self._printer.commands(self._settings.get(
-                        ["configuration", "reload_command"]))
-                    self.log_info("Reloading Klipper Configuration.")
+
+
                     self.log_debug("Writing Klipper config to {}".format(configpath))
-            except IOError:
-                self.log_error("Error: Couldn't write Klipper config file: {}".format(configpath))
-            else:
-                # we dont want to write the klipper conf to the octoprint settings
-                data.pop("config", None)
+                except IOError:
+                    self.log_error("Error: Couldn't write Klipper config file: {}".format(configpath))
+                else:
+                    #load the reload command from changed data if it is not existing load the saved setting
+                    if self.key_exist(data, "configuration", "reload_command"):
+                        reload_command = os.path.expanduser(
+                            data["configuration"]["reload_command"]
+                        )
+                    else:
+                        reload_command = self._settings.get(["configuration", "reload_command"])
+
+                    if reload_command != "manually":
+                        # Restart klippy to reload config
+                        self._printer.commands(reload_command)
+                        self.log_info("Restarting Klipper.")
+                    # we dont want to write the klipper conf to the octoprint settings
+                    data.pop("config", None)
 
         # save the rest of changed settings into config.yaml of octoprint
         old_debug_logging = self._settings.get_boolean(["configuration", "debug_logging"])
@@ -355,21 +374,31 @@ class KlipperPlugin(
             if "FIRMWARE_VERSION" in printerInfo:
                 self.log_info("Firmware version: {}".format(
                     printerInfo["FIRMWARE_VERSION"]))
+        elif "// probe" in line:
+            msg = line.strip('/')
+            self.log_info(msg)
+            write_parsing_response_buffer()
         elif "//" in line:
+            # add lines with // to a buffer
             self._message = self._message + line.strip('/')
             if not self._parsing_response:
                 self.update_status("info", self._message)
             self._parsing_response = True
+        elif "!!" in line:
+            msg = line.strip('!')
+            self.update_status("error", msg)
+            self.log_error(msg)
+            self.write_parsing_response_buffer()
         else:
-            if self._parsing_response:
-                self._parsing_response = False
-                self.log_info(self._message)
-                self._message = ""
-            if "!!" in line:
-                msg = line.strip('!')
-                self.update_status("error", msg)
-                self.log_error(msg)
+            self.write_parsing_response_buffer()
         return line
+
+    def write_parsing_response_buffer(self):
+        # write buffer with // lines after a gcode response without //
+        if self._parsing_response:
+            self._parsing_response = False
+            self.log_info(self._message)
+            self._message = ""
 
     def get_api_commands(self):
         return dict(
@@ -419,17 +448,21 @@ class KlipperPlugin(
                         configpath)
                 )
             else:
+
                 self._settings.set(["config"], data["config"])
                 # self.send_message("reload", "config", "", data["config"])
                 # send the configdata to frontend to update ace editor
+            if sys.version_info[0] < 3:
+                data["config"] = data["config"].decode('utf-8')
             return flask.jsonify(data=data["config"])
         elif command == "checkConfig":
             if "config" in data:
                 if not self.validate_configfile(data["config"]):
-                    self.log_debug("validateConfig ->" + data["config"])
+                    self.log_debug("validateConfig not ok")
                     self._settings.set(["configuration", "old_config"], data["config"])
                     return flask.jsonify(checkConfig="not OK")
                 else:
+                    self.log_debug("validateConfig ok")
                     self._settings.set(["configuration", "old_config"], "")
                     return flask.jsonify(checkConfig="OK")
 
@@ -479,7 +512,6 @@ class KlipperPlugin(
     def log_info(self, message):
         self._octoklipper_logger.info(message)
         self.send_message("log", "info", message, message)
-        self.send_message("console", "info", message, message)
 
     def log_debug(self, message):
         self._octoklipper_logger.debug(message)
@@ -490,7 +522,6 @@ class KlipperPlugin(
     def log_error(self, error):
         self._octoklipper_logger.error(error)
         self.send_message("log", "error", error, error)
-        self.send_message("console", "error", error, error)
 
     def file_exist(self, filepath):
         if not os.path.isfile(filepath):
@@ -529,26 +560,36 @@ class KlipperPlugin(
         # learn file to be validated
 
         try:
-            dataToValidated = configparser.RawConfigParser()
-            dataToValidated.read_string(dataToBeValidated)
+            dataToValidated = configparser.RawConfigParser(strict=False)
+            #
+            if sys.version_info[0] < 3:
+                buf = StringIO.StringIO(dataToBeValidated)
+                dataToValidated.readfp(buf)
+            else:
+                dataToValidated.read_string(dataToBeValidated)
         except configparser.Error as error:
-            error.message = error.message.replace("\\n","")
-            error.message = error.message.replace("file:","Klipper Configuration", 1)
-            error.message = error.message.replace("'","", 2)
-            error.source = "Klipper config"
+            if sys.version_info[0] < 3:
+                error.message = error.message.replace("\\n","")
+                error.message = error.message.replace("file: u","Klipper Configuration", 1)
+                error.message = error.message.replace("'","", 2)
+                error.message = error.message.replace("u'","'", 1)
+
+            else:
+                error.message = error.message.replace("\\n","")
+                error.message = error.message.replace("file:","Klipper Configuration", 1)
+                error.message = error.message.replace("'","", 2)
             self.log_error(
                 "Error: Invalid Klipper config file:\n" +
                 "{}".format(str(error))
             )
-            self.send_message("PopUp", "warning", "Invalid Config",
+            self.send_message("PopUp", "warning", "OctoKlipper: Invalid Config data\n",
                             "Config got not saved!\n" +
                             "You can reload your last changes\n" +
                             "on the 'Klipper Configuration' tab.\n\n" + str(error))
             self._parsing_check_response = False
-            return
         else:
             self._parsing_check_response = True
-            return
+        return
 
         #incorrectlines = []
         # for section in dataToValidated.sections():

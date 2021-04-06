@@ -1,7 +1,7 @@
 ## Fork information:
 - This is forked from [the original](https://github.com/mmone/OctoprintKlipperPlugin) version 0.2.5
 - The fork now supports Python3 (hopefully without any new bugs)
-- The current version is 0.3.4rc1 and includes the pull requests left on the old plugin page that fixes several bugs and Themify support.
+- The current version is 0.3.5 and includes the pull requests left on the old plugin page that fixes several bugs and Themify support.
 
 ## Fork Installation Information:
 - Uninstall any other versions of the plugin using Plugin Manager or other means, as necessary.
@@ -45,9 +45,9 @@ Click on the wrench icon in the titlebar to open OctoPrints settings dialog. Sel
 
 Also for the moment this plugin does what I wanted it to do, it is far from finished, pull requests are welcome. If you want to get started, the OctoPrint Plugin API is quite well documented here: [docs.octoprint.org/en/master/plugins](http://docs.octoprint.org/en/master/plugins).
 
- The [devel](https://github.com/thelastWallE/OctoprintKlipperPlugin/tree/devel) branch is the branch to merge new features and bugfixes to.  
- The [rc](https://github.com/thelastWallE/OctoprintKlipperPlugin/tree/rc) branch is for Release Candidates and bugfixing them.  
- The [master](https://github.com/thelastWallE/OctoprintKlipperPlugin/tree/master) branch is for Stable Releases.  
+ The [devel](https://github.com/thelastWallE/OctoprintKlipperPlugin/tree/devel) branch is the branch to merge new features and bugfixes to.
+ The [rc](https://github.com/thelastWallE/OctoprintKlipperPlugin/tree/rc) branch is for Release Candidates and bugfixing them.
+ The [master](https://github.com/thelastWallE/OctoprintKlipperPlugin/tree/master) branch is for Stable Releases.
 
 
 ## Screenshots

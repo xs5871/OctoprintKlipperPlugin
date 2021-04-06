@@ -113,6 +113,14 @@ div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content
    margin: 0px 2px 2px 2px;
 }
 
+div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content div#conf.tab-pane.active div.control-group label.inline input.inline-checkbox {
+   vertical-align:-0.2em;
+}
+
+div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content div#conf.tab-pane.active div.control-group label.inline {
+   display:inline;
+}
+
 #macros #item.control-group {
    margin-bottom: 2px;
    border: 2px solid #ccc;
