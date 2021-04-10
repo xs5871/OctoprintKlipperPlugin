@@ -129,7 +129,8 @@ class KlipperPlugin(
                 logpath="/tmp/klippy.log",
                 reload_command="RESTART",
                 navbar=True,
-                parse_check=False
+                parse_check=False,
+                fontsize=9
             )
         )
 
@@ -374,7 +375,7 @@ class KlipperPlugin(
             if "FIRMWARE_VERSION" in printerInfo:
                 self.log_info("Firmware version: {}".format(
                     printerInfo["FIRMWARE_VERSION"]))
-        elif "// probe" in line:
+        elif "// probe" in line or "// Failed to verify BLTouch" in line:
             msg = line.strip('/')
             self.log_info(msg)
             write_parsing_response_buffer()
@@ -452,9 +453,9 @@ class KlipperPlugin(
                 self._settings.set(["config"], data["config"])
                 # self.send_message("reload", "config", "", data["config"])
                 # send the configdata to frontend to update ace editor
-            if sys.version_info[0] < 3:
-                data["config"] = data["config"].decode('utf-8')
-            return flask.jsonify(data=data["config"])
+                if sys.version_info[0] < 3:
+                    data["config"] = data["config"].decode('utf-8')
+                return flask.jsonify(data=data["config"])
         elif command == "checkConfig":
             if "config" in data:
                 if not self.validate_configfile(data["config"]):

@@ -107,6 +107,28 @@ $(function() {
             }
         }
 
+        self.minusFontsize = function () {
+            self.settings.settings.plugins.klipper.configuration.fontsize(self.settings.settings.plugins.klipper.configuration.fontsize() - 1);
+            if (self.settings.settings.plugins.klipper.configuration.fontsize() < 9) {
+                self.settings.settings.plugins.klipper.configuration.fontsize(9);
+            }
+            if (editor) {
+                editor.setFontSize(self.settings.settings.plugins.klipper.configuration.fontsize());
+                editor.resize();
+            }
+        }
+
+        self.plusFontsize = function () {
+            self.settings.settings.plugins.klipper.configuration.fontsize(self.settings.settings.plugins.klipper.configuration.fontsize() + 1);
+            if (self.settings.settings.plugins.klipper.configuration.fontsize() > 20) {
+                self.settings.settings.plugins.klipper.configuration.fontsize(20);
+            }
+            if (editor) {
+                editor.setFontSize(self.settings.settings.plugins.klipper.configuration.fontsize());
+                editor.resize();
+            }
+        }
+
         self.loadLastSession = function () {
             if (self.settings.settings.plugins.klipper.configuration.old_config() != "") {
                 self.klipperViewModel.consoleMessage("info","lastSession:" + self.settings.settings.plugins.klipper.configuration.old_config())
@@ -156,6 +178,8 @@ $(function() {
             obKlipperConfig = config.withSilence();
             if (editor) {
                 editor.setValue(obKlipperConfig());
+                editor.setFontSize(self.settings.settings.plugins.klipper.configuration.fontsize());
+                editor.resize();
                 editor.clearSelection();
             }
             return obKlipperConfig;
@@ -166,13 +190,16 @@ $(function() {
         editor.setTheme("ace/theme/monokai");
         editor.session.setMode("ace/mode/klipper_config");
         editor.setOptions({
-          autoScrollEditorIntoView: true,
-          maxLines: "Infinity"
+            hScrollBarAlwaysVisible: true,
+            vScrollBarAlwaysVisible: true,
+            autoScrollEditorIntoView: true,
+            //maxLines: "Infinity"
         })
 
         editor.session.on('change', function(delta) {
             if (obKlipperConfig) {
                 obKlipperConfig.silentUpdate(editor.getValue());
+                editor.resize();
             }
         });
 

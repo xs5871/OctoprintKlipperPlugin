@@ -104,7 +104,15 @@ div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content
 
 div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content div#conf.tab-pane.active div.control-group div.conf-editor {
    height: 100%;
-   overflow: auto;
+   width: 100%;
+}
+
+div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content div#conf.tab-pane.active div.control-group div.conf-editor div#plugin-klipper-config {
+   position: absolute;
+   top: 0;
+   right: 0;
+   bottom: 0;
+   left: 0;
 }
 
 div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content div#conf.tab-pane.active div.control-group button.btn.btn-small {
