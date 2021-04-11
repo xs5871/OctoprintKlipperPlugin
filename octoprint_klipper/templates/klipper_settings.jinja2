@@ -196,7 +196,7 @@
     </div>
     <div class="control-group">
       <div class="controls">
-        <a href='#' data-bind='click: addProbePoint' class="fa fa-plus-circle"></a> {{ _('Add Point') }}
+        <a href='#' data-bind="click: addProbePoint" class="fa fa-plus-circle"></a> {{ _('Add Point') }}
       </div>
     </div>
   </div>
@@ -206,14 +206,19 @@
       <script src="plugin/klipper/static/js/lib/ace/ace.min.js" type="text/javascript" charset="utf-8"></script>
       <script src="plugin/klipper/static/js/lib/ace/theme-monokai.min.js" type="text/javascript" charset="utf-8"></script>
       <script src="plugin/klipper/static/js/lib/ace/mode-klipper_config.js" type="text/javascript"></script>
-      <button class="btn btn-small" data-bind='click: loadLastSession'
-         title="Reloads the last changes">
-         <i class="fas fa-redo"></i> {{ _('Reload last changes') }}
-      </button>
-      <button class="btn btn-small" data-bind='click: reloadFromFile'>
-         <i class="fas fa-upload"></i></a> {{ _('Reload from file') }}
-      </button>
-      <label class="inline"><input class="inline-checkbox" type="checkbox" data-bind="checked: settings.settings.plugins.klipper.configuration.parse_check"> {{ _('Check parsing on save') }}</label>
+      <div class="editor-controls">
+        <button class="btn btn-small" data-bind="click: loadLastSession"
+          title="Reloads the last changes">
+          <i class="fas fa-redo"></i> {{ _('Reload last changes') }}
+        </button>
+        <button class="btn btn-small" data-bind='click: reloadFromFile'>
+          <i class="fas fa-upload"></i> {{ _('Reload from file') }}
+        </button>
+        <label class="inline"><input class="inline-checkbox" type="checkbox" data-bind="checked: settings.settings.plugins.klipper.configuration.parse_check"> {{ _('Check parsing on save') }}</label>
+        &nbsp;&nbsp;
+        <a href='#' data-bind="click: minusFontsize" class="fas fa-search-minus"></a>
+        <a href='#' data-bind="click: plusFontsize" class="fas fa-search-plus"></a>
+      </div>
       <div class="conf-editor">
         <input id="hdnLoadKlipperConfig" type="hidden" data-bind="value: configBound(settings.settings.plugins.klipper.config)" />
         <div id="plugin-klipper-config"></div>
