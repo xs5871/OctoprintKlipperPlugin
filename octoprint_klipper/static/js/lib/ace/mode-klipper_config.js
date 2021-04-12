@@ -20,10 +20,13 @@ ace.define("ace/mode/klipper_config_highlight_rules",[], function(require, expor
             }],
             "#single_line_comment": [{
                 token: "comment.line.number-sign",
-                regex: /#.*$/
+                regex: /([^\*]|^)#[^\*].*/
             }, {
                 token: "comment.line.gcode",
                 regex: /;.*$/
+            }, {
+                token: "comment.line.number-sign",
+                regex: /(#\*#)/
             }],
             "#number": [{
                 token: "constant.numeric",
@@ -57,7 +60,7 @@ ace.define("ace/mode/klipper_config_highlight_rules",[], function(require, expor
             }],
             "#config_block": [{
                 token: "text",
-                regex: /^\[/,
+                regex: /\[/,
                 push: [{
                     token: "text",
                     regex: /\]/,
@@ -102,6 +105,16 @@ ace.define("ace/mode/klipper_config_highlight_rules",[], function(require, expor
                 regex: /\b(?:watermark|pid)\b/,
                 caseInsensitive: true
             }],
+            "#known_kinematics_type": [{
+                token: "support.type",
+                regex: /\b(?:cartesian|delta|corexy|corexz|polar|rotary_delta|winch|none)\b/,
+                caseInsensitive: true
+            }],
+            "#known_algo_type": [{
+                token: "support.type",
+                regex: /\b(?:lagrange|bicubic)\b/,
+                caseInsensitive: true
+            }],
             "#known_display_type": [{
                 token: "support.type",
                 regex: /\b(?:hd44780|st7920|uc1701|ssd1306|sh1106)\b/,
@@ -113,7 +126,11 @@ ace.define("ace/mode/klipper_config_highlight_rules",[], function(require, expor
             }],
             "#pin": [{
                 token: "support.type",
-                regex: /[\^~!]*(?:ar|analog)\d{1,2}/,
+                regex: /[\^~!]*(?:EXP|ar|analog)\d{1,2}/,
+                caseInsensitive: true
+            }, {
+                token: "support.type",
+                regex: /(?:(_\d{1,2}))/,
                 caseInsensitive: true
             }, {
                 token: "support.type",
@@ -135,7 +152,7 @@ ace.define("ace/mode/klipper_config_highlight_rules",[], function(require, expor
             }],
             "#config_line": [{
                 token: ["variable.name", "text"],
-                regex: /^(?!(gcode))(\w+)(\s*[:=]\s*)/,
+                regex: /(?!(gcode))(\w+)(\s*[:=]\s*)/,
                 push: [{
                     token: "text",
                     regex: /$/,
@@ -148,6 +165,10 @@ ace.define("ace/mode/klipper_config_highlight_rules",[], function(require, expor
                     include: "#known_control_type"
                 }, {
                     include: "#known_display_type"
+                }, {
+                    include: "#known_kinematics_type"
+                }, {
+                    include: "#known_algo_type"
                 }, {
                     include: "#pin"
                 }, {
