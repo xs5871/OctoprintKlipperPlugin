@@ -188,7 +188,7 @@ ace.define("ace/mode/klipper_config_highlight_rules",[], function(require, expor
                 regex: /(?!(gcode))(\w+)(\s*[=]\s*)/,
                 push: [{
                     token: "text",
-                    regex: /,/,
+                    regex: /,|$/,
                     next: "pop"
                 }, {
                     include: "#known_thermistor_type"
