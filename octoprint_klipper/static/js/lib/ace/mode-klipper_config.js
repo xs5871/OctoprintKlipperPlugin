@@ -14,6 +14,8 @@ ace.define("ace/mode/klipper_config_highlight_rules",[], function(require, expor
             }, {
                 include: "#config_line"
             }, {
+                include: "#config_line_display"
+            }, {
                 include: "#number"
             }, {
                 include: "#config_line_start_gcode"
@@ -152,7 +154,7 @@ ace.define("ace/mode/klipper_config_highlight_rules",[], function(require, expor
             }],
             "#config_line": [{
                 token: ["variable.name", "text"],
-                regex: /(?!(gcode))(\w+)(\s*[:=]\s*)/,
+                regex: /(?!(gcode))(\w+)(\s*[:]\s*)/,
                 push: [{
                     token: "text",
                     regex: /$/,
@@ -181,7 +183,38 @@ ace.define("ace/mode/klipper_config_highlight_rules",[], function(require, expor
                     include: "#single_line_comment"
                 }]
             }],
-           "#gcode_line": [{
+            "#config_line_display": [{
+                token: ["variable.name", "text"],
+                regex: /(?!(gcode))(\w+)(\s*[=]\s*)/,
+                push: [{
+                    token: "text",
+                    regex: /,/,
+                    next: "pop"
+                }, {
+                    include: "#known_thermistor_type"
+                }, {
+                    include: "#known_extruder_sensor_type"
+                }, {
+                    include: "#known_control_type"
+                }, {
+                    include: "#known_display_type"
+                }, {
+                    include: "#known_kinematics_type"
+                }, {
+                    include: "#known_algo_type"
+                }, {
+                    include: "#pin"
+                }, {
+                    include: "#serial"
+                }, {
+                    include: "#number"
+                }, {
+                    include: "#boolean"
+                }, {
+                    include: "#single_line_comment"
+                }]
+            }],
+            "#gcode_line": [{
                 include: "#gcode_command"
             }, {
                 include: "#gcode_extended_command"
