@@ -128,7 +128,7 @@ ace.define("ace/mode/klipper_config_highlight_rules",[], function(require, expor
             }],
             "#pin": [{
                 token: "support.type",
-                regex: /[\^~!]*(?:EXP|ar|analog)\d{1,2}/,
+                regex: /[\^~!]*(?:EXP|ar|analog)\d{1,2}|(?:probe:z_virtual_endstop)/,
                 caseInsensitive: true
             }, {
                 token: "support.type",
