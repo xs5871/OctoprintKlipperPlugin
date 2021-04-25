@@ -28,14 +28,14 @@ ace.define("ace/mode/klipper_config_highlight_rules",[], function(require, expor
                 regex: /;.*$/
             }, {
                 token: "comment.line.number-sign",
-                regex: /(#\*#)/
+                regex: /^(#\*#)/
             }],
             "#number": [{
                 token: "constant.numeric",
-                regex: /\-?\d+(?:[\.,]\d+)?\b/
+                regex: /\-?\d+(?:[\.]\d+)?\b/
             }, {
                 token: "constant.numeric",
-                regex: /\-?[\.,]\d+?\b/
+                regex: /\-?[\.]\d+?\b/
             }],
             "#boolean": [{
                 token: "constant.language",
@@ -112,6 +112,11 @@ ace.define("ace/mode/klipper_config_highlight_rules",[], function(require, expor
                 regex: /\b(?:cartesian|delta|corexy|corexz|polar|rotary_delta|winch|none)\b/,
                 caseInsensitive: true
             }],
+            "#known_screws_type": [{
+                token: "support.type",
+                regex: /\b(?:CW-M3|CCW-M3|CW-M4|CCW-M4|CW-M5|CCW-M5)\b/,
+                caseInsensitive: true
+            }],
             "#known_algo_type": [{
                 token: "support.type",
                 regex: /\b(?:lagrange|bicubic)\b/,
@@ -119,7 +124,7 @@ ace.define("ace/mode/klipper_config_highlight_rules",[], function(require, expor
             }],
             "#known_display_type": [{
                 token: "support.type",
-                regex: /\b(?:hd44780|st7920|uc1701|ssd1306|sh1106)\b/,
+                regex: /\b(?:hd44780|st7920|uc1701|ssd1306|emulated_st7920|sh1106)\b/,
                 caseInsensitive: true
             }],
             "#serial": [{
@@ -170,6 +175,8 @@ ace.define("ace/mode/klipper_config_highlight_rules",[], function(require, expor
                 }, {
                     include: "#known_kinematics_type"
                 }, {
+                    include: "#known_screws_type"
+                }, {
                     include: "#known_algo_type"
                 }, {
                     include: "#pin"
@@ -183,6 +190,7 @@ ace.define("ace/mode/klipper_config_highlight_rules",[], function(require, expor
                     include: "#single_line_comment"
                 }]
             }],
+            // For multiple keys on one line eg.: ^EXP1_5, ^EXP1_3
             "#config_line_display": [{
                 token: ["variable.name", "text"],
                 regex: /(?!(gcode))(\w+)(\s*[=]\s*)/,
@@ -231,7 +239,7 @@ ace.define("ace/mode/klipper_config_highlight_rules",[], function(require, expor
                 caseInsensitive: true,
                 push: [{
                     token: "text",
-                    regex: /(\s|$)/,
+                    regex: /(?=(\s|$|;))/,
                     next: "pop"
                 }, {
                     include: "#number"
@@ -241,11 +249,11 @@ ace.define("ace/mode/klipper_config_highlight_rules",[], function(require, expor
             }],
             "#gcode_parameter": [{
                 token: "variable.parameter",
-                regex: /\b[A-z]+(?![a-z])/,
+                regex: /\b[A-z]+(?![a-z])|(?:<---------------------- SAVE_CONFIG ---------------------->)|(?:\sDO NOT EDIT THIS BLOCK OR BELOW\. The contents are auto\-generated\.)/,
                 caseInsensitive: true,
                 push: [{
                     token: "text",
-                    regex: /(?=(\s|$))/,
+                    regex: /(?=(\s|$|;))|^/,
                     next: "pop"
                 }, {
                     include: "#number"
@@ -272,7 +280,7 @@ ace.define("ace/mode/klipper_config_highlight_rules",[], function(require, expor
                     next: "pop"
                 }, {
                     token: "constant.language",
-                    regex: /5V|average|command|echo|error|manual|median|OD|output_mode_store|pin_down|pin_up|reset|self_test|set_5V_output_mode|set_5V_output_mode|set_OD_output_mode|touch_mode/,
+                    regex: /$|5V|average|command|echo|error|manual|median|OD|output_mode_store|pin_down|pin_up|reset|self_test|set_5V_output_mode|set_5V_output_mode|set_OD_output_mode|touch_mode/,
                     caseInsensitive: true
                 }, {
                     include: "#number"
