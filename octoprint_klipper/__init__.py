@@ -568,6 +568,30 @@ class KlipperPlugin(
                 dataToValidated.readfp(buf)
             else:
                 dataToValidated.read_string(dataToBeValidated)
+
+            sections_search_list = ["bltouch",
+                                    "probe"]
+            value_search_list = [   "x_offset",
+                                    "y_offset",
+                                    "z_offset"]
+            try:
+                # cycle through sections and then values
+                for y in sections_search_list:
+                    for x in value_search_list:
+                        if dataToValidated.has_option(y, x):
+                            a_float = dataToValidated.getfloat(y, x)
+            except ValueError as error:
+                self.log_error(
+                    "Error: Invalid Value for <b>"+x+"</b> in Section: <b>"+y+"</b>\n" +
+                    "{}".format(str(error))
+                )
+                self.send_message("PopUp", "warning", "OctoKlipper: Invalid Config\n",
+                            "Config got not saved!\n" +
+                            "You can reload your last changes\n" +
+                            "on the 'Klipper Configuration' tab.\n\n" +
+                            "Invalid Value for <b>"+x+"</b> in Section: <b>"+y+"</b>\n" + "{}".format(str(error)))
+                self._parsing_check_response = False
+                return False
         except configparser.Error as error:
             if sys.version_info[0] < 3:
                 error.message = error.message.replace("\\n","")
@@ -588,9 +612,10 @@ class KlipperPlugin(
                             "You can reload your last changes\n" +
                             "on the 'Klipper Configuration' tab.\n\n" + str(error))
             self._parsing_check_response = False
+            return False
         else:
             self._parsing_check_response = True
-        return
+            return True
 
         #incorrectlines = []
         # for section in dataToValidated.sections():
