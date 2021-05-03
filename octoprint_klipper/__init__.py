@@ -128,7 +128,8 @@ class KlipperPlugin(
                 old_config="",
                 logpath="/tmp/klippy.log",
                 reload_command="RESTART",
-                navbar=True,
+                shortStatus_navbar=True,
+                shortStatus_sidebar=True,
                 parse_check=False,
                 fontsize=9
             )
@@ -232,7 +233,7 @@ class KlipperPlugin(
         )
 
     def get_settings_version(self):
-        return 2
+        return 3
 
     def on_settings_migrate(self, target, current):
         if current is None:
@@ -279,8 +280,16 @@ class KlipperPlugin(
                 settings.remove(["probePoints"])
 
             if settings.has(["configPath"]):
+                self.log_info("migrate setting for: configPath")
                 settings.set(["config_path"], settings.get(["configPath"]))
                 settings.remove(["configPath"])
+
+        if target is 3 and current is 2:
+            settings = self._settings
+            if settings.has(["configuration", "navbar"]):
+                self.log_info("migrate setting for: configuration/navbar")
+                settings.set(["configuration", "shortStatus_navbar"], settings.get(["configuration", "navbar"]))
+                settings.remove(["configuration", "navbar"])
 
     # -- Template Plugin
 
@@ -516,12 +525,14 @@ class KlipperPlugin(
 
     def log_debug(self, message):
         self._octoklipper_logger.debug(message)
+        self._logger.info(message)
         # sends a message to frontend(in klipper.js -> self.onDataUpdaterPluginMessage) and write it to the console.
         # _mtype, subtype=debug/info, title of message, message)
         self.send_message("console", "debug", message, message)
 
     def log_error(self, error):
         self._octoklipper_logger.error(error)
+        self._logger.info(error)
         self.send_message("log", "error", error, error)
 
     def file_exist(self, filepath):
@@ -542,23 +553,8 @@ class KlipperPlugin(
 
     def validate_configfile(self, dataToBeValidated):
         """
-        --->For now this just checks if the given data can be parsed<----
-
-        From https://www.opensourceforu.com/2015/03/practical-python-programming-writing-a-config-file-checker/
-
-        Validates a given Config File in filetobevalidated against a correct config file pointed to by goldenfilepath
-        returns a list of erroneous lines as a list[strings]
-        if config file is fine, it should return an empty list
+        --->SyntaxCheck for a given data<----
         """
-        #len(ValidateFile('c:\example.cfg', 'c:\example.cfg' ))== 0
-
-        # learn golden file
-        #__location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
-        #goldenfilepath = os.path.join(__location__, "goldenprinter.cfg")
-        #goldenconfig = ConfigParser.ConfigParser()
-        # dataToValidated.read(goldenfilepath)
-
-        # learn file to be validated
 
         try:
             dataToValidated = configparser.RawConfigParser(strict=False)
@@ -616,23 +612,6 @@ class KlipperPlugin(
         else:
             self._parsing_check_response = True
             return True
-
-        #incorrectlines = []
-        # for section in dataToValidated.sections():
-        #   #check each key is present in corresponding golden section
-        #   for key in dataToValidated.options(section):
-        #      if not goldenconfig.has_option(section,key):
-        #         incorrectlines.append(key + "=" + dataToValidated.get(section,key))
-        #         # print incorrect lines
-        #         if len(incorrectlines) > 0 :
-        #            self.send_message("errorPopUp","warning", "OctoKlipper Settings", "Invalid Klipper config file: " + str(incorrectlines))
-        #            for k in incorrectlines:
-        #               print k
-        #               self._logger.error(
-        #                  "Error: Invalid Klipper config line: {}".format(str(k))
-        #               )
-        # return incorrectlines
-
 
 __plugin_name__ = "OctoKlipper"
 __plugin_pythoncompat__ = ">=2.7,<4"

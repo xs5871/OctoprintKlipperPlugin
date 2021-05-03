@@ -1,9 +1,41 @@
+.plugin-klipper-sidebar {
+   padding: 1px;
+   height: auto;
+   border: 1px solid #aaa;
+   width: 98%;
+   text-align: center;
+   word-break: break-all;
+   margin: auto;
+}
+
+li#navbar_plugin_klipper {
+   cursor: pointer;
+   max-width:360px;
+   max-height:80px;
+   word-break: break-all;
+}
+
+.plugin-klipper-sidebar a {
+   color: #333;
+   padding: 2px 2px;
+   text-align: center;
+   text-decoration: none;
+   display: inline-block;
+   cursor: pointer;
+}
+
+.plugin-klipper-sidebar a:hover, .plugin-klipper-sidebar a:active {
+   background-color: #aaa;
+   cursor: pointer;
+ }
+
 .plugin-klipper-log {
    padding: 0px;
    overflow-y: scroll;
    height: 400px;
    border: 1px solid #eee;
    width: 100%;
+   word-break: break-all;
 }
 
 .plugin-klipper-log .log-item {
@@ -101,6 +133,7 @@ ul#klipper-settings {
    height: 100%;
 }
 
+/*conf editor*/
 div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content div#conf.tab-pane.active div.control-group {
    margin-bottom: 0px;
    height: 100%;
@@ -131,12 +164,22 @@ div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content
    margin: 0px 2px 2px 2px;
 }
 
-div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content div#conf.tab-pane.active div.control-group label.inline input.inline-checkbox {
-   vertical-align:-0.2em;
+/*checkboxes*/
+div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content div.tab-pane.active div.control-group input.inline-checkbox {
+   vertical-align: -0.2em;
 }
 
-div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content div#conf.tab-pane.active div.control-group label.inline {
-   display:inline;
+div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content div.tab-pane.active div.control-group label.inline {
+   display: inline;
+}
+
+div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content div.tab-pane.active div.control-group div.controls input.controls-checkbox {
+   margin-top: 8px;
+}
+
+/*macros*/
+div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content div#macros.tab-pane.active div div#item.control-group label.control-label {
+   width: 80px;
 }
 
 #macros #item.control-group {
