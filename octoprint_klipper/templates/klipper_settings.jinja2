@@ -17,19 +17,21 @@
     <div class="control-group">
         <label class="control-label">{{ _('Replace Connection Panel') }}</label>
         <div class="controls">
-            <input type="checkbox" class="input-block-level" data-bind="checked: settings.settings.plugins.klipper.connection.replace_connection_panel">
+            <input class="controls-checkbox" title="{{ _('Replace Connection Panel') }}" type="checkbox" data-bind="checked: settings.settings.plugins.klipper.connection.replace_connection_panel">
         </div>
     </div>
+
     <div class="control-group">
-        <label class="control-label">{{ _('Show NavBar Message') }}</label>
+        <label class="control-label">{{ _('Show Short Messages') }}</label>
         <div class="controls">
-            <input type="checkbox" class="input-block-level" data-bind="checked: settings.settings.plugins.klipper.configuration.navbar">
+          <label class="checkbox" title="{{ _('on NavBar') }}"><input type="checkbox" data-bind="checked: settings.settings.plugins.klipper.configuration.shortStatus_navbar"> {{ _('on NavBar') }}</label>
+          <label class="checkbox" title="{{ _('on SideBar') }}"><input type="checkbox" data-bind="checked: settings.settings.plugins.klipper.configuration.shortStatus_sidebar"> {{ _('on SideBar') }}</label>
         </div>
     </div>
     <div class="control-group">
         <label class="control-label">{{ _('Enable debug logging') }}</label>
         <div class="controls">
-            <input type="checkbox" class="input-block-level" data-bind="checked: settings.settings.plugins.klipper.configuration.debug_logging">
+            <input class="controls-checkbox" title="{{ _('Enable debug logging') }}" type="checkbox" data-bind="checked: settings.settings.plugins.klipper.configuration.debug_logging">
         </div>
     </div>
     <div class="control-group">
@@ -61,44 +63,43 @@
   </div>
   <!-- Macros -->
   <div class="tab-pane" id="macros">
-    <div class="control-group">
-       <div class="controls">
+    <div class="control-group" style="margin-bottom: 0px;">
+       <div class="controls" style="margin-left: 82px;">
           <div class="row-fluid">
             <div class="span8" style="text-align: right"><small>{{ _('Add macro button to:') }}</small></div>
-            <div class="span1"><small>{{ _('Klipper Tab') }}</small></div>
-            <div class="span2"><small>{{ _('Sidebar') }}</small></div>
+            <div class="span1" style="margin: auto;text-align: center"><small>{{ _('Klipper Tab') }}</small></div>
+            <div class="span2" style="margin: auto;"><small>{{ _('Sidebar') }}</small></div>
           </div>
        </div>
     </div>
     <div data-bind="foreach: settings.settings.plugins.klipper.macros">
        <div class="control-group" id="item">
            <label class="control-label">{{ _('Name') }}</label>
-           <div class="controls">
+           <div class="controls" style="margin-left: 82px;">
                 <div class="row-fluid">
                   <div class="span8">
                     <input type="text" class="input-block-level" data-bind="value: name"/>
                   </div>
-                  <div class="span1">
-                    <input type="checkbox" class="input-block-level" data-bind="checked: tab"/>
+                  <div class="span1" style="margin: auto; text-align: center;">
+                    <input title="{{ _('Klipper Tab') }}" style="margin: auto;" type="checkbox" class="input-block-level" data-bind="checked: tab"/>
                   </div>
-                  <div class="span1">
-                    <input type="checkbox" class="input-block-level" data-bind="checked: sidebar"/>
+                  <div class="span1" style="margin: auto; text-align: center;">
+                    <input title="{{ _('Sidebar') }}" style="margin: auto;" type="checkbox" class="input-block-level" data-bind="checked: sidebar"/>
                   </div>
-                  <div class="span2">
-                     <a href='#' data-bind='click: $parent.moveMacroUp' class="fa fa-chevron-up"></a>
-                     <a href='#' data-bind='click: $parent.moveMacroDown' class="fa fa-chevron-down"></a>
-                     <a href='#' data-bind='click: $parent.removeMacro' class="fa fa-trash-o"></a>
+                  <div class="span2" style="margin: auto; text-align: center;">
+                     <a href='#' style="vertical-align: bottom;" data-bind='click: $parent.moveMacroUp' class="fa fa-chevron-up"></a>
+                     <a href='#' style="vertical-align: bottom;" data-bind='click: $parent.moveMacroDown' class="fa fa-chevron-down"></a>
+                     <a href='#' style="vertical-align: bottom;" data-bind='click: $parent.removeMacro' class="fa fa-trash-o"></a>
                   </div>
                 </div>
            </div>
            <label class="control-label">{{ _('Command') }}</label>
-           <div class="controls">
+           <div class="controls" style="margin-left: 82px;">
                <div class="row-fluid">
-                 <div class="span8">
+                 <div class="span12" style="margin-top:2px;">
                     <textarea rows="2" class="block" data-bind="value: macro">
                     </textarea>
                  </div>
-                 <div class="span2"></div>
                </div>
            </div>
        </div>

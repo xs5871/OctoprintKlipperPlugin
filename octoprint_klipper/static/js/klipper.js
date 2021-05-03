@@ -31,7 +31,8 @@ $(function () {
         self.paramMacroViewModel = parameters[4];
         self.access = parameters[5];
 
-        self.shortStatus = ko.observable();
+        self.shortStatus_navbar = ko.observable();
+        self.shortStatus_sidebar = ko.observable();
         self.logMessages = ko.observableArray();
 
         self.showPopUp = function(popupType, popupTitle, message){
@@ -140,7 +141,13 @@ $(function () {
                         self.consoleMessage(data.subtype, data.payload);
                         break;
                     case "status":
-                        self.shortStatus(data.payload);
+                        if (data.payload.length > 36) {
+                            var shortText = data.payload.substring(0, 31) + " [..]"
+                            self.shortStatus_navbar(shortText);
+                        } else {
+                            self.shortStatus_navbar(data.payload);
+                        }
+                        self.shortStatus_sidebar(data.payload);
                         break;
                     default:
                         self.logMessage(data.time, data.subtype, data.payload);
