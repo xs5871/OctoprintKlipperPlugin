@@ -82,7 +82,7 @@ ace.define("ace/mode/klipper_config_highlight_rules",[], function(require, expor
             }],
             "#known_driver_type": [{
                 token: "support.type",
-                regex: /\btmc(?:2130|2208|2209|2660|5160)\b/,
+                regex: /\b(?:tmc)(?:2130|2208|2209|2660|5160)\b/,
                 caseInsensitive: true,
                 push: [{
                     token: "text",
@@ -99,7 +99,7 @@ ace.define("ace/mode/klipper_config_highlight_rules",[], function(require, expor
             }],
             "#known_extruder_sensor_type": [{
                 token: "support.type",
-                regex: /\b(?:MAX6675|MAX31855|MAX31856|MAX31865|PT100 INA826|AD595|AD597|AD8494|AD8495|AD8496|AD8497|PT1000|BME280)\b/,
+                regex: /\b(?:MAX6675|MAX31855|MAX31856|MAX31865|PT100 INA826|AD595|AD597|AD8494|AD8495|AD8496|AD8497|PT1000|BME280|HTU21D|SI7013|SI7020|SI7021|SHT21|lm75|temperature_mcu|temperature_host|DS18B20)\b/,
                 caseInsensitive: true
             }],
             "#known_control_type": [{
@@ -129,7 +129,12 @@ ace.define("ace/mode/klipper_config_highlight_rules",[], function(require, expor
             }],
             "#serial": [{
                 token: "support.type",
-                regex: /\/dev\/serial\/by-(?:id|path)\/[\d\w\/\-:\.]+/
+                regex: /(?:\/dev\/serial\/by-)(?:id\/|path\/)[\d\w\/\-:\.]+/
+            }],
+            "#known_restart_command": [{
+                token: "support.type",
+                regex: /\b(?:arduino|cheetah|rpi_usb|command)\b/,
+                caseInsensitive: true
             }],
             "#pin": [{
                 token: "support.type",
@@ -145,7 +150,7 @@ ace.define("ace/mode/klipper_config_highlight_rules",[], function(require, expor
                 caseInsensitive: true
             }],
             "#config_line_start_gcode": [{
-                token: ["variable.name", "text"],
+                token: ["variable.name", "variable.name"],
                 regex: /^(gcode)(\s*[:=]\s*)/,
                 push: [{
                     token: "text",
@@ -158,8 +163,8 @@ ace.define("ace/mode/klipper_config_highlight_rules",[], function(require, expor
                 }]
             }],
             "#config_line": [{
-                token: ["variable.name", "text"],
-                regex: /(?!(gcode))(\w+)(\s*[:]\s*)/,
+                token: ["variable.name", "variable.name", "variable.name", "variable.name"],
+                regex: /(?!(gcode))(?!(sensor_type))(\w+)(\s*[:]\s*)/,
                 push: [{
                     token: "text",
                     regex: /$/,
@@ -183,6 +188,8 @@ ace.define("ace/mode/klipper_config_highlight_rules",[], function(require, expor
                 }, {
                     include: "#serial"
                 }, {
+                    include: "#known_restart_command"
+                }, {
                     include: "#number"
                 }, {
                     include: "#boolean"
@@ -190,9 +197,24 @@ ace.define("ace/mode/klipper_config_highlight_rules",[], function(require, expor
                     include: "#single_line_comment"
                 }]
             }],
+            "#config_line_sensor": [{
+                token: ["variable.name", "variable.name", "variable.name", "variable.name"],
+                regex: /(?!(gcode))(?=(sensor_type))(\w+)(\s*[:]\s*)/,
+                push: [{
+                    token: "text",
+                    regex: /$/,
+                    next: "pop"
+                }, {
+                    include: "#known_thermistor_type"
+                }, {
+                    include: "#known_extruder_sensor_type"
+                }, {
+                    include: "#single_line_comment"
+                }]
+            }],
             // For multiple keys on one line eg.: ^EXP1_5, ^EXP1_3
             "#config_line_display": [{
-                token: ["variable.name", "text"],
+                token: ["variable.name", "variable.name", "variable.name"],
                 regex: /(?!(gcode))(\w+)(\s*[=]\s*)/,
                 push: [{
                     token: "text",
@@ -271,7 +293,7 @@ ace.define("ace/mode/klipper_config_highlight_rules",[], function(require, expor
                 caseInsensitive: true
             }],
             "#gcode_extended_parameter": [{
-                token: ["variable.parameter", "text"],
+                token: ["variable.parameter", "variable.parameter"],
                 regex: /\b(AC|ACCEL|ACCEL_TO_DECEL|AD|ADVANCE|ANGLE|BAND|BD|BLUE|CARRIAGE|CLEAR|COMMAND|CURRENT|DISTANCE|DURATION|ENABLE|EXTRUDER|FACTOR|FIELD|GREEN|HEATER|HOLDCURRENT|ID|INDEX|LED|LIFT_SPEED|LOAD|MACRO|METHOD|MODE|MOVE_SPEED|MSG|NAME|PARAMETER|PGP|PIN|PREFIX|PROBE_SPEED|PULLUP|RED|REMOVE|RETRACT_LENGTH|RETRACT_SPEED|SAMPLE_RETRACT_DIST|SAMPLES|SAMPLES_RESULT|SAMPLES_TOLERANCE|SAMPLES_TOLERANCE_RETRIES|SAVE|SENSOR|SERVO|SET_POSITION|SMOOTH_TIME|SPEED|SQUARE_CORNER_VELOCITY|START|STEPPER|STOP_ON_ENDSTOP|SYNC|TARGET|TIMEOUT|TRANSMIT|TYPE|UNRETRACT_EXTRA_LENGTH|UNRETRACT_SPEED|VALUE|VARIABLE|VELOCITY|WIDTH|WRITE_FILE|X|X_ADJUST|XY|XZ|Y|Y_ADJUST|YZ|Z|Z_ADJUST)(=)/,
                 caseInsensitive: true,
                 push: [{
