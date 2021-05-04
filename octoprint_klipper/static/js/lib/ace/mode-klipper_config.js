@@ -99,7 +99,7 @@ ace.define("ace/mode/klipper_config_highlight_rules",[], function(require, expor
             }],
             "#known_extruder_sensor_type": [{
                 token: "support.type",
-                regex: /\b(?:MAX6675|MAX31855|MAX31856|MAX31865|PT100 INA826|AD595|AD8494|AD8495|AD8496|AD8497|PT1000|BME280)\b/,
+                regex: /\b(?:MAX6675|MAX31855|MAX31856|MAX31865|PT100 INA826|AD595|AD597|AD8494|AD8495|AD8496|AD8497|PT1000|BME280)\b/,
                 caseInsensitive: true
             }],
             "#known_control_type": [{
