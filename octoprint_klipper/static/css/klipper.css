@@ -16,7 +16,6 @@ li#navbar_plugin_klipper {
 }
 
 .plugin-klipper-sidebar a {
-   color: #333;
    padding: 2px 2px;
    text-align: center;
    text-decoration: none;
@@ -25,7 +24,6 @@ li#navbar_plugin_klipper {
 }
 
 .plugin-klipper-sidebar a:hover, .plugin-klipper-sidebar a:active {
-   background-color: #aaa;
    cursor: pointer;
  }
 
@@ -148,6 +146,20 @@ div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content
    height: calc(100% - 28px);
    width: 100%;
    padding-top: 2px;
+}
+
+/*UIcustomizer fix for responsiveMode*/
+body.UICResponsiveMode #settings_dialog_content {
+   width: 100%;
+   width: calc(100% - 30px);
+   height: 97%;
+   height: calc(100% - 35px);
+   margin-right: -18px;
+   margin-top: 50px;
+}
+
+body.UICResponsiveMode div#settings_plugin_klipper form.form-horizontal div.tab-content div.tab-pane div.control-group.row-fluid.UICRemoveFluidRow {
+   height: auto;
 }
 
 div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content div#conf.tab-pane.active div.control-group div.conf-editor div#plugin-klipper-config {
