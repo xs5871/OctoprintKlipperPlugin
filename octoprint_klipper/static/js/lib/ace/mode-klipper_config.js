@@ -12,6 +12,8 @@ ace.define("ace/mode/klipper_config_highlight_rules",[], function(require, expor
             }, {
                 include: "#config_block"
             }, {
+                include: "#config_line_sensor"
+            }, {
                 include: "#config_line"
             }, {
                 include: "#config_line_display"
@@ -162,9 +164,9 @@ ace.define("ace/mode/klipper_config_highlight_rules",[], function(require, expor
                     include: "#single_line_comment"
                 }]
             }],
-            "#config_line": [{
-                token: ["variable.name", "variable.name", "variable.name", "variable.name"],
-                regex: /(?!(gcode))(?!(sensor_type))(\w+)(\s*[:]\s*)/,
+            "#config_line_sensor": [{
+                token: ["variable.name", "variable.name"],
+                regex: /(sensor_type)(\s*[:]\s*)/,
                 push: [{
                     token: "text",
                     regex: /$/,
@@ -173,6 +175,17 @@ ace.define("ace/mode/klipper_config_highlight_rules",[], function(require, expor
                     include: "#known_thermistor_type"
                 }, {
                     include: "#known_extruder_sensor_type"
+                }, {
+                    include: "#single_line_comment"
+                }]
+            }],
+            "#config_line": [{
+                token: ["variable.name"],
+                regex: /((?!gcode|sensor_type)\w+\s*[:]\s*)/,
+                push: [{
+                    token: "text",
+                    regex: /$/,
+                    next: "pop"
                 }, {
                     include: "#known_control_type"
                 }, {
@@ -193,21 +206,6 @@ ace.define("ace/mode/klipper_config_highlight_rules",[], function(require, expor
                     include: "#number"
                 }, {
                     include: "#boolean"
-                }, {
-                    include: "#single_line_comment"
-                }]
-            }],
-            "#config_line_sensor": [{
-                token: ["variable.name", "variable.name", "variable.name", "variable.name"],
-                regex: /(?!(gcode))(?=(sensor_type))(\w+)(\s*[:]\s*)/,
-                push: [{
-                    token: "text",
-                    regex: /$/,
-                    next: "pop"
-                }, {
-                    include: "#known_thermistor_type"
-                }, {
-                    include: "#known_extruder_sensor_type"
                 }, {
                     include: "#single_line_comment"
                 }]
@@ -257,7 +255,7 @@ ace.define("ace/mode/klipper_config_highlight_rules",[], function(require, expor
             }],
             "#gcode_command": [{
                 token: ["text", "keyword.operator"],
-                regex: /^(\s*)([A-z]+)(?![A-z])/,
+                regex: /(\s*)([A-z]+)(?![A-z])/,
                 caseInsensitive: true,
                 push: [{
                     token: "text",
