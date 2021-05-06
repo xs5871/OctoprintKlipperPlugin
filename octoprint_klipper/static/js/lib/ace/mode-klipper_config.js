@@ -24,13 +24,10 @@ ace.define("ace/mode/klipper_config_highlight_rules",[], function(require, expor
             }],
             "#single_line_comment": [{
                 token: "comment.line.number-sign",
-                regex: /([^\*]|^)#[^\*].*/
+                regex: /(?!#\*#)([^\*]|^)#[^\*].*/
             }, {
                 token: "comment.line.gcode",
                 regex: /;.*$/
-            }, {
-                token: "comment.line.number-sign",
-                regex: /^(#\*#)/
             }],
             "#number": [{
                 token: "constant.numeric",
@@ -63,10 +60,10 @@ ace.define("ace/mode/klipper_config_highlight_rules",[], function(require, expor
                 }]
             }],
             "#config_block": [{
-                token: "text",
+                token: "storage.type",
                 regex: /\[/,
                 push: [{
-                    token: "text",
+                    token: "storage.type",
                     regex: /\]/,
                     next: "pop"
                 }, {
@@ -79,7 +76,7 @@ ace.define("ace/mode/klipper_config_highlight_rules",[], function(require, expor
             }],
             "#known_config_block_name": [{
                 token: "storage.type",
-                regex: /\b(?:ad5206|adc_temperature|bed_mesh|bed_screws|bed_tilt|bltouch|board_pins|controller_fan|delayed_gcode|delta_calibrate|display|display_data|display_template|dotstar|dual_carriage|endstop_phase|extruder_stepper|extruder[1-9]{0,1}|fan|filament_switch_sensor|firmware_retraction|force_move|gcode_arcs|gcode_button|gcode_macro|hall_filament_width_sensor|heater_bed|heater_fan|heater_generic|homing_heaters|homing_override|idle_timeout|include|manual_stepper|mcp4018|mcp4451|mcp4728|mcu|menu|multi_pin|neopixel|output_pin|pause_resume|printer|probe|quad_gantry_level|replicape|respond|safe_z_home|samd_sercom|screws_tilt_adjust|servo|skew_correction|static_digital_output|stepper_(?:bed|arm|[abcdxy]|z[1-9]{0,1})|sx1509|temperature_fan|temperature_sensor|thermistor|tsl1401cl_filament_width_sensor|verify_heater|virtual_sdcard|z_tilt)\b/,
+                regex: /\b(?:ad5206|adxl345|input_shaper|resonance_tester|adc_temperature|bed_mesh|bed_screws|bed_tilt|bltouch|board_pins|controller_fan|delayed_gcode|delta_calibrate|display|display_data|display_template|dotstar|dual_carriage|endstop_phase|extruder_stepper|extruder[1-9]{0,1}|fan|filament_switch_sensor|firmware_retraction|force_move|gcode_arcs|gcode_button|gcode_macro|hall_filament_width_sensor|heater_bed|heater_fan|heater_generic|homing_heaters|homing_override|idle_timeout|include|manual_stepper|mcp4018|mcp4451|mcp4728|mcu|menu|multi_pin|neopixel|output_pin|pause_resume|printer|probe|quad_gantry_level|replicape|respond|safe_z_home|samd_sercom|screws_tilt_adjust|servo|skew_correction|static_digital_output|stepper_(?:bed|arm|[abcdxy]|z[1-9]{0,1})|sx1509|temperature_fan|temperature_sensor|thermistor|tsl1401cl_filament_width_sensor|verify_heater|virtual_sdcard|z_tilt)\b/,
                 caseInsensitive: true
             }],
             "#known_driver_type": [{
@@ -124,6 +121,21 @@ ace.define("ace/mode/klipper_config_highlight_rules",[], function(require, expor
                 regex: /\b(?:lagrange|bicubic)\b/,
                 caseInsensitive: true
             }],
+            "#known_samples_result_type": [{
+                token: "support.type",
+                regex: /\b(?:median|average)\b/,
+                caseInsensitive: true
+            }],
+            "#known_shaper_type": [{
+                token: "support.type",
+                regex: /\b(?:zv|mzv|zvd|ei|2hump_ei|and|3hump_ei)\b/,
+                caseInsensitive: true
+            }],
+            "#known_axel_chip": [{
+                token: "support.type",
+                regex: /\b(?:adxl345|mzv|zvd|ei|2hump_ei|and|3hump_ei)\b/,
+                caseInsensitive: true
+            }],
             "#known_display_type": [{
                 token: "support.type",
                 regex: /\b(?:hd44780|st7920|uc1701|ssd1306|emulated_st7920|sh1106)\b/,
@@ -140,15 +152,15 @@ ace.define("ace/mode/klipper_config_highlight_rules",[], function(require, expor
             }],
             "#pin": [{
                 token: "support.type",
-                regex: /[\^~!]*(?:EXP|ar|analog)\d{1,2}|(?:probe:z_virtual_endstop)/,
+                regex: /[\^~!]*(?:EXP|ar|analog)\d{1,2}|(?:probe:z_virtual_endstop|rpi:)/,
                 caseInsensitive: true
             }, {
                 token: "support.type",
-                regex: /(?:(_\d{1,2}))/,
+                regex: /(?:(_\d{1,2}=?))/,
                 caseInsensitive: true
             }, {
                 token: "support.type",
-                regex: /(?:\b)[\^~!]*(?:z:)?[a-z]{1,2}\d{1,2}(?:\.\d{1,2})?/,
+                regex: /[\^~!]*(?:z:)?[a-zA-Z]{1,2}\d{1,2}(?:\.\d{1,2})?/,
                 caseInsensitive: true
             }],
             "#config_line_start_gcode": [{
@@ -156,7 +168,7 @@ ace.define("ace/mode/klipper_config_highlight_rules",[], function(require, expor
                 regex: /^(gcode)(\s*[:=]\s*)/,
                 push: [{
                     token: "text",
-                    regex: /(?=(\[))/,
+                    regex: /(?=(\[|#\*#))/,
                     next: "start"
                 }, {
                     include: "#gcode_line"
@@ -180,8 +192,8 @@ ace.define("ace/mode/klipper_config_highlight_rules",[], function(require, expor
                 }]
             }],
             "#config_line": [{
-                token: ["variable.name"],
-                regex: /((?!gcode|sensor_type)\w+\s*[:]\s*)/,
+                token: ["variable.name", "variable.name"],
+                regex: /(?!gcode|sensor_type|rpi:)(\w+)(\s*[:]\s*)/,
                 push: [{
                     token: "text",
                     regex: /$/,
@@ -196,6 +208,12 @@ ace.define("ace/mode/klipper_config_highlight_rules",[], function(require, expor
                     include: "#known_screws_type"
                 }, {
                     include: "#known_algo_type"
+                }, {
+                    include: "#known_samples_result_type"
+                }, {
+                    include: "#known_shaper_type"
+                }, {
+                    include: "#known_axel_chip"
                 }, {
                     include: "#pin"
                 }, {
@@ -269,7 +287,7 @@ ace.define("ace/mode/klipper_config_highlight_rules",[], function(require, expor
             }],
             "#gcode_parameter": [{
                 token: "variable.parameter",
-                regex: /\b[A-z]+(?![a-z])|(?:<---------------------- SAVE_CONFIG ---------------------->)|(?:\sDO NOT EDIT THIS BLOCK OR BELOW\. The contents are auto\-generated\.)/,
+                regex: /\b[A-z]+(?![a-z])/,
                 caseInsensitive: true,
                 push: [{
                     token: "text",
