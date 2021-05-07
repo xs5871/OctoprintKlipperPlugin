@@ -133,7 +133,7 @@ ace.define("ace/mode/klipper_config_highlight_rules",[], function(require, expor
             }],
             "#known_axel_chip": [{
                 token: "support.type",
-                regex: /\b(?:adxl345|mzv|zvd|ei|2hump_ei|and|3hump_ei)\b/,
+                regex: /\b(?:adxl345)\b/,
                 caseInsensitive: true
             }],
             "#known_display_type": [{
