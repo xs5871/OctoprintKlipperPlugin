@@ -21,6 +21,7 @@ $(function() {
         var editor = null;
 
         self.settings = parameters[0];
+        self.klipperViewModel = parameters[1];
 
         self.header = OctoPrint.getRequestHeaders({
             "content-type": "application/json",
@@ -30,8 +31,8 @@ $(function() {
         self.apiUrl = OctoPrint.getSimpleApiUrl("klipper");
 
         self.onSettingsBeforeSave = function () {
-            if (editor.session) {
-                //console.debug("OctoKlipper : onSettingsBeforeSave:" + editor.session.getValue())
+            if (editor.session && self.settings.settings.plugins.klipper.configuration.parse_check() === true) {
+                self.klipperViewModel.consoleMessage("debug", "onSettingsBeforeSave:")
                 var settings = {
                     "crossDomain": true,
                     "url": self.apiUrl,
@@ -106,9 +107,31 @@ $(function() {
             }
         }
 
+        self.minusFontsize = function () {
+            self.settings.settings.plugins.klipper.configuration.fontsize(self.settings.settings.plugins.klipper.configuration.fontsize() - 1);
+            if (self.settings.settings.plugins.klipper.configuration.fontsize() < 9) {
+                self.settings.settings.plugins.klipper.configuration.fontsize(9);
+            }
+            if (editor) {
+                editor.setFontSize(self.settings.settings.plugins.klipper.configuration.fontsize());
+                editor.resize();
+            }
+        }
+
+        self.plusFontsize = function () {
+            self.settings.settings.plugins.klipper.configuration.fontsize(self.settings.settings.plugins.klipper.configuration.fontsize() + 1);
+            if (self.settings.settings.plugins.klipper.configuration.fontsize() > 20) {
+                self.settings.settings.plugins.klipper.configuration.fontsize(20);
+            }
+            if (editor) {
+                editor.setFontSize(self.settings.settings.plugins.klipper.configuration.fontsize());
+                editor.resize();
+            }
+        }
+
         self.loadLastSession = function () {
             if (self.settings.settings.plugins.klipper.configuration.old_config() != "") {
-                console.debug("OctoKlipper : lastSession:" + self.settings.settings.plugins.klipper.configuration.old_config())
+                self.klipperViewModel.consoleMessage("info","lastSession:" + self.settings.settings.plugins.klipper.configuration.old_config())
                 if (editor.session) {
                     editor.session.setValue(self.settings.settings.plugins.klipper.configuration.old_config());
                     editor.clearSelection();
@@ -155,6 +178,8 @@ $(function() {
             obKlipperConfig = config.withSilence();
             if (editor) {
                 editor.setValue(obKlipperConfig());
+                editor.setFontSize(self.settings.settings.plugins.klipper.configuration.fontsize());
+                editor.resize();
                 editor.clearSelection();
             }
             return obKlipperConfig;
@@ -165,13 +190,16 @@ $(function() {
         editor.setTheme("ace/theme/monokai");
         editor.session.setMode("ace/mode/klipper_config");
         editor.setOptions({
-          autoScrollEditorIntoView: true,
-          maxLines: "Infinity"
+            hScrollBarAlwaysVisible: true,
+            vScrollBarAlwaysVisible: true,
+            autoScrollEditorIntoView: true,
+            //maxLines: "Infinity"
         })
 
         editor.session.on('change', function(delta) {
             if (obKlipperConfig) {
                 obKlipperConfig.silentUpdate(editor.getValue());
+                editor.resize();
             }
         });
 
@@ -194,7 +222,10 @@ $(function() {
 
     OCTOPRINT_VIEWMODELS.push({
         construct: KlipperSettingsViewModel,
-        dependencies: ["settingsViewModel"],
+        dependencies: [
+                "settingsViewModel",
+                "klipperViewModel"
+                ],
         elements: ["#settings_plugin_klipper"]
     });
 });

@@ -1,16 +1,46 @@
+.plugin-klipper-sidebar {
+   padding: 1px;
+   height: auto;
+   border: 1px solid #aaa;
+   width: 98%;
+   text-align: center;
+   word-break: break-all;
+   margin: auto;
+}
+
+li#navbar_plugin_klipper {
+   cursor: pointer;
+   max-width:360px;
+   max-height:80px;
+   word-break: break-all;
+}
+
+.plugin-klipper-sidebar a {
+   padding: 2px 2px;
+   text-align: center;
+   text-decoration: none;
+   display: inline-block;
+   cursor: pointer;
+}
+
+.plugin-klipper-sidebar a:hover, .plugin-klipper-sidebar a:active {
+   cursor: pointer;
+ }
+
 .plugin-klipper-log {
-   padding: 3px;
+   padding: 0px;
    overflow-y: scroll;
    height: 400px;
    border: 1px solid #eee;
    width: 100%;
+   word-break: break-all;
 }
 
 .plugin-klipper-log .log-item {
    margin: 3px auto 0 auto;
    border: 1px solid #ddd;
    border-radius: 3px;
-   background-color: #eeeeef;
+   background-color: #efefef;
    color: #333;
 }
 
@@ -57,26 +87,30 @@ ul#klipper-settings {
 
 #tab_plugin_klipper_main .row-fluid {
    display: flex;
-   flex-direction: row;
-   flex-wrap: wrap;
+   flex: row wrap;
+   align-items: stretch;
 }
 
-#tab_plugin_klipper_main .span8 {
-   flex-grow: 8;
-   float: left;
-   box-sizing: border-box;
+@media all and (max-width: 940px) {
+   #tab_plugin_klipper_main .row-fluid {
+     /* On small screens, we are no longer using row direction but column */
+     flex-direction: column;
+   }
+ }
+
+#tab_plugin_klipper_main #left-side {
+   flex: 3 1;
+   padding-right: 10px;
 }
 
 #tab_plugin_klipper_main .span8 label {
    float: left;
 }
 
-#tab_plugin_klipper_main .span4 {
-   flex-grow: 0;
-   flex-shrink: 1;
-   /* max-width: 13%; */
-   float: left;
-   box-sizing: border-box;
+#tab_plugin_klipper_main #right-side {
+   flex: 1 1;
+   max-width: 200px;
+   min-width: 100px;
 }
 
 #settings_plugin_klipper {
@@ -94,23 +128,70 @@ ul#klipper-settings {
 }
 
 #settings_plugin_klipper form .tab-content .tab-pane {
-   height: calc(100% - 35px);
+   height: 100%;
 }
 
+/*conf editor*/
 div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content div#conf.tab-pane.active div.control-group {
    margin-bottom: 0px;
    height: 100%;
 }
 
+div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content div#conf.tab-pane.active div.control-group .editor-controls{
+   margin-bottom: 0px;
+   height: 26px;
+}
+
 div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content div#conf.tab-pane.active div.control-group div.conf-editor {
-   height: 100%;
-   overflow: auto;
+   height: calc(100% - 28px);
+   width: 100%;
+   padding-top: 2px;
+}
+
+/*UIcustomizer fix for responsiveMode*/
+body.UICResponsiveMode #settings_dialog_content {
+   width: 100%;
+   width: calc(100% - 30px);
+   height: 97%;
+   height: calc(100% - 35px);
+   margin-right: -18px;
+   margin-top: 50px;
+}
+
+body.UICResponsiveMode div#settings_plugin_klipper form.form-horizontal div.tab-content div.tab-pane div.control-group.row-fluid.UICRemoveFluidRow {
+   height: auto;
+}
+
+div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content div#conf.tab-pane.active div.control-group div.conf-editor div#plugin-klipper-config {
+   position: relative;
+   top: 0;
+   right: 0;
+   bottom: 0;
+   left: 0;
 }
 
 div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content div#conf.tab-pane.active div.control-group button.btn.btn-small {
    width: 30%;
    display: inline-block;
    margin: 0px 2px 2px 2px;
+}
+
+/*checkboxes*/
+div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content div.tab-pane.active div.control-group input.inline-checkbox {
+   vertical-align: -0.2em;
+}
+
+div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content div.tab-pane.active div.control-group label.inline {
+   display: inline;
+}
+
+div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content div.tab-pane.active div.control-group div.controls input.controls-checkbox {
+   margin-top: 8px;
+}
+
+/*macros*/
+div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content div#macros.tab-pane.active div div#item.control-group label.control-label {
+   width: 80px;
 }
 
 #macros #item.control-group {

@@ -16,7 +16,6 @@
 $(function () {
     function KlipperViewModel(parameters) {
         var self = this;
-        var console_debug = false;
 
         self.header = OctoPrint.getRequestHeaders({
             "content-type": "application/json",
@@ -32,7 +31,8 @@ $(function () {
         self.paramMacroViewModel = parameters[4];
         self.access = parameters[5];
 
-        self.shortStatus = ko.observable();
+        self.shortStatus_navbar = ko.observable();
+        self.shortStatus_sidebar = ko.observable();
         self.logMessages = ko.observableArray();
 
         self.showPopUp = function(popupType, popupTitle, message){
@@ -141,10 +141,17 @@ $(function () {
                         self.consoleMessage(data.subtype, data.payload);
                         break;
                     case "status":
-                        self.shortStatus(data.payload);
+                        if (data.payload.length > 36) {
+                            var shortText = data.payload.substring(0, 31) + " [..]"
+                            self.shortStatus_navbar(shortText);
+                        } else {
+                            self.shortStatus_navbar(data.payload);
+                        }
+                        self.shortStatus_sidebar(data.payload);
                         break;
                     default:
                         self.logMessage(data.time, data.subtype, data.payload);
+                        self.consoleMessage(data.subtype, data.payload);
                 }
 
                 //if ("warningPopUp" == data.type){
@@ -165,7 +172,11 @@ $(function () {
             }
         };
 
-        self.logMessage = function (timestamp, type, message) {
+        self.logMessage = function (timestamp, type="info", message) {
+            if (!timestamp) {
+                var today = new Date();
+                var timestamp = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+            }
             self.logMessages.push({
                 time: timestamp,
                 type: type,
@@ -174,14 +185,14 @@ $(function () {
         };
 
         self.consoleMessage = function (type, message) {
-            if (type == "info"){
-                console.info("OctoKlipper : " + message);
-            } else if (type == "debug"){
-                if (console_debug){
-                    console.debug("OctoKlipper : " + message);
+            if (self.settings.settings.plugins.klipper.configuration.debug_logging() === true) {
+                if (type == "info"){
+                    console.info("OctoKlipper : " + message);
+                } else if (type == "debug"){
+                        console.debug("OctoKlipper : " + message);
+                } else {
+                    console.error("OctoKlipper : " + message);
                 }
-            } else {
-                console.error("OctoKlipper : " + message);
             }
             return
         };
@@ -200,7 +211,7 @@ $(function () {
             $.ajax(settings).done(function (response) {
                 self.consoleMessage(
                     "debug",
-                    "Reloaded from Backend " + response);
+                    "Reloaded config file from Backend");
             });
         }
 

@@ -11,3 +11,5 @@ dist
 *.bak
 .vscode
 .vscode/**
+
+thunder-tests

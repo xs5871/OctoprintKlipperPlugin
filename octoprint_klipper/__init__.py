@@ -44,7 +44,7 @@ class KlipperPlugin(
         octoprint.plugin.EventHandlerPlugin):
 
     _parsing_response = False
-    _parsing_check_response = False
+    _parsing_check_response = True
     _message = ""
 
     def __init__(self):
@@ -128,7 +128,10 @@ class KlipperPlugin(
                 old_config="",
                 logpath="/tmp/klippy.log",
                 reload_command="RESTART",
-                navbar=True
+                shortStatus_navbar=True,
+                shortStatus_sidebar=True,
+                parse_check=False,
+                fontsize=9
             )
         )
 
@@ -160,24 +163,35 @@ class KlipperPlugin(
         )
 
         if "config" in data:
-            try:
-                if sys.version_info[0] < 3:
-                    data["config"] = data["config"].encode('utf-8')
+            if self.key_exist(data, "configuration", "parse_check"):
+                check_parse = data["configuration"]["parse_check"]
+            else:
+                check_parse = self._settings.get(["configuration", "parse_check"])
 
-                # check for configpath if it was changed during changing of the configfile
-                if self.key_exist(data, "configuration", "configpath"):
-                    configpath = os.path.expanduser(
-                        data["configuration"]["configpath"]
-                    )
-                else:
-                    # if the configpath was not changed during changing the printer.cfg. Then the configpath would not be in data[]
-                    configpath = os.path.expanduser(
-                        self._settings.get(["configuration", "configpath"])
-                    )
-                if self.file_exist(configpath) and self._parsing_check_response:
+            if sys.version_info[0] < 3:
+                data["config"] = data["config"].encode('utf-8')
+
+            # check for configpath if it was changed during changing of the configfile
+            if self.key_exist(data, "configuration", "configpath"):
+                configpath = os.path.expanduser(
+                    data["configuration"]["configpath"]
+                )
+            else:
+                # if the configpath was not changed during changing the printer.cfg. Then the configpath would not be in data[]
+                configpath = os.path.expanduser(
+                    self._settings.get(["configuration", "configpath"])
+                )
+            if self.file_exist(configpath) and (self._parsing_check_response or not check_parse):
+                try:
                     f = open(configpath, "w")
                     f.write(data["config"])
                     f.close()
+
+
+                    self.log_debug("Writing Klipper config to {}".format(configpath))
+                except IOError:
+                    self.log_error("Error: Couldn't write Klipper config file: {}".format(configpath))
+                else:
                     #load the reload command from changed data if it is not existing load the saved setting
                     if self.key_exist(data, "configuration", "reload_command"):
                         reload_command = os.path.expanduser(
@@ -189,14 +203,9 @@ class KlipperPlugin(
                     if reload_command != "manually":
                         # Restart klippy to reload config
                         self._printer.commands(reload_command)
-                        self.log_info("Reloading Klipper Configuration.")
-
-                    self.log_debug("Writing Klipper config to {}".format(configpath))
-            except IOError:
-                self.log_error("Error: Couldn't write Klipper config file: {}".format(configpath))
-            else:
-                # we dont want to write the klipper conf to the octoprint settings
-                data.pop("config", None)
+                        self.log_info("Restarting Klipper.")
+                    # we dont want to write the klipper conf to the octoprint settings
+                    data.pop("config", None)
 
         # save the rest of changed settings into config.yaml of octoprint
         old_debug_logging = self._settings.get_boolean(["configuration", "debug_logging"])
@@ -224,7 +233,7 @@ class KlipperPlugin(
         )
 
     def get_settings_version(self):
-        return 2
+        return 3
 
     def on_settings_migrate(self, target, current):
         if current is None:
@@ -271,8 +280,16 @@ class KlipperPlugin(
                 settings.remove(["probePoints"])
 
             if settings.has(["configPath"]):
+                self.log_info("migrate setting for: configPath")
                 settings.set(["config_path"], settings.get(["configPath"]))
                 settings.remove(["configPath"])
+
+        if target is 3 and current is 2:
+            settings = self._settings
+            if settings.has(["configuration", "navbar"]):
+                self.log_info("migrate setting for: configuration/navbar")
+                settings.set(["configuration", "shortStatus_navbar"], settings.get(["configuration", "navbar"]))
+                settings.remove(["configuration", "navbar"])
 
     # -- Template Plugin
 
@@ -367,21 +384,31 @@ class KlipperPlugin(
             if "FIRMWARE_VERSION" in printerInfo:
                 self.log_info("Firmware version: {}".format(
                     printerInfo["FIRMWARE_VERSION"]))
+        elif "// probe" in line or "// Failed to verify BLTouch" in line:
+            msg = line.strip('/')
+            self.log_info(msg)
+            write_parsing_response_buffer()
         elif "//" in line:
+            # add lines with // to a buffer
             self._message = self._message + line.strip('/')
             if not self._parsing_response:
                 self.update_status("info", self._message)
             self._parsing_response = True
+        elif "!!" in line:
+            msg = line.strip('!')
+            self.update_status("error", msg)
+            self.log_error(msg)
+            self.write_parsing_response_buffer()
         else:
-            if self._parsing_response:
-                self._parsing_response = False
-                self.log_info(self._message)
-                self._message = ""
-            if "!!" in line:
-                msg = line.strip('!')
-                self.update_status("error", msg)
-                self.log_error(msg)
+            self.write_parsing_response_buffer()
         return line
+
+    def write_parsing_response_buffer(self):
+        # write buffer with // lines after a gcode response without //
+        if self._parsing_response:
+            self._parsing_response = False
+            self.log_info(self._message)
+            self._message = ""
 
     def get_api_commands(self):
         return dict(
@@ -435,16 +462,17 @@ class KlipperPlugin(
                 self._settings.set(["config"], data["config"])
                 # self.send_message("reload", "config", "", data["config"])
                 # send the configdata to frontend to update ace editor
-            if sys.version_info[0] < 3:
-                data["config"] = data["config"].decode('utf-8')
-            return flask.jsonify(data=data["config"])
+                if sys.version_info[0] < 3:
+                    data["config"] = data["config"].decode('utf-8')
+                return flask.jsonify(data=data["config"])
         elif command == "checkConfig":
             if "config" in data:
                 if not self.validate_configfile(data["config"]):
-                    self.log_debug("validateConfig ->" + data["config"])
+                    self.log_debug("validateConfig not ok")
                     self._settings.set(["configuration", "old_config"], data["config"])
                     return flask.jsonify(checkConfig="not OK")
                 else:
+                    self.log_debug("validateConfig ok")
                     self._settings.set(["configuration", "old_config"], "")
                     return flask.jsonify(checkConfig="OK")
 
@@ -494,18 +522,18 @@ class KlipperPlugin(
     def log_info(self, message):
         self._octoklipper_logger.info(message)
         self.send_message("log", "info", message, message)
-        self.send_message("console", "info", message, message)
 
     def log_debug(self, message):
         self._octoklipper_logger.debug(message)
+        self._logger.info(message)
         # sends a message to frontend(in klipper.js -> self.onDataUpdaterPluginMessage) and write it to the console.
         # _mtype, subtype=debug/info, title of message, message)
         self.send_message("console", "debug", message, message)
 
     def log_error(self, error):
         self._octoklipper_logger.error(error)
+        self._logger.info(error)
         self.send_message("log", "error", error, error)
-        self.send_message("console", "error", error, error)
 
     def file_exist(self, filepath):
         if not os.path.isfile(filepath):
@@ -525,34 +553,41 @@ class KlipperPlugin(
 
     def validate_configfile(self, dataToBeValidated):
         """
-        --->For now this just checks if the given data can be parsed<----
-
-        From https://www.opensourceforu.com/2015/03/practical-python-programming-writing-a-config-file-checker/
-
-        Validates a given Config File in filetobevalidated against a correct config file pointed to by goldenfilepath
-        returns a list of erroneous lines as a list[strings]
-        if config file is fine, it should return an empty list
+        --->SyntaxCheck for a given data<----
         """
-        #len(ValidateFile('c:\example.cfg', 'c:\example.cfg' ))== 0
-
-        # learn golden file
-        #__location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
-        #goldenfilepath = os.path.join(__location__, "goldenprinter.cfg")
-        #goldenconfig = ConfigParser.ConfigParser()
-        # dataToValidated.read(goldenfilepath)
-
-        # learn file to be validated
 
         try:
-            dataToValidated = configparser.RawConfigParser()
+            dataToValidated = configparser.RawConfigParser(strict=False)
             #
             if sys.version_info[0] < 3:
                 buf = StringIO.StringIO(dataToBeValidated)
                 dataToValidated.readfp(buf)
             else:
                 dataToValidated.read_string(dataToBeValidated)
-        except configparser.DuplicateSectionError:
-            self._parsing_check_response = True
+
+            sections_search_list = ["bltouch",
+                                    "probe"]
+            value_search_list = [   "x_offset",
+                                    "y_offset",
+                                    "z_offset"]
+            try:
+                # cycle through sections and then values
+                for y in sections_search_list:
+                    for x in value_search_list:
+                        if dataToValidated.has_option(y, x):
+                            a_float = dataToValidated.getfloat(y, x)
+            except ValueError as error:
+                self.log_error(
+                    "Error: Invalid Value for <b>"+x+"</b> in Section: <b>"+y+"</b>\n" +
+                    "{}".format(str(error))
+                )
+                self.send_message("PopUp", "warning", "OctoKlipper: Invalid Config\n",
+                            "Config got not saved!\n" +
+                            "You can reload your last changes\n" +
+                            "on the 'Klipper Configuration' tab.\n\n" +
+                            "Invalid Value for <b>"+x+"</b> in Section: <b>"+y+"</b>\n" + "{}".format(str(error)))
+                self._parsing_check_response = False
+                return False
         except configparser.Error as error:
             if sys.version_info[0] < 3:
                 error.message = error.message.replace("\\n","")
@@ -568,31 +603,15 @@ class KlipperPlugin(
                 "Error: Invalid Klipper config file:\n" +
                 "{}".format(str(error))
             )
-            self.send_message("PopUp", "warning", "Invalid Config",
+            self.send_message("PopUp", "warning", "OctoKlipper: Invalid Config data\n",
                             "Config got not saved!\n" +
                             "You can reload your last changes\n" +
                             "on the 'Klipper Configuration' tab.\n\n" + str(error))
             self._parsing_check_response = False
+            return False
         else:
             self._parsing_check_response = True
-        return
-
-        #incorrectlines = []
-        # for section in dataToValidated.sections():
-        #   #check each key is present in corresponding golden section
-        #   for key in dataToValidated.options(section):
-        #      if not goldenconfig.has_option(section,key):
-        #         incorrectlines.append(key + "=" + dataToValidated.get(section,key))
-        #         # print incorrect lines
-        #         if len(incorrectlines) > 0 :
-        #            self.send_message("errorPopUp","warning", "OctoKlipper Settings", "Invalid Klipper config file: " + str(incorrectlines))
-        #            for k in incorrectlines:
-        #               print k
-        #               self._logger.error(
-        #                  "Error: Invalid Klipper config line: {}".format(str(k))
-        #               )
-        # return incorrectlines
-
+            return True
 
 __plugin_name__ = "OctoKlipper"
 __plugin_pythoncompat__ = ">=2.7,<4"
