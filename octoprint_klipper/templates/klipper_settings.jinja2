@@ -218,8 +218,8 @@
         </button>
         <label class="inline"><input class="inline-checkbox" type="checkbox" data-bind="checked: settings.settings.plugins.klipper.configuration.parse_check"> {{ _('Check parsing on save') }}</label>
         &nbsp;&nbsp;
-        <a href='#' data-bind="click: minusFontsize" class="fas fa-search-minus"></a>
-        <a href='#' data-bind="click: plusFontsize" class="fas fa-search-plus"></a>
+        <a href='#' data-bind="click: minusFontsize" title="{{ _('Decrease Fontsize') }}" class="fas fa-search-minus"></a>
+        <a href='#' data-bind="click: plusFontsize" title="{{ _('Increase Fontsize') }}" class="fas fa-search-plus"></a>
       </div>
       <div class="conf-editor">
         <input id="hdnLoadKlipperConfig" type="hidden" data-bind="value: configBound(settings.settings.plugins.klipper.config)" />
