@@ -131,62 +131,40 @@ ul#klipper-settings {
    height: 100%;
 }
 
-/*conf editor*/
-div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content div#conf.tab-pane.active div.control-group {
-   margin-bottom: 0px;
+div.tab-content div#conf.tab-pane.active div.control-group {
    height: 100%;
+   margin: 0;
 }
 
-div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content div#conf.tab-pane.active div.control-group .editor-controls{
+div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content div#conf.tab-pane.active .editor-controls{
    margin-bottom: 0px;
    height: 26px;
 }
 
-div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content div#conf.tab-pane.active div.control-group div.conf-editor {
+div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content div#conf.tab-pane.active div.conf-editor {
    height: 95%;
    height: calc(100% - 28px);
-   width: 100%;
+   width: 99%;
+   width: calc(100% - 4px);
    padding-top: 2px;
 }
 
-/*UIcustomizer fix for responsiveMode*/
-body.UICResponsiveMode #settings_dialog_content {
-   width: 100%;
-   width: calc(100% - 30px);
-   height: 97%;
-   height: calc(100% - 35px);
-   margin-right: -18px;
-   margin-top: 50px;
-}
-
-body.UICResponsiveMode div#settings_plugin_klipper form.form-horizontal div.tab-content div.tab-pane div.control-group.row-fluid.UICRemoveFluidRow {
-   height: auto;
-}
-
-div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content div#conf.tab-pane.active div.control-group div.conf-editor div#plugin-klipper-config {
-   position: relative;
-   top: 0;
-   right: 0;
-   bottom: 0;
-   left: 0;
-}
-
-div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content div#conf.tab-pane.active div.control-group button.btn.btn-small {
+div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content div#conf.tab-pane.active button.btn.btn-small {
    width: 30%;
    display: inline-block;
    margin: 0px 2px 2px 2px;
 }
 
 /*checkboxes*/
-div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content div.tab-pane.active div.control-group input.inline-checkbox {
+div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content div.tab-pane.active input.inline-checkbox {
    vertical-align: -0.2em;
 }
 
-div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content div.tab-pane.active div.control-group label.inline {
+div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content div.tab-pane.active label.inline {
    display: inline;
 }
 
-div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content div.tab-pane.active div.control-group div.controls input.controls-checkbox {
+div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content div.tab-pane.active div.controls input.controls-checkbox {
    margin-top: 8px;
 }
 
