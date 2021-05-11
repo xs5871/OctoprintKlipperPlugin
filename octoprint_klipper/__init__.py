@@ -354,8 +354,7 @@ class KlipperPlugin(
                 "js/klipper_param_macro.js",
                 "js/klipper_graph.js"
                 ],
-            css=["css/klipper.css"],
-            less=["css/klipper.less"]
+            css=["css/klipper.css"]
         )
 
     # -- Event Handler Plugin
