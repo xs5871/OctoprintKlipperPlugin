@@ -190,7 +190,7 @@ $(function() {
         editor.setTheme("ace/theme/monokai");
         editor.session.setMode("ace/mode/klipper_config");
         editor.setOptions({
-            hScrollBarAlwaysVisible: true,
+            hScrollBarAlwaysVisible: false,
             vScrollBarAlwaysVisible: true,
             autoScrollEditorIntoView: true,
             //maxLines: "Infinity"
