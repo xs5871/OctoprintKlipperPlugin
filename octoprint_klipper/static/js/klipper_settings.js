@@ -193,6 +193,7 @@ $(function() {
             hScrollBarAlwaysVisible: false,
             vScrollBarAlwaysVisible: true,
             autoScrollEditorIntoView: true,
+            showPrintMargin: false,
             //maxLines: "Infinity"
         })
 

@@ -151,7 +151,8 @@ div#settings_plugin_klipper div.tab-content div#conf.tab-pane div.control-group 
 div#settings_plugin_klipper div.tab-content div#conf.tab-pane div.control-group div.conf-editor div#plugin-klipper-config {
    font-family: monospace;
    overflow: auto;
-   height: -webkit-fill-available
+   height: 100%;
+   height: -webkit-fill-available;
 }
 
 div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content div#conf.tab-pane.active button.btn.btn-small {
