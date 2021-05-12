@@ -191,10 +191,10 @@ $(function() {
         editor.session.setMode("ace/mode/klipper_config");
         editor.setOptions({
             hScrollBarAlwaysVisible: false,
-            vScrollBarAlwaysVisible: true,
+            vScrollBarAlwaysVisible: false,
             autoScrollEditorIntoView: true,
             showPrintMargin: false,
-            //maxLines: "Infinity"
+            maxLines: "Infinity"
         })
 
         editor.session.on('change', function(delta) {
