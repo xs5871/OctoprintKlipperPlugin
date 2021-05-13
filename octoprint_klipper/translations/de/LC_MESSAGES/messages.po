@@ -146,12 +146,10 @@ msgid "Macros"
 msgstr "Makros"
 
 #: octoprint_klipper/templates/klipper_settings.jinja2:5
-#, fuzzy
 msgid "Bed Leveling"
-msgstr "Unterstützte Druckbett-Nivellierung"
+msgstr "Druckbett-Nivellierung"
 
 #: octoprint_klipper/templates/klipper_settings.jinja2:6
-#, fuzzy
 msgid "Klipper Configuration"
 msgstr "Klipper Konfiguration"
 
