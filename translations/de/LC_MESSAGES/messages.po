@@ -200,13 +200,13 @@ msgid ""
 "              Set this to \"Manually\" if you don't want to immediately "
 "restart klipper."
 msgstr ""
-"Der Befehl der ausgeführt wird nachdem die Klipper Konfiguration geändert wurde und "
-"neu geladen werden muss.<br>\n"
-"              Auf \"Manually\" setzen wenn man nicht gleich Klipper neustarten möchte."
+"Der Befehl der ausgeführt wird nachdem die Klipper Konfiguration <br>\n"
+"geändert wurde und neu geladen werden muss.<br>\n"
+"Auf \"Manually\" setzen wenn man nicht gleich Klipper neustarten möchte."
 
 #: octoprint_klipper/templates/klipper_settings.jinja2:69
 msgid "Add macro button to:"
-msgstr "Makroschaltfläche anzeigen:"
+msgstr "Makroschaltfläche anzeigen auf:"
 
 #: octoprint_klipper/templates/klipper_settings.jinja2:70
 #: octoprint_klipper/templates/klipper_settings.jinja2:84
@@ -235,8 +235,8 @@ msgid ""
 "To show a dialog that asks for parameters you can write your macro like "
 "in the following example:"
 msgstr ""
-"Um ein Dialog anzeigen zu lassen, welches nach Parametern fragt, kann man "
-"ein Makro wie im nächsten Beispiel schreiben:"
+"Um ein Dialog anzeigen zu lassen, welches nach Parametern fragt, <br>\n"
+"kann man ein Makro wie im nächsten Beispiel schreiben:"
 
 #: octoprint_klipper/templates/klipper_settings.jinja2:130
 msgid ""
@@ -245,10 +245,10 @@ msgid ""
 "           If you use a piece of paper for leveling, set \"Probe Height\""
 " to the paper thickness eg. \"0.1\"."
 msgstr ""
-"Diese Funktion hilft beim Einstellen des Druckbettes, "
+"Diese Funktion hilft beim Einstellen des Druckbettes, <br>\n"
 "da es die angegebenen Punkte automatisch nacheinander anfährt.<br>\n"
-"          Wenn man ein Papier zum messen nimmt, setzt man \"Messhöhe\""
-" auf die Papierstärke zBsp.: \"0.1\"."
+"Wenn man ein Papier zum messen nimmt, setzt man \"Messhöhe\" <br>\n"
+"auf die Papierstärke zBsp.: \"0.1\"."
 
 #: octoprint_klipper/templates/klipper_settings.jinja2:135
 msgid "Probe Height"
@@ -264,7 +264,7 @@ msgstr "Höhe für Seitenbewegung"
 
 #: octoprint_klipper/templates/klipper_settings.jinja2:151
 msgid "Lift Head by this amount before moving."
-msgstr "Hebe Druckkopf auf diese Höhe vor Seitenbewegung"
+msgstr "Hebe Druckkopf auf diese Höhe vor einer Seitenbewegung"
 
 #: octoprint_klipper/templates/klipper_settings.jinja2:155
 msgid "Probe Feedrate Z"
@@ -290,7 +290,7 @@ msgstr "Lade letzte Änderung"
 #: octoprint_klipper/templates/klipper_settings.jinja2:216
 #: octoprint_klipper/templates/klipper_settings.jinja2:217
 msgid "Reload from file"
-msgstr "Neuladen von Datei"
+msgstr "Datei neuladen"
 
 #: octoprint_klipper/templates/klipper_settings.jinja2:219
 msgid "Check parsing on save"
@@ -306,7 +306,7 @@ msgstr "Vergrößere Schriftgröße"
 
 #: octoprint_klipper/templates/klipper_sidebar.jinja2:3
 msgid "Printer Profile"
-msgstr "Druckprofil"
+msgstr "Druckerprofil"
 
 #: octoprint_klipper/templates/klipper_sidebar.jinja2:5
 msgid "Connect"
@@ -328,7 +328,7 @@ msgstr "Log löschen"
 
 #: octoprint_klipper/templates/klipper_tab_main.jinja2:27
 msgid "Query Klipper for its current status"
-msgstr "Aktuellen Status von Klipper anfragen"
+msgstr "Aktuellen Status von Klipper anfordern"
 
 #: octoprint_klipper/templates/klipper_tab_main.jinja2:29
 msgid "Get Status"
@@ -374,8 +374,8 @@ msgid ""
 "Assists in manually leveling your printbed by moving the head to a "
 "configurable set of positions in sequence."
 msgstr ""
-"Unterstützt beim manuellem Bettnivellieren da der Druckkopf "
-"nacheinander einstellbare Punkte anfährt."
+"Unterstützt beim manuellem Bettnivellieren, <br>\n"
+"da der Druckkopf nacheinander einstellbare Punkte anfährt."
 
 #: octoprint_klipper/templates/klipper_tab_main.jinja2:77
 msgid "Determines optimal PID parameters by heat cycling the hotend/bed."
@@ -390,7 +390,7 @@ msgid ""
 "Assists in debugging performance issues by analyzing the Klipper log "
 "files."
 msgstr ""
-"Unterstützt beim Suchen von Performanceproblemen mit dem analysieren des Klipperlogs"
+"Unterstützt, mit dem analysieren des Klipperlogs, beim Suchen von Performanceproblemen."
 
 #: octoprint_klipper/templates/klipper_tab_main.jinja2:93
 msgid "Analyze Klipper Log"
