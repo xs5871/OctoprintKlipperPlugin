@@ -1,9 +1,9 @@
 <form class="form-horizontal">
 <ul class="nav nav-pills" id="klipper-settings">
-  <li><a href="#basic" data-toggle="tab" data-profile-type="klipper-basic">Basic</a></li>
-  <li><a href="#macros" data-toggle="tab" data-profile-type="klipper-macros">Macros</a></li>
-  <li><a href="#level" data-toggle="tab" data-profile-type="klipper-bed">Bed Leveling</a></li>
-  <li><a href="#conf" data-toggle="tab" data-profile-type="klipper-config">Klipper Configuration</a></li>
+  <li><a href="#basic" data-toggle="tab" data-profile-type="klipper-basic">{{ _('Basic') }}</a></li>
+  <li><a href="#macros" data-toggle="tab" data-profile-type="klipper-macros">{{ _('Macros') }}</a></li>
+  <li><a href="#level" data-toggle="tab" data-profile-type="klipper-bed">{{ _('Bed Leveling') }}</a></li>
+  <li><a href="#conf" data-toggle="tab" data-profile-type="klipper-config">{{ _('Klipper Configuration') }}</a></li>
 </ul>
 <div class="tab-content">
   <!-- Basics -->
@@ -55,8 +55,8 @@
               <option value="manually">Manually</option>
            </select>
            <span class="help-block">
-              The command that is executed when the Klipper configuration changed and needs to be reloaded.<br>
-              Set this to "Manually" if you don't want to immediately restart klipper.
+              {{ _('The command that is executed when the Klipper configuration changed and needs to be reloaded.<br>
+              Set this to "Manually" if you don\'t want to immediately restart klipper.') }}
            </span>
         </div>
     </div>
@@ -111,7 +111,7 @@
     </div>
     <div class="control-group">
         <span class="help-block">
-         To show a dialog that asks for parameters you can write your macro like in the following example:<br>
+         {{ _('To show a dialog that asks for parameters you can write your macro like in the following example:') }}<br>
         </span>
     </div>
     <div class="control-group">
@@ -127,8 +127,8 @@
   <div class="tab-pane" id="level">
     <div class="control-group">
        <span class="help-block">
-           This feature assists in manually leveling you print bed by moving the head to the defined points in sequence.<br>
-           If you use a piece of paper for leveling, set "Probe Height" to the paper thickness eg. "0.1".
+           {{ _('This feature assists in manually leveling you print bed by moving the head to the defined points in sequence.<br>
+           If you use a piece of paper for leveling, set "Probe Height" to the paper thickness eg. "0.1".') }}
         </span>
     </div>
     <div class="control-group">
