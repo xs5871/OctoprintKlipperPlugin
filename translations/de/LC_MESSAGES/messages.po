@@ -1,0 +1,292 @@
+# German translations for OctoKlipper.
+# Copyright (C) 2021 The OctoPrint Project
+# This file is distributed under the same license as the OctoKlipper
+# project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2021.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: OctoKlipper 0.3.8.2\n"
+"Report-Msgid-Bugs-To: i18n@octoprint.org\n"
+"POT-Creation-Date: 2021-05-13 16:32+0200\n"
+"PO-Revision-Date: 2021-05-13 17:32+0200\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: de\n"
+"Language-Team: de <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.0\n"
+
+#: octoprint_klipper/__init__.py:87
+msgid "Allows to config klipper"
+msgstr "Erlaubt Klipper zu konfigurieren"
+
+#: octoprint_klipper/__init__.py:95
+msgid "Allows to use klipper macros"
+msgstr "Erlaubt Makros zu benutzen"
+
+#: octoprint_klipper/templates/klipper_graph_dialog.jinja2:4
+msgid "Performance Graph"
+msgstr "Performancediagramm"
+
+#: octoprint_klipper/templates/klipper_graph_dialog.jinja2:15
+msgid "Fill Datasets"
+msgstr "Fülle Flächen"
+
+#: octoprint_klipper/templates/klipper_graph_dialog.jinja2:22
+msgid "Select"
+msgstr "Auswählen"
+
+#: octoprint_klipper/templates/klipper_graph_dialog.jinja2:26
+msgid "Analyze Log"
+msgstr "Log analysieren"
+
+#: octoprint_klipper/templates/klipper_graph_dialog.jinja2:27
+msgid "Close"
+msgstr "Schließen"
+
+#: octoprint_klipper/templates/klipper_leveling_dialog.jinja2:4
+#: octoprint_klipper/templates/klipper_tab_main.jinja2:72
+msgid "Assisted Bed Leveling"
+msgstr "Unterstützte Druckbett-Nivellierung"
+
+#: octoprint_klipper/templates/klipper_leveling_dialog.jinja2:14
+msgid "Home"
+msgstr "Grundstellung"
+
+#: octoprint_klipper/templates/klipper_leveling_dialog.jinja2:42
+msgid "Start"
+msgstr "Start"
+
+#: octoprint_klipper/templates/klipper_leveling_dialog.jinja2:43
+msgid "Previous"
+msgstr "Vorheriger"
+
+#: octoprint_klipper/templates/klipper_leveling_dialog.jinja2:44
+msgid "Next"
+msgstr "Nächster"
+
+#: octoprint_klipper/templates/klipper_leveling_dialog.jinja2:45
+msgid "Stop"
+msgstr "Stop"
+
+#: octoprint_klipper/templates/klipper_offset_dialog.jinja2:4
+#: octoprint_klipper/templates/klipper_tab_main.jinja2:86
+msgid "Coordinate Offset"
+msgstr "Koordinaten Versatz"
+
+#: octoprint_klipper/templates/klipper_offset_dialog.jinja2:8
+msgid "Set an offset for all future GCODE move commands in mm."
+msgstr "Setze einen Versatz in mm für alle zukünftigen GCODE Bewegungskommandos"
+
+#: octoprint_klipper/templates/klipper_offset_dialog.jinja2:26
+msgid "Add to existing offset"
+msgstr "Hinzufügen zum existierenden Versatz"
+
+#: octoprint_klipper/templates/klipper_offset_dialog.jinja2:31
+msgid "Set Offset"
+msgstr "Setze Versatz"
+
+#: octoprint_klipper/templates/klipper_param_macro_dialog.jinja2:4
+msgid "Run - "
+msgstr "Ausführen - "
+
+#: octoprint_klipper/templates/klipper_param_macro_dialog.jinja2:27
+msgid "OK"
+msgstr "OK"
+
+#: octoprint_klipper/templates/klipper_pid_tuning_dialog.jinja2:4
+#: octoprint_klipper/templates/klipper_tab_main.jinja2:79
+msgid "PID Tuning"
+msgstr "PID Abstimmung"
+
+#: octoprint_klipper/templates/klipper_pid_tuning_dialog.jinja2:8
+msgid "Heater / Extruder Name (from config file)"
+msgstr "Heizer / Extruder Name (von Konfigdatei)"
+
+#: octoprint_klipper/templates/klipper_pid_tuning_dialog.jinja2:12
+msgid "name"
+msgstr "Name"
+
+#: octoprint_klipper/templates/klipper_pid_tuning_dialog.jinja2:17
+msgid "Target Temperature"
+msgstr "Zieltemperatur"
+
+#: octoprint_klipper/templates/klipper_pid_tuning_dialog.jinja2:25
+msgid "The result of the tuning cycle is reported in the message log."
+msgstr "Die Ergebnisse der Abstimmung werden im Nachrichtenlog ausgegeben."
+
+#: octoprint_klipper/templates/klipper_pid_tuning_dialog.jinja2:28
+msgid "Start Tuning"
+msgstr "Starte Abstimmung"
+
+#: octoprint_klipper/templates/klipper_settings.jinja2:12
+msgid "Serial Port"
+msgstr "Serieller Port"
+
+#: octoprint_klipper/templates/klipper_settings.jinja2:18
+#: octoprint_klipper/templates/klipper_settings.jinja2:20
+msgid "Replace Connection Panel"
+msgstr "Ersetze Verbindungsmenu"
+
+#: octoprint_klipper/templates/klipper_settings.jinja2:25
+msgid "Show Short Messages"
+msgstr "Zeige Kurzmeldungen"
+
+#: octoprint_klipper/templates/klipper_settings.jinja2:27
+msgid "on NavBar"
+msgstr "auf Nav-leiste"
+
+#: octoprint_klipper/templates/klipper_settings.jinja2:28
+msgid "on SideBar"
+msgstr "auf Seitenleiste"
+
+#: octoprint_klipper/templates/klipper_settings.jinja2:32
+#: octoprint_klipper/templates/klipper_settings.jinja2:34
+msgid "Enable debug logging"
+msgstr "Aktiviere Debugloging"
+
+#: octoprint_klipper/templates/klipper_settings.jinja2:38
+msgid "Klipper Config File"
+msgstr "Klipper Konfigdatei"
+
+#: octoprint_klipper/templates/klipper_settings.jinja2:44
+msgid "Klipper Log File"
+msgstr "Klipper Logdatei"
+
+#: octoprint_klipper/templates/klipper_settings.jinja2:50
+msgid "Configuration Reload Command"
+msgstr "Konfiguration Neustart Befehl"
+
+#: octoprint_klipper/templates/klipper_settings.jinja2:69
+msgid "Add macro button to:"
+msgstr "Makroschaltfläche anzeigen:"
+
+#: octoprint_klipper/templates/klipper_settings.jinja2:70
+#: octoprint_klipper/templates/klipper_settings.jinja2:84
+msgid "Klipper Tab"
+msgstr "Klipper Reiter"
+
+#: octoprint_klipper/templates/klipper_settings.jinja2:71
+#: octoprint_klipper/templates/klipper_settings.jinja2:87
+msgid "Sidebar"
+msgstr "Seitenleiste"
+
+#: octoprint_klipper/templates/klipper_settings.jinja2:77
+msgid "Name"
+msgstr "Name"
+
+#: octoprint_klipper/templates/klipper_settings.jinja2:96
+msgid "Command"
+msgstr "Befehl"
+
+#: octoprint_klipper/templates/klipper_settings.jinja2:109
+msgid "Add Macro"
+msgstr "Makro hinzufügen"
+
+#: octoprint_klipper/templates/klipper_settings.jinja2:135
+msgid "Probe Height"
+msgstr "Sensor Messhöhe"
+
+#: octoprint_klipper/templates/klipper_settings.jinja2:141
+msgid "Z-height to probe at"
+msgstr "Höhe bei der gemessen wird"
+
+#: octoprint_klipper/templates/klipper_settings.jinja2:145
+msgid "Probe Lift"
+msgstr "Sensorhöhe bei Seitenbewegung"
+
+#: octoprint_klipper/templates/klipper_settings.jinja2:151
+msgid "Lift Head by this amount before moving."
+msgstr "Hebe Düsenkopf auf diese Höhe vor Seitenbewegung"
+
+#: octoprint_klipper/templates/klipper_settings.jinja2:155
+msgid "Probe Feedrate Z"
+msgstr "Geschwindigkeit Z"
+
+#: octoprint_klipper/templates/klipper_settings.jinja2:164
+msgid "Feedrate X/Y"
+msgstr "Geschwindigkeit X/Y"
+
+#: octoprint_klipper/templates/klipper_settings.jinja2:173
+msgid "Probe Points"
+msgstr "Messpunkte"
+
+#: octoprint_klipper/templates/klipper_settings.jinja2:200
+msgid "Add Point"
+msgstr "Füge Messpunkt hinzu"
+
+#: octoprint_klipper/templates/klipper_settings.jinja2:212
+#: octoprint_klipper/templates/klipper_settings.jinja2:213
+msgid "Reload last changes"
+msgstr "Lade letzte Änderung"
+
+#: octoprint_klipper/templates/klipper_settings.jinja2:216
+#: octoprint_klipper/templates/klipper_settings.jinja2:217
+msgid "Reload from file"
+msgstr "Neuladen von Datei"
+
+#: octoprint_klipper/templates/klipper_settings.jinja2:219
+msgid "Check parsing on save"
+msgstr "Prüfe Syntax beim speichern"
+
+#: octoprint_klipper/templates/klipper_settings.jinja2:221
+msgid "Decrease Fontsize"
+msgstr "Verringere Schriftgröße"
+
+#: octoprint_klipper/templates/klipper_settings.jinja2:222
+msgid "Increase Fontsize"
+msgstr "Vergrößere Schriftgröße"
+
+#: octoprint_klipper/templates/klipper_sidebar.jinja2:3
+msgid "Printer Profile"
+msgstr "Druckprofil"
+
+#: octoprint_klipper/templates/klipper_sidebar.jinja2:5
+msgid "Connect"
+msgstr "Verbinde"
+
+#: octoprint_klipper/templates/klipper_sidebar.jinja2:6
+#: octoprint_klipper/templates/klipper_tab_main.jinja2:37
+msgid "Open Klipper config"
+msgstr "Öffne Klipper Konfig"
+
+#: octoprint_klipper/templates/klipper_sidebar.jinja2:16
+#: octoprint_klipper/templates/klipper_tab_main.jinja2:99
+msgid "Macros"
+msgstr "Makros"
+
+#: octoprint_klipper/templates/klipper_tab_main.jinja2:3
+msgid "Messages"
+msgstr "Nachricht"
+
+#: octoprint_klipper/templates/klipper_tab_main.jinja2:16
+msgid "Clear"
+msgstr "Lösche"
+
+#: octoprint_klipper/templates/klipper_tab_main.jinja2:29
+msgid "Get Status"
+msgstr "Statusanfrage"
+
+#: octoprint_klipper/templates/klipper_tab_main.jinja2:44
+msgid "Restart"
+msgstr "Neustart"
+
+#: octoprint_klipper/templates/klipper_tab_main.jinja2:51
+msgid "Host"
+msgstr "Host"
+
+#: octoprint_klipper/templates/klipper_tab_main.jinja2:58
+msgid "Firmware"
+msgstr "Firmware"
+
+#: octoprint_klipper/templates/klipper_tab_main.jinja2:65
+msgid "Tools"
+msgstr "Tools"
+
+#: octoprint_klipper/templates/klipper_tab_main.jinja2:93
+msgid "Analyze Klipper Log"
+msgstr "Analysiere Klipperlog"
+
