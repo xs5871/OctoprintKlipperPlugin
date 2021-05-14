@@ -118,8 +118,17 @@ div#settings_plugin_klipper form {
 }
 
 div#settings_plugin_klipper form .tab-content {
-   height: calc(100% - 40px);
+   height: calc(100% - 60px);
    overflow: auto;
+}
+
+div#settings_plugin_klipper form .tab-footer {
+   height: 20px;
+   width: 100%;
+   top: 10px;
+   position: relative;
+   border-top: 1px solid #eee;
+   padding-top: 5px;
 }
 
 div#settings_plugin_klipper div.tab-content div#conf.tab-pane {
