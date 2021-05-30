@@ -31,7 +31,7 @@ $(function() {
         self.apiUrl = OctoPrint.getSimpleApiUrl("klipper");
 
         self.onSettingsBeforeSave = function () {
-            if (editor.session && self.settings.settings.plugins.klipper.configuration.parse_check() === true) {
+            if (editor.session) {
                 self.klipperViewModel.consoleMessage("debug", "onSettingsBeforeSave:")
                 var settings = {
                     "crossDomain": true,
@@ -152,8 +152,31 @@ $(function() {
                 }
 
                 $.ajax(settings).done(function (response) {
-                    editor.session.setValue(response["data"]);
-                    editor.clearSelection();
+                    if (editor.session) {
+                        editor.session.setValue(response["data"]);
+                        editor.clearSelection();
+                    }
+                });
+            }
+        }
+
+        self.loadCfgBackup = function () {
+            if (editor.session) {
+                var settings = {
+                    "crossDomain": true,
+                    "url": self.apiUrl,
+                    "method": "POST",
+                    "headers": self.header,
+                    "processData": false,
+                    "dataType": "json",
+                    "data": JSON.stringify({command: "reloadCfgBackup"})
+                }
+
+                $.ajax(settings).done(function (response) {
+                    if (editor.session) {
+                        editor.session.setValue(response["data"]);
+                        editor.clearSelection();
+                    }
                 });
             }
         }
