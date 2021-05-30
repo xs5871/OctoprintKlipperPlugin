@@ -217,7 +217,7 @@ $(function() {
             vScrollBarAlwaysVisible: false,
             autoScrollEditorIntoView: true,
             showPrintMargin: false,
-            maxLines: "Infinity"
+            //maxLines: "Infinity"
         })
 
         editor.session.on('change', function(delta) {
