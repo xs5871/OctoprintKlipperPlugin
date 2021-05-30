@@ -14,3 +14,5 @@ dist
 
 thunder-tests
 vscode.env
+.venv
+OctoKlipper.egg-info
