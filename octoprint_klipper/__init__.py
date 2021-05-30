@@ -386,7 +386,7 @@ class KlipperPlugin(
         elif "// probe" in line or "// Failed to verify BLTouch" in line:
             msg = line.strip('/')
             self.log_info(msg)
-            write_parsing_response_buffer()
+            self.write_parsing_response_buffer()
         elif "//" in line:
             # add lines with // to a buffer
             self._message = self._message + line.strip('/')
