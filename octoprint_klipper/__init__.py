@@ -22,7 +22,7 @@ import glob
 import os
 import sys
 from octoprint.util.comm import parse_firmware_line
-from octoprint.access.permissions import Permissions, ADMIN_GROUP, USER_GROUP
+from octoprint.access.permissions import Permissions, ADMIN_GROUP
 from .modules import KlipperLogAnalyzer
 import flask
 from flask_babel import gettext
@@ -141,7 +141,7 @@ class KlipperPlugin(
         configpath = os.path.expanduser(
             self._settings.get(["configuration", "configpath"])
         )
-
+        data["config"] = ""
         try:
             f = open(configpath, "r")
             data["config"] = f.read()
@@ -179,7 +179,10 @@ class KlipperPlugin(
                 configpath = os.path.expanduser(
                     self._settings.get(["configuration", "configpath"])
                 )
-            if self.file_exist(configpath) and (self._parsing_check_response or not check_parse):
+            if self.file_exist(configpath):
+                self.copy_cfg_to_backup(configpath)
+
+            if self._parsing_check_response or not check_parse:
                 try:
                     f = open(configpath, "w")
                     f.write(data["config"])
@@ -411,6 +414,7 @@ class KlipperPlugin(
             listLogFiles=[],
             getStats=["logFile"],
             reloadConfig=[],
+            reloadCfgBackup=[],
             checkConfig=["config"]
         )
 
@@ -442,10 +446,13 @@ class KlipperPlugin(
             return self.reload_cfg()
         elif command == "reloadCfgBackup":
             self.log_debug("reloadCfgBackup")
-            return self.read_cfg_backup()
+            configpath = os.path.expanduser(
+                    self._settings.get(["configuration", "configpath"])
+                )
+            return self.copy_cfg_from_backup(configpath)
         elif command == "checkConfig":
             if "config" in data:
-                self.write_cfg_backup(data["config"])
+                #self.write_cfg_backup(data["config"])
                 if self.key_exist(data, "configuration", "parse_check"):
                     check_parse = data["configuration"]["parse_check"]
                 else:
@@ -625,51 +632,47 @@ class KlipperPlugin(
                 data["config"] = data["config"].decode('utf-8')
             return flask.jsonify(data=data["config"])
 
-    def read_cfg_backup(self):
+    def copy_cfg_from_backup(self, dst):
         """
-        Read the backuped printer.cfg in the data folder of OctoKlipper
+        Copy the backuped config files in the data folder of OctoKlipper to the given destination
+        """
+        from shutil import copy
 
-        :return:
-        The last version of the configfile printer_bak.cfg in the data folder as json
-        """
-        data = octoprint.plugin.SettingsPlugin.on_settings_load(self)
-        self.oldconfig_path = os.path.join(self.get_plugin_data_folder(), "printer_bak.cfg")
-        self.log_debug("reloadCfgBackupPath:" + self.oldconfig_path)
-        if os.path.exists(self.oldconfig_path):
-            try:
-                f = open(self.oldconfig_path, "r")
-                data["config"] = f.read()
-                f.close()
-            except IOError:
-                self.log_error(
-                    "Error: Klipper config file not found at: {}".format(
-                        self.oldconfig_path)
-                )
-            else:
+        bak_config_path = os.path.join(self.get_plugin_data_folder(), "configs/")
+        src_files = os.listdir(bak_config_path)
+        nio_files = []
+        self.log_debug("reloadCfgBackupPath:" + src_files)
 
-                self._settings.set(["config"], data["config"])
-                # self.send_message("reload", "config", "", data["config"])
-                # send the configdata to frontend to update ace editor
-                if sys.version_info[0] < 3:
-                    data["config"] = data["config"].decode('utf-8')
-                self.log_debug("return CfgBackup now")
-                return flask.jsonify(data=data["config"])
+        for file_name in src_files:
+            full_file_name = os.path.join(bak_config_path, file_name)
+            if os.path.isfile(full_file_name):
+                try:
+                    copy(full_file_name, dst)
+                except IOError:
+                    self.log_error(
+                        "Error: Klipper config file not found at: {}".format(
+                            full_file_name)
+                    )
+                    nio_files.append(full_file_name)
+                else:
+                    self.log_debug("File done: " + full_file_name)
+        return nio_files
 
-    def write_cfg_backup(self, data):
+    def copy_cfg_to_backup(self, src):
         """
-        Write the backuped printer.cfg into the data folder of OctoKlipper as printer_bak.cfg
+        Copy the config file into the data folder of OctoKlipper
         """
-        data = octoprint.plugin.SettingsPlugin.on_settings_load(self)
-        self.oldconfig_path = os.path.join(self.get_plugin_data_folder(), "printer_bak.cfg")
-        self.log_debug("WriteCfgBackupPath:" + self.oldconfig_path)
+        from shutil import copyfile
+
+        filename = os.path.basename(src)
+        dst = os.path.join(self.get_plugin_data_folder(), "configs", "", filename)
+        self.log_debug("CopyCfgBackupPath:" + dst)
         try:
-            f = open(self.oldconfig_path, "w")
-            f.write(data["config"])
-            f.close()
+            copyfile(src, dst)
         except IOError:
             self.log_error(
-                "Error: Couldn't write Klipper config file to {}".format(
-                    self.oldconfig_path)
+                "Error: Couldn't copy Klipper config file to {}".format(
+                    dst)
             )
         else:
             self.log_debug("CfgBackup writen")
