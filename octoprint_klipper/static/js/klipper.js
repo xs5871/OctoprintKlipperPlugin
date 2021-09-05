@@ -227,9 +227,8 @@ $(function () {
 
     // OctoKlipper settings link
     self.openOctoKlipperSettings = function (profile_type) {
-      self.consoleMessage("debug", ": openOctoKlipperSettings :");
       if (!self.hasRight("CONFIG")) return;
-      self.consoleMessage("debug", ": openOctoKlipperSettings : Access okay");
+
       $("a#navbar_show_settings").click();
       $("li#settings_plugin_klipper_link a").click();
       if (profile_type) {
