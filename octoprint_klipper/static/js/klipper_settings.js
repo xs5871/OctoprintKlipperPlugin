@@ -32,10 +32,10 @@ $(function () {
     self.markedForFileRemove = ko.observableArray([]);
 
     self.checkFontsize = function () {
-      if (settings.settings.plugins.klipper.configuration.fontsize() > 20) {
-        settings.settings.plugins.klipper.configuration.fontsize(20)
-      } else if (settings.settings.plugins.klipper.configuration.fontsize()< 9) {
-        settings.settings.plugins.klipper.configuration.fontsize(9)
+      if (self.settings.settings.plugins.klipper.configuration.fontsize() > 20) {
+        self.settings.settings.plugins.klipper.configuration.fontsize(20)
+      } else if (self.settings.settings.plugins.klipper.configuration.fontsize()< 9) {
+        self.settings.settings.plugins.klipper.configuration.fontsize(9)
       }
     }
     // initialize list helper
