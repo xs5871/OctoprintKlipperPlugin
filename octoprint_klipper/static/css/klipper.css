@@ -179,7 +179,6 @@ div#klipper_backups_dialog div.modal-body textarea {
   padding-left: 0px !important;
   padding-right: 0px !important;
   box-sizing: border-box;
-  height: -webkit-fill-available;
   resize: none;
   width: 100%;
 }
