@@ -14,16 +14,22 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from __future__ import absolute_import, division, print_function, unicode_literals
-import datetime
 import logging
 import octoprint.plugin
 import octoprint.plugin.core
 import glob
 import os
+import time
 import sys
+
+from octoprint.server import NO_CONTENT
+from octoprint.util import is_hidden_path
+from octoprint.util import get_formatted_size
+from . import util, cfgUtils, logger
 from octoprint.util.comm import parse_firmware_line
 from octoprint.access.permissions import Permissions, ADMIN_GROUP
 from .modules import KlipperLogAnalyzer
+from octoprint.server.util.flask import restricted_access
 import flask
 from flask_babel import gettext
 
@@ -35,13 +41,16 @@ except ImportError:
 if sys.version_info[0] < 3:
     import StringIO
 
+MAX_UPLOAD_SIZE = 5 * 1024 * 1024  # 5Mb
+
 class KlipperPlugin(
         octoprint.plugin.StartupPlugin,
         octoprint.plugin.TemplatePlugin,
         octoprint.plugin.SettingsPlugin,
         octoprint.plugin.AssetPlugin,
         octoprint.plugin.SimpleApiPlugin,
-        octoprint.plugin.EventHandlerPlugin):
+        octoprint.plugin.EventHandlerPlugin,
+        octoprint.plugin.BlueprintPlugin):
 
     _parsing_response = False
     _parsing_check_response = True
@@ -74,8 +83,10 @@ class KlipperPlugin(
             self._settings.global_set(
                 ["serial", "additionalPorts"], additional_ports)
             self._settings.save()
-            self.log_info(
-                "Added klipper serial port {} to list of additional ports.".format(klipper_port))
+            logger.log_info(
+                self,
+                "Added klipper serial port {} to list of additional ports.".format(klipper_port)
+            )
 
     # -- Settings Plugin
 
@@ -126,6 +137,7 @@ class KlipperPlugin(
                 debug_logging=False,
                 configpath="~/printer.cfg",
                 old_config="",
+                temp_config="",
                 logpath="/tmp/klippy.log",
                 reload_command="RESTART",
                 shortStatus_navbar=True,
@@ -141,71 +153,32 @@ class KlipperPlugin(
         configpath = os.path.expanduser(
             self._settings.get(["configuration", "configpath"])
         )
-        data["config"] = ""
-        try:
-            f = open(configpath, "r")
-            data["config"] = f.read()
-            f.close()
-        except IOError:
-            self.log_error(
-                "Error: Klipper config file not found at: {}".format(
-                    configpath)
-            )
-        else:
-            self.send_message("reload", "config", "", data["config"])
+        standardconfigfile = os.path.join(configpath, "printer.cfg")
+        data["config"] = cfgUtils.get_cfg(self, standardconfigfile)
+        util.send_message(self, "reload", "config", "", data["config"])
             # send the configdata to frontend to update ace editor
         return data
 
     def on_settings_save(self, data):
-
-        self.log_debug(
-            "Save klipper configs"
-        )
-
         if "config" in data:
-            check_parse = self._settings.get(["configuration", "parse_check"])
-            self.log_debug("check_parse: {}".format(check_parse))
-
-            if sys.version_info[0] < 3:
-                data["config"] = data["config"].encode('utf-8')
-
-            # check for configpath if it was changed during changing of the configfile
-            if self.key_exist(data, "configuration", "configpath"):
-                configpath = os.path.expanduser(
-                    data["configuration"]["configpath"]
-                )
-            else:
-                # if the configpath was not changed during changing the printer.cfg. Then the configpath would not be in data[]
-                configpath = os.path.expanduser(
-                    self._settings.get(["configuration", "configpath"])
-                )
-            if self.file_exist(configpath):
-                self.copy_cfg_to_backup(configpath)
-
-            if self._parsing_check_response or not check_parse:
-                try:
-                    f = open(configpath, "w")
-                    f.write(data["config"])
-                    f.close()
-
-                    self.log_debug("Writing Klipper config to {}".format(configpath))
-                except IOError:
-                    self.log_error("Error: Couldn't write Klipper config file: {}".format(configpath))
+            if cfgUtils.save_cfg(self, data["config"], "printer.cfg"):
+                #load the reload command from changed data if it is not existing load the saved setting
+                if util.key_exist(data, "configuration", "reload_command"):
+                    reload_command = os.path.expanduser(
+                        data["configuration"]["reload_command"]
+                    )
                 else:
-                    #load the reload command from changed data if it is not existing load the saved setting
-                    if self.key_exist(data, "configuration", "reload_command"):
-                        reload_command = os.path.expanduser(
-                            data["configuration"]["reload_command"]
-                        )
-                    else:
-                        reload_command = self._settings.get(["configuration", "reload_command"])
+                    reload_command = self._settings.get(["configuration", "reload_command"])
 
-                    if reload_command != "manually":
-                        # Restart klippy to reload config
-                        self._printer.commands(reload_command)
-                        self.log_info("Restarting Klipper.")
-                    # we dont want to write the klipper conf to the octoprint settings
-                    data.pop("config", None)
+                if reload_command != "manually":
+                    # Restart klippy to reload config
+                    self._printer.commands(reload_command)
+                    logger.log_info(self, "Restarting Klipper.")
+                # we dont want to write the klipper conf to the octoprint settings
+            else:
+                # save not sure. saving to the octoprintconfig:
+                self._settings.set(["configuration", "temp_config"], data)
+            data.pop("config", None)
 
         # save the rest of changed settings into config.yaml of octoprint
         old_debug_logging = self._settings.get_boolean(["configuration", "debug_logging"])
@@ -280,14 +253,14 @@ class KlipperPlugin(
                 settings.remove(["probePoints"])
 
             if settings.has(["configPath"]):
-                self.log_info("migrate setting for: configPath")
+                logger.log_info(self, "migrate setting for: configPath")
                 settings.set(["config_path"], settings.get(["configPath"]))
                 settings.remove(["configPath"])
 
         if current is not None and current < 3:
             settings = self._settings
             if settings.has(["configuration", "navbar"]):
-                self.log_info("migrate setting for: configuration/navbar")
+                logger.log_info(self, "migrate setting for: configuration/navbar")
                 settings.set(["configuration", "shortStatus_navbar"], settings.get(["configuration", "navbar"]))
                 settings.remove(["configuration", "navbar"])
 
@@ -323,15 +296,27 @@ class KlipperPlugin(
                 custom_bindings=True
             ),
             dict(type="sidebar",
-                 custom_bindings=True,
-                 icon="rocket",
-                 replaces="connection" if self._settings.get_boolean(
-                     ["connection", "replace_connection_panel"]) else ""
-                 ),
+                custom_bindings=True,
+                icon="rocket",
+                replaces="connection" if self._settings.get_boolean(
+                    ["connection", "replace_connection_panel"]) else ""
+            ),
             dict(
                 type="generic",
                 name="Performance Graph",
                 template="klipper_graph_dialog.jinja2",
+                custom_bindings=True
+            ),
+            dict(
+                type="generic",
+                name="Config Backups",
+                template="klipper_backups_dialog.jinja2",
+                custom_bindings=True
+            ),
+            dict(
+                type="generic",
+                name="Config Editor",
+                template="klipper_editor.jinja2",
                 custom_bindings=True
             ),
             dict(
@@ -341,6 +326,12 @@ class KlipperPlugin(
                 custom_bindings=True
             )
         ]
+
+    def get_template_vars(self):
+        return {
+            "max_upload_size": MAX_UPLOAD_SIZE,
+            "max_upload_size_str": get_formatted_size(MAX_UPLOAD_SIZE),
+        }
 
     # -- Asset Plugin
 
@@ -352,8 +343,11 @@ class KlipperPlugin(
                 "js/klipper_pid_tuning.js",
                 "js/klipper_offset.js",
                 "js/klipper_param_macro.js",
-                "js/klipper_graph.js"
-                ],
+                "js/klipper_graph.js",
+                "js/klipper_backup.js",
+                "js/klipper_editor.js"
+            ],
+            clientjs=["clientjs/klipper.js"],
             css=["css/klipper.css"]
         )
 
@@ -361,18 +355,19 @@ class KlipperPlugin(
 
     def on_event(self, event, payload):
         if "UserLoggedIn" == event:
-            self.update_status("info", "Klipper: Standby")
+            util.update_status(self, "info", "Klipper: Standby")
         if "Connecting" == event:
-            self.update_status("info", "Klipper: Connecting ...")
+            util.update_status(self, "info", "Klipper: Connecting ...")
         elif "Connected" == event:
-            self.update_status("info", "Klipper: Connected to host")
-            self.log_info(
+            util.update_status(self, "info", "Klipper: Connected to host")
+            logger.log_info(
+                self,
                 "Connected to host via {} @{}bps".format(payload["port"], payload["baudrate"]))
         elif "Disconnected" == event:
-            self.update_status("info", "Klipper: Disconnected from host")
+            util.update_status(self, "info", "Klipper: Disconnected from host")
         elif "Error" == event:
-            self.update_status("error", "Klipper: Error")
-            self.log_error(payload["error"])
+            util.update_status(self, "error", "Klipper: Error")
+            logger.log_error(self, payload["error"])
 
     # -- GCODE Hook
 
@@ -381,22 +376,22 @@ class KlipperPlugin(
         if "FIRMWARE_VERSION" in line:
             printerInfo = parse_firmware_line(line)
             if "FIRMWARE_VERSION" in printerInfo:
-                self.log_info("Firmware version: {}".format(
+                logger.log_info(self, "Firmware version: {}".format(
                     printerInfo["FIRMWARE_VERSION"]))
         elif "// probe" in line or "// Failed to verify BLTouch" in line:
             msg = line.strip('/')
-            self.log_info(msg)
+            logger.log_info(self, msg)
             self.write_parsing_response_buffer()
         elif "//" in line:
             # add lines with // to a buffer
             self._message = self._message + line.strip('/')
             if not self._parsing_response:
-                self.update_status("info", self._message)
+                util.update_status(self, "info", self._message)
             self._parsing_response = True
         elif "!!" in line:
             msg = line.strip('!')
-            self.update_status("error", msg)
-            self.log_error(msg)
+            util.update_status(self, "error", msg)
+            logger.log_error(self, msg)
             self.write_parsing_response_buffer()
         else:
             self.write_parsing_response_buffer()
@@ -406,7 +401,7 @@ class KlipperPlugin(
         # write buffer with // lines after a gcode response without //
         if self._parsing_response:
             self._parsing_response = False
-            self.log_info(self._message)
+            logger.log_info(self, self._message)
             self._message = ""
 
     def get_api_commands(self):
@@ -414,7 +409,6 @@ class KlipperPlugin(
             listLogFiles=[],
             getStats=["logFile"],
             reloadConfig=[],
-            reloadCfgBackup=[],
             checkConfig=["config"]
         )
 
@@ -424,12 +418,12 @@ class KlipperPlugin(
             logpath = os.path.expanduser(
                 self._settings.get(["configuration", "logpath"])
             )
-            if self.file_exist(logpath):
+            if util.file_exist(self, logpath):
                 for f in glob.glob(self._settings.get(["configuration", "logpath"]) + "*"):
                     filesize = os.path.getsize(f)
+                    filemdate = time.strftime("%d.%m.%Y %H:%M",time.localtime(os.path.getctime(f)))
                     files.append(dict(
-                        name=os.path.basename(
-                            f) + " ({:.1f} KB)".format(filesize / 1000.0),
+                        name=os.path.basename(f) + " (" + filemdate + ")",
                         file=f,
                         size=filesize
                     ))
@@ -441,30 +435,151 @@ class KlipperPlugin(
                 log_analyzer = KlipperLogAnalyzer.KlipperLogAnalyzer(
                     data["logFile"])
                 return flask.jsonify(log_analyzer.analyze())
-        elif command == "reloadConfig":
-            self.log_debug("reloadConfig")
-            return self.reload_cfg()
-        elif command == "reloadCfgBackup":
-            self.log_debug("reloadCfgBackup")
-            configpath = os.path.expanduser(
-                    self._settings.get(["configuration", "configpath"])
-                )
-            return self.copy_cfg_from_backup(configpath)
-        elif command == "checkConfig":
-            if "config" in data:
-                #self.write_cfg_backup(data["config"])
-                if self.key_exist(data, "configuration", "parse_check"):
-                    check_parse = data["configuration"]["parse_check"]
-                else:
-                    check_parse = self._settings.get(["configuration", "parse_check"])
-                if check_parse and not self.validate_configfile(data["config"]):
-                    self.log_debug("validateConfig not ok")
-                    self._settings.set(["configuration", "old_config"], data["config"])
-                    return flask.jsonify(checkConfig="not OK")
-                else:
-                    self.log_debug("validateConfig ok")
-                    self._settings.set(["configuration", "old_config"], "")
-                    return flask.jsonify(checkConfig="OK")
+
+    def is_blueprint_protected(self):
+        return False
+
+    def route_hook(self, server_routes, *args, **kwargs):
+        from octoprint.server.util.tornado import LargeResponseHandler, path_validation_factory
+        from octoprint.util import is_hidden_path
+        configpath = os.path.expanduser(
+                        self._settings.get(["configuration", "configpath"])
+                    )
+        bak_path = os.path.join(self.get_plugin_data_folder(), "configs", "")
+
+        return [
+            (r"/download/(.*)", LargeResponseHandler, dict(path=configpath,
+                                                           as_attachment=True,
+                                                           path_validation=path_validation_factory(lambda path: not is_hidden_path(path),
+                                                                                                   status_code=404))),
+            (r"/download/backup(.*)", LargeResponseHandler, dict(path=bak_path,
+                                                           as_attachment=True,
+                                                           path_validation=path_validation_factory(lambda path: not is_hidden_path(path),
+                                                                                                   status_code=404)))
+        ]
+
+    # API for Backups
+    # Get Content of a Backupconfig
+    @octoprint.plugin.BlueprintPlugin.route("/backup/<filename>", methods=["GET"])
+    @restricted_access
+    @Permissions.PLUGIN_KLIPPER_CONFIG.require(403)
+    def get_backup(self, filename):
+        data_folder = self.get_plugin_data_folder()
+        full_path = os.path.realpath(os.path.join(data_folder, "configs", filename))
+        response = cfgUtils.get_cfg(self, full_path)
+        return flask.jsonify(response = response)
+
+    # Delete a Backupconfig
+    @octoprint.plugin.BlueprintPlugin.route("/backup/<filename>", methods=["DELETE"])
+    @restricted_access
+    @Permissions.PLUGIN_KLIPPER_CONFIG.require(403)
+    def delete_backup(self, filename):
+        data_folder = self.get_plugin_data_folder()
+        full_path = os.path.realpath(os.path.join(data_folder, "configs", filename))
+        if (
+            full_path.startswith(data_folder)
+            and os.path.exists(full_path)
+            and not is_hidden_path(full_path)
+        ):
+            try:
+                os.remove(full_path)
+            except Exception:
+                self._octoklipper_logger.exception("Could not delete {}".format(filename))
+                raise
+        return NO_CONTENT
+
+    # Get a list of all backuped configfiles
+    @octoprint.plugin.BlueprintPlugin.route("/backup/list", methods=["GET"])
+    @restricted_access
+    @Permissions.PLUGIN_KLIPPER_CONFIG.require(403)
+    def list_backups(self):
+        files = cfgUtils.list_cfg_files(self, "backup")
+        return flask.jsonify(files = files)
+
+    # restore a backuped configfile
+    @octoprint.plugin.BlueprintPlugin.route("/backup/restore/<filename>", methods=["GET"])
+    @restricted_access
+    @Permissions.PLUGIN_KLIPPER_CONFIG.require(403)
+    def restore_backup(self, filename):
+        configpath = os.path.expanduser(
+                        self._settings.get(["configuration", "configpath"])
+                    )
+        data_folder = self.get_plugin_data_folder()
+        backupfile = os.path.realpath(os.path.join(data_folder, "configs", filename))
+        return flask.jsonify(restored = cfgUtils.copy_cfg(self, backupfile, configpath))
+
+    # API for Configs
+    # Get Content of a Configfile
+    @octoprint.plugin.BlueprintPlugin.route("/config/<filename>", methods=["GET"])
+    @restricted_access
+    @Permissions.PLUGIN_KLIPPER_CONFIG.require(403)
+    def get_config(self, filename):
+        cfg_path = os.path.expanduser(
+            self._settings.get(["configuration", "configpath"])
+        )
+        full_path = os.path.realpath(os.path.join(cfg_path, filename))
+        response = cfgUtils.get_cfg(self, full_path)
+        return flask.jsonify(response = response)
+
+    # Delete a Configfile
+    @octoprint.plugin.BlueprintPlugin.route("/config/<filename>", methods=["DELETE"])
+    @restricted_access
+    @Permissions.PLUGIN_KLIPPER_CONFIG.require(403)
+    def delete_config(self, filename):
+        cfg_path = os.path.expanduser(
+            self._settings.get(["configuration", "configpath"])
+        )
+        full_path = os.path.realpath(os.path.join(cfg_path, filename))
+        if (
+            full_path.startswith(cfg_path)
+            and os.path.exists(full_path)
+            and not is_hidden_path(full_path)
+        ):
+            try:
+                os.remove(full_path)
+            except Exception:
+                self._octoklipper_logger.exception("Could not delete {}".format(filename))
+                raise
+        return NO_CONTENT
+
+    # Get a list of all configfiles
+    @octoprint.plugin.BlueprintPlugin.route("/config/list", methods=["GET"])
+    @restricted_access
+    @Permissions.PLUGIN_KLIPPER_CONFIG.require(403)
+    def list_configs(self):
+        files = cfgUtils.list_cfg_files(self, "")
+        return flask.jsonify(files = files, max_upload_size = MAX_UPLOAD_SIZE)
+
+    # check syntax of a given data
+    @octoprint.plugin.BlueprintPlugin.route("/config/check", methods=["POST"])
+    @restricted_access
+    @Permissions.PLUGIN_KLIPPER_CONFIG.require(403)
+    def check_config(self):
+        data = flask.request.json
+        data_to_check = data.get("DataToCheck", [])
+        response = cfgUtils.check_cfg(self, data_to_check)
+        return flask.jsonify(is_syntax_ok = response)
+
+    # save a configfile
+    @octoprint.plugin.BlueprintPlugin.route("/config/save", methods=["POST"])
+    @restricted_access
+    @Permissions.PLUGIN_KLIPPER_CONFIG.require(403)
+    def save_config(self):
+        data = flask.request.json
+
+        filename = data.get("filename", [])
+        Filecontent = data.get("DataToSave", [])
+        if filename == []:
+            flask.abort(
+                400,
+                description="Invalid request, the filename is not set",
+            )
+        saved = cfgUtils.save_cfg(self, Filecontent, filename)
+        if saved == True:
+            util.send_message(self, "reload", "configlist", "", "")
+        return flask.jsonify(saved = saved)
+
+    # APIs end
 
     def get_update_information(self):
         return dict(
@@ -490,193 +605,6 @@ class KlipperPlugin(
             )
         )
 
-    #-- Helpers
-    def send_message(self, type, subtype, title, payload):
-        """
-        Send Message over API to FrontEnd
-        """
-        self._plugin_manager.send_plugin_message(
-            self._identifier,
-            dict(
-                time=datetime.datetime.now().strftime("%H:%M:%S"),
-                type=type,
-                subtype=subtype,
-                title=title,
-                payload=payload
-            )
-        )
-
-    def poll_status(self):
-        self._printer.commands("STATUS")
-
-    def update_status(self, type, status):
-        self.send_message("status", type, status, status)
-
-    def log_info(self, message):
-        self._octoklipper_logger.info(message)
-        self.send_message("log", "info", message, message)
-
-    def log_debug(self, message):
-        self._octoklipper_logger.debug(message)
-        self._logger.info(message)
-        # sends a message to frontend(in klipper.js -> self.onDataUpdaterPluginMessage) and write it to the console.
-        # _mtype, subtype=debug/info, title of message, message)
-        self.send_message("console", "debug", message, message)
-
-    def log_error(self, error):
-        self._octoklipper_logger.error(error)
-        self._logger.info(error)
-        self.send_message("log", "error", error, error)
-
-    def file_exist(self, filepath):
-        if not os.path.isfile(filepath):
-            self.send_message("PopUp", "warning", "OctoKlipper Settings",
-                              "Klipper " + filepath + " does not exist!")
-            return False
-        else:
-            return True
-
-    def key_exist(self, dict, key1, key2):
-        try:
-            dict[key1][key2]
-        except KeyError:
-            return False
-        else:
-            return True
-
-    def validate_configfile(self, dataToBeValidated):
-        """
-        --->SyntaxCheck for a given data<----
-        """
-        check_parse = self._settings.get(["configuration", "parse_check"])
-        if check_parse:
-            try:
-                dataToValidated = configparser.RawConfigParser(strict=False)
-                #
-                if sys.version_info[0] < 3:
-                    buf = StringIO.StringIO(dataToBeValidated)
-                    dataToValidated.readfp(buf)
-                else:
-                    dataToValidated.read_string(dataToBeValidated)
-
-                sections_search_list = ["bltouch",
-                                        "probe"]
-                value_search_list = [   "x_offset",
-                                        "y_offset",
-                                        "z_offset"]
-                try:
-                    # cycle through sections and then values
-                    for y in sections_search_list:
-                        for x in value_search_list:
-                            if dataToValidated.has_option(y, x):
-                                a_float = dataToValidated.getfloat(y, x)
-                except ValueError as error:
-                    self.log_error(
-                        "Error: Invalid Value for <b>"+x+"</b> in Section: <b>"+y+"</b>\n" +
-                        "{}".format(str(error))
-                    )
-                    self.send_message("PopUp", "warning", "OctoKlipper: Invalid Config\n",
-                                "Config got not saved!\n" +
-                                "You can reload your last changes\n" +
-                                "on the 'Klipper Configuration' tab.\n\n" +
-                                "Invalid Value for <b>"+x+"</b> in Section: <b>"+y+"</b>\n" + "{}".format(str(error)))
-                    self._parsing_check_response = False
-                    return False
-            except configparser.Error as error:
-                if sys.version_info[0] < 3:
-                    error.message = error.message.replace("\\n","")
-                    error.message = error.message.replace("file: u","Klipper Configuration", 1)
-                    error.message = error.message.replace("'","", 2)
-                    error.message = error.message.replace("u'","'", 1)
-
-                else:
-                    error.message = error.message.replace("\\n","")
-                    error.message = error.message.replace("file:","Klipper Configuration", 1)
-                    error.message = error.message.replace("'","", 2)
-                self.log_error(
-                    "Error: Invalid Klipper config file:\n" +
-                    "{}".format(str(error))
-                )
-                self.send_message("PopUp", "warning", "OctoKlipper: Invalid Config data\n",
-                                "Config got not saved!\n" +
-                                "You can reload your last changes\n" +
-                                "on the 'Klipper Configuration' tab.\n\n" + str(error))
-                self._parsing_check_response = False
-                return False
-            else:
-                self._parsing_check_response = True
-                return True
-
-    def reload_cfg(self):
-        data = octoprint.plugin.SettingsPlugin.on_settings_load(self)
-
-        configpath = os.path.expanduser(
-            self._settings.get(["configuration", "configpath"])
-        )
-
-        try:
-            f = open(configpath, "r")
-            data["config"] = f.read()
-            f.close()
-        except IOError:
-            self.log_error(
-                "Error: Klipper config file not found at: {}".format(
-                    configpath)
-            )
-        else:
-
-            self._settings.set(["config"], data["config"])
-            # self.send_message("reload", "config", "", data["config"])
-            # send the configdata to frontend to update ace editor
-            if sys.version_info[0] < 3:
-                data["config"] = data["config"].decode('utf-8')
-            return flask.jsonify(data=data["config"])
-
-    def copy_cfg_from_backup(self, dst):
-        """
-        Copy the backuped config files in the data folder of OctoKlipper to the given destination
-        """
-        from shutil import copy
-
-        bak_config_path = os.path.join(self.get_plugin_data_folder(), "configs/")
-        src_files = os.listdir(bak_config_path)
-        nio_files = []
-        self.log_debug("reloadCfgBackupPath:" + src_files)
-
-        for file_name in src_files:
-            full_file_name = os.path.join(bak_config_path, file_name)
-            if os.path.isfile(full_file_name):
-                try:
-                    copy(full_file_name, dst)
-                except IOError:
-                    self.log_error(
-                        "Error: Klipper config file not found at: {}".format(
-                            full_file_name)
-                    )
-                    nio_files.append(full_file_name)
-                else:
-                    self.log_debug("File done: " + full_file_name)
-        return nio_files
-
-    def copy_cfg_to_backup(self, src):
-        """
-        Copy the config file into the data folder of OctoKlipper
-        """
-        from shutil import copyfile
-
-        filename = os.path.basename(src)
-        dst = os.path.join(self.get_plugin_data_folder(), "configs", "", filename)
-        self.log_debug("CopyCfgBackupPath:" + dst)
-        try:
-            copyfile(src, dst)
-        except IOError:
-            self.log_error(
-                "Error: Couldn't copy Klipper config file to {}".format(
-                    dst)
-            )
-        else:
-            self.log_debug("CfgBackup writen")
-
 __plugin_name__ = "OctoKlipper"
 __plugin_pythoncompat__ = ">=2.7,<4"
 __plugin_settings_overlay__ = {
@@ -690,12 +618,12 @@ __plugin_settings_overlay__ = {
     }
 }
 
-
 def __plugin_load__():
     global __plugin_implementation__
     global __plugin_hooks__
     __plugin_implementation__ = KlipperPlugin()
     __plugin_hooks__ = {
+        "octoprint.server.http.routes": __plugin_implementation__.route_hook,
         "octoprint.access.permissions": __plugin_implementation__.get_additional_permissions,
         "octoprint.comm.protocol.gcode.received": __plugin_implementation__.on_parse_gcode,
         "octoprint.plugin.softwareupdate.check_config": __plugin_implementation__.get_update_information
