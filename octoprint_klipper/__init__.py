@@ -208,64 +208,66 @@ class KlipperPlugin(
     def get_settings_version(self):
         return 3
 
+
+    #migrate Settings
     def on_settings_migrate(self, target, current):
+        settings = self._settings
         if current is None:
-            settings = self._settings
-
-            if settings.has(["serialport"]):
-                settings.set(["connection", "port"],
-                             settings.get(["serialport"]))
-                settings.remove(["serialport"])
-
-            if settings.has(["replace_connection_panel"]):
-                settings.set(
-                    ["connection", "replace_connection_panel"],
-                    settings.get(["replace_connection_panel"])
-                )
-                settings.remove(["replace_connection_panel"])
-
-            if settings.has(["probeHeight"]):
-                settings.set(["probe", "height"],
-                             settings.get(["probeHeight"]))
-                settings.remove(["probeHeight"])
-
-            if settings.has(["probeLift"]):
-                settings.set(["probe", "lift"], settings.get(["probeLift"]))
-                settings.remove(["probeLift"])
-
-            if settings.has(["probeSpeedXy"]):
-                settings.set(["probe", "speed_xy"],
-                             settings.get(["probeSpeedXy"]))
-                settings.remove(["probeSpeedXy"])
-
-            if settings.has(["probeSpeedZ"]):
-                settings.set(["probe", "speed_z"],
-                             settings.get(["probeSpeedZ"]))
-                settings.remove(["probeSpeedZ"])
-
-            if settings.has(["probePoints"]):
-                points = settings.get(["probePoints"])
-                points_new = []
-                for p in points:
-                    points_new.append(
-                        dict(name="", x=int(p["x"]), y=int(p["y"]), z=0))
-                settings.set(["probe", "points"], points_new)
-                settings.remove(["probePoints"])
-
-            if settings.has(["configPath"]):
-                logger.log_info(self, "migrate setting for: configPath")
-                settings.set(["config_path"], settings.get(["configPath"]))
-                settings.remove(["configPath"])
-
+            self.migrate_old_settings(settings)
         if current is not None and current < 3:
-            settings = self._settings
-            if settings.has(["configuration", "navbar"]):
-                logger.log_info(self, "migrate setting for: configuration/navbar")
-                settings.set(["configuration", "shortStatus_navbar"], settings.get(["configuration", "navbar"]))
-                settings.remove(["configuration", "navbar"])
+            self.migrate_configuration(
+                settings,
+                "shortStatus_navbar",
+                "navbar",
+            )
+
+        if current is not None and current < 4:
+            self.migrate_configuration(
+                settings,
+                "old_config",
+                "temp_config",
+            )
+
+            setting_path = settings.get(["configuration", "configpath"])
+            if setting_path.find("printer.cfg")!=-1:
+                new_setting_path = setting_path.replace("printer.cfg","")
+                logger.log_info(self, "migrate setting for 'configuration/configpath': " + setting_path + " -> " + new_setting_path)
+                settings.set(["configuration", "configpath"], new_setting_path)
+
+    def migrate_old_settings(self, settings):
+
+        self.migrate_settings(settings, "serialport", "connection", "port")
+        self.migrate_settings(settings, "replace_connection_panel", "connection", "replace_connection_panel")
+        self.migrate_settings(settings, "probeHeight", "probe", "height")
+        self.migrate_settings(settings, "probeLift", "probe", "lift")
+        self.migrate_settings(settings, "probeSpeedXy", "probe", "speed_xy")
+        self.migrate_settings(settings, "probeSpeedZ", "probe", "speed_z")
+        self.migrate_settings(settings, "configPath", "configpath")
+
+        if settings.has(["probePoints"]):
+            points = settings.get(["probePoints"])
+            points_new = [dict(name="", x=int(p["x"]), y=int(p["y"]), z=0) for p in points]
+            settings.set(["probe", "points"], points_new)
+            settings.remove(["probePoints"])
+
+    def migrate_settings(self, settings, old, new, new2="") -> None:
+        if settings.has([old]):
+            if new2 != "":
+                logger.log_info(self, "migrate setting for '" + old + "' -> '" + new + "/" + new2 + "'")
+                settings.set([new, new2], settings.get([old]))
+            else:
+                logger.log_info(self, "migrate setting for '" + old + "' -> '" + new + "'")
+                settings.set([new], settings.get([old]))
+            settings.remove([old])
+
+    def migrate_settings_configuration(self, settings, new, old):
+        if settings.has(["configuration", old]):
+            logger.log_info(self, "migrate setting for 'configuration/" + old + "' -> 'configuration/" + new + "'")
+            settings.set(["configuration", new], settings.get(["configuration", old]))
+            settings.remove(["configuration", old])
+
 
     # -- Template Plugin
-
     def get_template_configs(self):
         return [
             dict(type="navbar", custom_bindings=True),
@@ -354,18 +356,18 @@ class KlipperPlugin(
     # -- Event Handler Plugin
 
     def on_event(self, event, payload):
-        if "UserLoggedIn" == event:
+        if event == "UserLoggedIn":
             util.update_status(self, "info", "Klipper: Standby")
-        if "Connecting" == event:
+        if event == "Connecting":
             util.update_status(self, "info", "Klipper: Connecting ...")
-        elif "Connected" == event:
+        elif event == "Connected":
             util.update_status(self, "info", "Klipper: Connected to host")
             logger.log_info(
                 self,
                 "Connected to host via {} @{}bps".format(payload["port"], payload["baudrate"]))
-        elif "Disconnected" == event:
+        elif event == "Disconnected":
             util.update_status(self, "info", "Klipper: Disconnected from host")
-        elif "Error" == event:
+        elif event == "Error":
             util.update_status(self, "error", "Klipper: Error")
             logger.log_error(self, payload["error"])
 
@@ -407,9 +409,7 @@ class KlipperPlugin(
     def get_api_commands(self):
         return dict(
             listLogFiles=[],
-            getStats=["logFile"],
-            reloadConfig=[],
-            checkConfig=["config"]
+            getStats=["logFile"]
         )
 
     def on_api_command(self, command, data):
@@ -427,9 +427,7 @@ class KlipperPlugin(
                         file=f,
                         size=filesize
                     ))
-                return flask.jsonify(data=files)
-            else:
-                return flask.jsonify(data=files)
+            return flask.jsonify(data=files)
         elif command == "getStats":
             if "logFile" in data:
                 log_analyzer = KlipperLogAnalyzer.KlipperLogAnalyzer(
@@ -458,7 +456,7 @@ class KlipperPlugin(
                                                                                                    status_code=404)))
         ]
 
-    # API for Backups
+# API for Backups
     # Get Content of a Backupconfig
     @octoprint.plugin.BlueprintPlugin.route("/backup/<filename>", methods=["GET"])
     @restricted_access
@@ -508,7 +506,7 @@ class KlipperPlugin(
         backupfile = os.path.realpath(os.path.join(data_folder, "configs", filename))
         return flask.jsonify(restored = cfgUtils.copy_cfg(self, backupfile, configpath))
 
-    # API for Configs
+# API for Configs
     # Get Content of a Configfile
     @octoprint.plugin.BlueprintPlugin.route("/config/<filename>", methods=["GET"])
     @restricted_access
@@ -566,20 +564,19 @@ class KlipperPlugin(
     @Permissions.PLUGIN_KLIPPER_CONFIG.require(403)
     def save_config(self):
         data = flask.request.json
-
         filename = data.get("filename", [])
-        Filecontent = data.get("DataToSave", [])
         if filename == []:
             flask.abort(
                 400,
                 description="Invalid request, the filename is not set",
             )
+        Filecontent = data.get("DataToSave", [])
         saved = cfgUtils.save_cfg(self, Filecontent, filename)
         if saved == True:
             util.send_message(self, "reload", "configlist", "", "")
         return flask.jsonify(saved = saved)
+# APIs end
 
-    # APIs end
 
     def get_update_information(self):
         return dict(
