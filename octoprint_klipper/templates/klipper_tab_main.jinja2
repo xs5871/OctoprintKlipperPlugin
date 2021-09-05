@@ -22,10 +22,15 @@
             <i class="fa icon-black fa-info-circle"></i> {{ _("Get Status") }}
           </button>
           <button class="btn btn-block btn-small"
-            data-bind="visible: $root.loginState.hasPermissionKo($root.access.permissions.PLUGIN_KLIPPER_CONFIG), click: function() {openOctoKlipperSettings('klipper-config');}"
-            title="{{ _('Open the Klipper configuration file') }}">
+            data-bind="visible: $root.loginState.hasPermissionKo($root.access.permissions.PLUGIN_KLIPPER_CONFIG), click: openOctoKlipperSettings('klipper-basic')"
+            title="{{ _('Open the OctoKlipper Settings') }}">
+            {{ _("Open OctoKlipper Settings") }}
+          </button>
+          <button class="btn btn-block btn-small"
+            data-bind="visible: $root.loginState.hasPermissionKo($root.access.permissions.PLUGIN_KLIPPER_CONFIG), click: showEditorDialog"
+            title="{{ _('Show the Editor') }}">
             <i class="fa icon-black fa-file-code-o"></i>
-            {{ _("Open Klipper config") }}
+            {{ _("Show Editor") }}
           </button>
         </div>
       </div>

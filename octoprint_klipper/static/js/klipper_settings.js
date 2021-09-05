@@ -238,6 +238,16 @@ $(function () {
       });
     };
 
+    self.showEditor = function () {
+      if (!self.klipperViewModel.hasRight("CONFIG")) return;
+
+      var editorDialog = $("#klipper_editor");
+        editorDialog.modal({
+          show: "true",
+          backdrop: "static",
+      });
+    };
+
     self.addMacro = function () {
       self.settings.settings.plugins.klipper.macros.push({
         name: "Macro",

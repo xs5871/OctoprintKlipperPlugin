@@ -47,6 +47,15 @@ $(function () {
       });
     };
 
+    self.showEditorDialog = function () {
+      if (!self.hasRight("CONFIG")) return;
+      var editorDialog = $("#klipper_editor");
+      editorDialog.modal({
+        show: "true",
+        backdrop: "static",
+      });
+    }
+
     self.showLevelingDialog = function () {
       var dialog = $("#klipper_leveling_dialog");
       dialog.modal({
