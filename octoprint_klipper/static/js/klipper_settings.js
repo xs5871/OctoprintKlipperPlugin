@@ -202,7 +202,6 @@ $(function () {
       var dialog = $("#klipper_backups_dialog");
       dialog.modal({
         show: "true",
-        minHeight: "600px",
       });
     };
 

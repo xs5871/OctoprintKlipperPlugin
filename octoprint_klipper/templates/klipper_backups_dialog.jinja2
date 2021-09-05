@@ -4,39 +4,56 @@
     <button type="button" class="close" data-dismiss="modal">&times;</button>
     <h3 id="klipper_dialog_label">{{ _('Backups') }}</h3>
   </div>
-  <div class="modal-body klipper-column-fluid">
-    <div class="klipper-row-fluid">
-      <div class="klipper-fluid-item-2" data-bind="visible: $root.klipperViewModel.hasRightKo('CONFIG')">
-        <button class="btn btn-small" data-bind="click: listBakFiles" title="{{ _('Refresh file list') }}"><i class="icon-refresh"></i>
-          Refresh</button>
+  <div class="modal-body">
+    <div class="editor-controls">
+      <div class="klipper-btn-group klipper-fluid-item-1" data-bind="visible: $root.klipperViewModel.hasRightKo('CONFIG')">
         <div class="btn-group">
-          <button class="btn btn-small dropdown-toggle" data-toggle="dropdown"><i class="far fa-square"></i> <span class="caret"></span></button>
+          <button class="btn btn-small dropdown-toggle" data-toggle="dropdown">
+            <i class="far fa-square"></i>
+            <span class="caret"></span>
+          </button>
           <ul class="dropdown-menu">
-            <li><a href="javascript:void(0)" data-bind="click: markFilesOnPage">{{ _('Select all on this page') }}</a>
+            <li>
+              <a href="javascript:void(0)" data-bind="click: markFilesOnPage">{{ _('Select all on this page') }}</a>
             </li>
-            <li><a href="javascript:void(0)" data-bind="click: markAllFiles">{{ _('Select all') }}</a></li>
-            <li class="divider"></li>
-            <li><a href="javascript:void(0)" data-bind="click: clearMarkedFiles">{{ _('Clear selection') }}</a></li>
+            <li>
+              <a href="javascript:void(0)" data-bind="click: markAllFiles">{{ _('Select all') }}</a>
+            </li>
+            <li class="divider">
+            </li>
+            <li>
+              <a href="javascript:void(0)" data-bind="click: clearMarkedFiles">{{ _('Clear selection') }}</a>
+            </li>
           </ul>
         </div>
+        <button class="btn btn-small" data-bind="click: listBakFiles" title="{{ _('Refresh file list') }}">
+          <i class="icon-refresh"></i> {{ _('Refresh Files') }}
+        </button>
+
         <button class="btn btn-small"
           data-bind="click: restoreMarkedFiles, enable: markedForFileRestore().length > 0">{{ _('Restore selected') }}</button>
-        <button class="btn btn-small" data-bind="click: removeMarkedFiles, enable: markedForFileRestore().length > 0">{{
-          _('Delete selected') }}</button>
+        <button class="btn btn-small"
+          data-bind="click: removeMarkedFiles, enable: markedForFileRestore().length > 0">{{ _('Delete selected') }}</button>
       </div>
       <div class="pull-right">
         <div class="btn-group">
-          <button class="btn btn-small dropdown-toggle" data-toggle="dropdown"><i class="fas fa-wrench"></i> <span class="caret"></span></button>
+          <button class="btn btn-small dropdown-toggle" data-toggle="dropdown">
+            <i class="fas fa-wrench"></i>
+            <span class="caret"></span>
+          </button>
           <ul class="dropdown-menu dropdown-menu-right">
             <li><a href="javascript:void(0)" data-bind="click: function() { backups.changeSorting('name'); }"><i class="fas fa-check"
                   data-bind="style: {visibility: backups.currentSorting() == 'name' ? 'visible' : 'hidden'}"></i> {{ _('Sort by name') }}
-                ({{ _('ascending') }})</a></li>
+                ({{ _('ascending') }})</a>
+            </li>
             <li><a href="javascript:void(0)" data-bind="click: function() { backups.changeSorting('date'); }"><i class="fas fa-check"
                   data-bind="style: {visibility: backups.currentSorting() == 'date' ? 'visible' : 'hidden'}"></i> {{ _('Sort by date') }}
-                ({{ _('descending') }})</a></li>
+                ({{ _('descending') }})</a>
+            </li>
             <li><a href="javascript:void(0)" data-bind="click: function() { backups.changeSorting('size'); }"><i class="fas fa-check"
                   data-bind="style: {visibility: backups.currentSorting() == 'size' ? 'visible' : 'hidden'}"></i> {{ _('Sort by file size') }}
-                ({{ _('descending') }})</a></li>
+                ({{ _('descending') }})</a>
+            </li>
           </ul>
         </div>
       </div>
@@ -86,10 +103,8 @@
             data-bind="click: backups.nextPage">»</a></li>
       </ul>
     </div>
-    <div class="klipper-fluid-item-3">
+    <div class="textarea">
       <textarea readonly data-bind="value: CfgContent" id="klipper_bak_text"></textarea>
     </div>
-  </div>
-  <div class="modal-footer">
   </div>
 </div>

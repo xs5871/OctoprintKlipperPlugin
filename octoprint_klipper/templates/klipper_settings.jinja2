@@ -21,8 +21,7 @@
             data-bind="checked: settings.settings.plugins.klipper.connection.replace_connection_panel">
         </div>
       </div>
-
-      <div class="control-group">
+      <div class="control-group border">
         <label class="control-label">{{ _('Show Short Messages') }}</label>
         <div class="controls">
           <label class="checkbox" title="{{ _('on NavBar') }}"><input type="checkbox"
@@ -38,8 +37,8 @@
             data-bind="checked: settings.settings.plugins.klipper.configuration.debug_logging" />
         </div>
       </div>
-      <div class="control-group">
-        <label class="control-label">Editor</label>
+      <div class="control-group border">
+        <label class="control-label">{{ _('Config Editor') }}</label>
         <div class="controls">
           <label class="checkbox" title="{{ _('Check parsing on save') }}"><input type="checkbox"
             data-bind="checked: settings.settings.plugins.klipper.configuration.parse_check" /> {{ _('Check parsing on save') }}
@@ -62,7 +61,7 @@
           <input type="text" class="input-block-level" data-bind="value: settings.settings.plugins.klipper.configuration.logpath" />
         </div>
       </div>
-      <div class="control-group">
+      <div class="control-group border">
         <label class="control-label">{{ _('Configuration Reload Command') }}</label>
         <div class="controls">
           <select data-bind="value: settings.settings.plugins.klipper.configuration.reload_command">
@@ -232,15 +231,6 @@
         <h3 class="text-center m-0">{{ _('Config Files') }}</h3>
         <div class="klipper-row-fluid">
           <div class="klipper-fluid-item-2" data-bind="visible: $root.klipperViewModel.hasRightKo('CONFIG')">
-            <button class="btn btn-small" data-bind="click: newFile" title="{{ _('Add new File') }}">
-              <i class="far fa-file"></i> {{ _('New File') }}
-            </button>
-            <button class="btn btn-small" data-bind="click: showEditor" title="{{ _('Open last config') }}">
-              <i class="fas fa-file-code"></i> {{ _('Show Editor') }}
-            </button>
-            <button class="btn btn-small" data-bind="click: listCfgFiles" title="{{ _('Refresh file list') }}">
-              <i class="icon-refresh"></i> {{ _('Refresh Files') }}
-            </button>
             <div class="btn-group">
               <button class="btn btn-small dropdown-toggle" data-toggle="dropdown"><i class="far fa-square"></i>
                 <span class="caret"></span>
@@ -252,6 +242,15 @@
                 <li><a href="javascript:void(0)" data-bind="click: clearMarkedFiles">{{ _('Clear selection') }}</a></li>
               </ul>
             </div>
+            <button class="btn btn-small" data-bind="click: newFile" title="{{ _('Add new File') }}">
+              <i class="far fa-file"></i> {{ _('New File') }}
+            </button>
+            <button class="btn btn-small" data-bind="click: showEditor" title="{{ _('Open last config') }}">
+              <i class="fas fa-file-code"></i> {{ _('Show Editor') }}
+            </button>
+            <button class="btn btn-small" data-bind="click: listCfgFiles" title="{{ _('Refresh file list') }}">
+              <i class="icon-refresh"></i> {{ _('Refresh Files') }}
+            </button>
             <button class="btn btn-small"
               data-bind="click: removeMarkedFiles, enable: markedForFileRemove().length > 0">{{ _('Delete selected') }}</button>
           </div>

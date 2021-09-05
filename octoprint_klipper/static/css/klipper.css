@@ -149,6 +149,31 @@ ul#klipper-settings {
   height: -webkit-fill-available;
 }
 
+div#klipper_backups_dialog {
+  min-height: 300px;
+  display: flex;
+  flex-flow: column;
+  min-height: 400px;
+}
+
+div#klipper_backups_dialog div.modal-body {
+  min-height: 350px;
+  display: flex;
+  flex-flow: column;
+  flex-grow: 1;
+}
+
+div#klipper_backups_dialog .editor-controls {
+  flex: 0 auto;
+	display: flex;
+	align-items: stretch;
+  flex-flow: row wrap;
+}
+
+div#klipper_backups_dialog div.modal-body .textarea {
+  overflow: auto;
+}
+
 div#klipper_backups_dialog div.modal-body textarea {
   margin-bottom: 0px !important;
   padding-left: 0px !important;
@@ -175,6 +200,10 @@ div#settings_plugin_klipper form {
 div#settings_plugin_klipper div.tab-content {
   height: calc(100% - 58px);
   overflow: auto;
+}
+
+div#settings_plugin_klipper div.tab-content .border{
+  border-bottom: 1px solid;
 }
 
 div#settings_plugin_klipper div.tab-footer {
@@ -228,7 +257,7 @@ div#settings_plugin_klipper div.tab-content div#conf.tab-pane div.control-group 
 }
 
 div#klipper_editor {
-  height: 80%;
+  min-height: 300px;
   display: flex;
   flex-flow: column;
 }
@@ -247,7 +276,7 @@ div#klipper_editor .modal-header {
 
 div#klipper_editor .modal-body {
   overflow: auto;
-  min-height: 300px;
+  min-height: 250px;
   display: flex;
   flex-flow: column;
   flex-grow: 1;
@@ -277,9 +306,6 @@ div#klipper_editor .modal-body .editor-controls {
 	align-items: center;
 }
 
-div#klipper_editor .flex-end {
-  align-self: flex-end;
-}
 
 div#klipper_editor div.conf-editor {
   width: 99%;
