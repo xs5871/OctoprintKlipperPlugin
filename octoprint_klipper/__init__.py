@@ -446,11 +446,11 @@ class KlipperPlugin(
         bak_path = os.path.join(self.get_plugin_data_folder(), "configs", "")
 
         return [
-            (r"/download/(.*)", LargeResponseHandler, dict(path=configpath,
+            (r"/download/configs/(.*)", LargeResponseHandler, dict(path=configpath,
                                                            as_attachment=True,
                                                            path_validation=path_validation_factory(lambda path: not is_hidden_path(path),
                                                                                                    status_code=404))),
-            (r"/download/backup(.*)", LargeResponseHandler, dict(path=bak_path,
+            (r"/download/backup/(.*)", LargeResponseHandler, dict(path=bak_path,
                                                            as_attachment=True,
                                                            path_validation=path_validation_factory(lambda path: not is_hidden_path(path),
                                                                                                    status_code=404)))

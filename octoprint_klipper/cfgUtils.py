@@ -39,14 +39,16 @@ def list_cfg_files(self, path: str) -> list:
     for f in cfg_files:
         filesize = os.path.getsize(f)
         filemdate = time.localtime(os.path.getmtime(f))
+        if path != "backup":
+            url = flask.url_for("index") + "plugin/klipper/download/configs/" + os.path.basename(f)
+        else:
+            url = flask.url_for("index") + "plugin/klipper/download/backup/" + os.path.basename(f)
         files.append(dict(
-            name=os.path.basename(f),
-            file=f,
-            size=" ({:.1f} KB)".format(filesize / 1000.0),
-            mdate=time.strftime("%d.%m.%Y %H:%M", filemdate),
-            url= flask.url_for("index")
-                + "plugin/klipper/download/"
-                + os.path.basename(f),
+            name= os.path.basename(f),
+            file= f,
+            size= " ({:.1f} KB)".format(filesize / 1000.0),
+            mdate= time.strftime("%d.%m.%Y %H:%M", filemdate),
+            url= url,
         ))
         logger.log_debug(self, "list_cfg_files " + str(len(files)) + ": " + f)
     return files
