@@ -135,9 +135,8 @@ class KlipperPlugin(
             ),
             configuration=dict(
                 debug_logging=False,
-                configpath="~/printer.cfg",
+                configpath="~/",
                 old_config="",
-                temp_config="",
                 logpath="/tmp/klippy.log",
                 reload_command="RESTART",
                 shortStatus_navbar=True,
@@ -206,7 +205,7 @@ class KlipperPlugin(
         )
 
     def get_settings_version(self):
-        return 3
+        return 4
 
 
     #migrate Settings
