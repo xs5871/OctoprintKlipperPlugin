@@ -38,18 +38,9 @@ $(function () {
 
       if (editor) {
         editor.session.setValue(config.content);
+        self.settings.settings.plugins.klipper.configuration.old_config(config.content);
         editor.clearSelection();
       }
-      setInterval(function () {
-        if (editor) {
-
-
-            var modalbodyheight = $('#klipper_editor').height();
-            //$('#conf_editor').height( modalbodyheight - 135 );
-            editor.resize();
-
-        };
-      }, 500);
     };
 
     self.checkSyntax = function () {

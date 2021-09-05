@@ -238,7 +238,7 @@ div#klipper_editor {
   div#klipper_editor.modal {
     height: unset !important;
   }
-  
+
 }
 
 div#klipper_editor .modal-header {
@@ -272,7 +272,9 @@ div#klipper_editor .modal-body input[type="checkbox"] {
 }
 
 div#klipper_editor .modal-body .editor-controls {
-  flex: 0 auto 50px;
+	flex: 0 auto;
+	display: flex;
+	align-items: center;
 }
 
 div#klipper_editor .flex-end {
