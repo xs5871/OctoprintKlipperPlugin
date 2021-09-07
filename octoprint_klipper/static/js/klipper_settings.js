@@ -90,13 +90,6 @@ $(function () {
           .deleteCfg(config)
           .done(function () {
             self.listCfgFiles();
-            var html = "<p>" + _.sprintf(gettext("All fine</p>"), { name: _.escape(config) });
-            new PNotify({
-              title: gettext("All is fine"),
-              text: html,
-              type: "error",
-              hide: false,
-            });
           })
           .fail(function (response) {
             var html = "<p>" + _.sprintf(gettext("Failed to remove config %(name)s.</p><p>Please consult octoprint.log for details.</p>"), { name: _.escape(config) });
