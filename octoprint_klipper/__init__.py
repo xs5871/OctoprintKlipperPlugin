@@ -608,7 +608,7 @@ __plugin_settings_overlay__ = {
         'actions': [{
             'action': 'octoklipper_restart',
             'command': 'sudo service klipper restart',
-            'name': 'Restart Klipper',
+            'name': gettext('Restart Klipper'),
             'confirm': '<h3><center><b>' + gettext("You are about to restart Klipper!") + '<br>' + gettext("This will stop ongoing prints!") + '</b></center></h3><br>Command = "sudo service klipper restart"'
         }]
     }

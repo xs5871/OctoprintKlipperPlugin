@@ -42,6 +42,7 @@ $(function () {
     };
 
     self.onStartupComplete = function () {
+      $('#klipper_backups_dialog').css('display', 'none');
       if (self.loginState.loggedIn()) {
         self.listBakFiles();
       }

@@ -37,14 +37,34 @@ $(function () {
     self.logMessages = ko.observableArray();
 
     self.showPopUp = function (popupType, popupTitle, message) {
-      var title = popupType.toUpperCase() + ":  " + popupTitle;
+      var title = "OctoKlipper: <br />" + popupTitle + "<br />";
+      var hide = false;
+      if (popupType == "success") {
+        hide = true
+      }
       new PNotify({
         title: title,
         text: message,
         type: popupType,
-        hide: false,
+        hide: hide,
         icon: true
       });
+    };
+
+    self.onStartupComplete = function () {
+      var klipper_editor = $('#klipper_editor')
+      var modalOverflow = $(window).height() - 10 < klipper_editor.height();
+      
+      klipper_editor.css('display', 'none');
+			if (modalOverflow) {
+				klipper_editor
+					.css('margin-top', 0)
+					.addClass('modal-overflow');
+			} else {
+				klipper_editor
+					.css('margin-top', 0 - klipper_editor.height() / 2)
+					.removeClass('modal-overflow');
+			}
     };
 
     self.showEditorDialog = function () {

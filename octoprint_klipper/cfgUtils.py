@@ -174,7 +174,7 @@ def check_cfg(self, data):
             "Error: Invalid Klipper config file:\n"
             + "{}".format(str(error))
         )
-        util.send_message(self, "PopUp", "warning", "OctoKlipper: Invalid Config data\n",
+        util.send_message(self, "PopUp", "warning", "Invalid Config data\n",
                             "\n"
                             + str(error))
 
@@ -205,7 +205,7 @@ def is_float_ok(self, dataToValidated):
             self,
             "PopUp",
             "warning",
-            "OctoKlipper: Invalid Config data\n",
+            "Invalid Config data\n",
             "\n"
             + "Invalid Value for <b>" + x + "</b> in Section: <b>" + y + "</b>\n"
             + "{}".format(str(error))

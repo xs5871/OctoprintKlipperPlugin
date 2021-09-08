@@ -51,16 +51,17 @@ $(function () {
           .done(function (response) {
             var msg = ""
             if (response.is_syntax_ok == true) {
-              msg = gettext('Syntax OK')
+              self.klipperViewModel.showPopUp("success", gettext("SyntaxCheck"), gettext("SyntaxCheck OK"));
             } else {
               msg = gettext('Syntax NOK')
+              showMessageDialog(
+                msg,
+                {
+                  title: gettext("SyntaxCheck")
+                }
+              )
             }
-            showMessageDialog(
-              msg,
-              {
-                title: gettext("SyntaxCheck")
-              }
-            )
+
           });
       };
     };
@@ -73,16 +74,16 @@ $(function () {
           .done(function (response) {
             var msg = ""
             if (response.saved === true) {
-              msg = gettext('File saved.')
+              self.klipperViewModel.showPopUp("success", gettext("Save Config"), gettext("File saved."));
             } else {
-              msg = gettext('File not saved.')
+              msg = gettext('File not saved!')
+              showMessageDialog(
+                msg,
+                {
+                  title: gettext("Save Config")
+                }
+              )
             }
-            showMessageDialog(
-              msg,
-              {
-                title: gettext("Save File")
-              }
-            )
           });
       }
     };
@@ -147,6 +148,7 @@ $(function () {
               }
             )
           } else {
+            self.klipperViewModel.showPopUp("success", gettext("Reload Config"), gettext("File reloaded."));
             if (editor) {
               editor.session.setValue(response.response.config);
               editor.clearSelection();

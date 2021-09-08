@@ -150,7 +150,6 @@ ul#klipper-settings {
 }
 
 div#klipper_backups_dialog {
-  min-height: 300px;
   display: flex;
   flex-flow: column;
   min-height: 400px;
@@ -255,10 +254,6 @@ div#settings_plugin_klipper div.tab-content div#conf.tab-pane div.control-group 
   margin: 5;
 }
 
-div#klipper_editor {
-  min-height: 300px;
-}
-
 @media (max-width: 979px) {
 
   div#klipper_editor.modal {
@@ -267,13 +262,18 @@ div#klipper_editor {
 
 }
 
-div#klipper_editor .modal-header {
-  height: 6px;
+#klipper_editor {
+  
+  display: flex;
+  flex-flow: column;
+}
+
+.octoprint-container.UICMainCont.container-fluid {
+  margin-top:0px !important;
 }
 
 div#klipper_editor .modal-body {
   overflow: auto;
-  min-height: 250px;
   display: flex;
   flex-flow: column;
 }
