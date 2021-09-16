@@ -79,11 +79,10 @@ $(function () {
     );
 
     self.listBakFiles = function () {
-      self.klipperViewModel.consoleMessage("debug", "listBakFiles:");
+      self.klipperViewModel.consoleMessage("debug", "listBakFiles");
 
       OctoPrint.plugins.klipper.listCfgBak()
         .done(function (response) {
-          self.klipperViewModel.consoleMessage("debug", "listBakFilesdone: " + response);
           self.backups.updateItems(response.files);
           self.backups.resetPage();
         });
@@ -132,7 +131,7 @@ $(function () {
 
       var restore = function () {
         OctoPrint.plugins.klipper.restoreBackup(backup).done(function (response) {
-          self.klipperViewModel.consoleMessage("debug", "restoreCfg: " + response.text);
+          self.klipperViewModel.consoleMessage("debug", "restoreCfg: " + backup + " / " + response.restored);
         });
       };
 
@@ -142,7 +141,7 @@ $(function () {
         title: gettext("Are you sure you want to restore now?"),
         html: html,
         proceed: gettext("Proceed"),
-        onproceed: restore(),
+        onproceed: restore,
       });
     };
 
@@ -207,7 +206,7 @@ $(function () {
               }),
               true
             );
-            self.klipperViewModel.consoleMessage("debug", "restoreCfg: " + response.text);
+            self.klipperViewModel.consoleMessage("debug", "restoreCfg: " + filename + " / " + response);
             self.markedForFileRestore.remove(function (item) {
               return item.name == filename;
             });

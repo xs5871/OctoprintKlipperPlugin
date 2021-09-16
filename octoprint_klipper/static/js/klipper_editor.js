@@ -18,6 +18,7 @@ $(function () {
     var self = this;
     var obKlipperConfig = null;
     var editor = null;
+    var editor_dirty = false;
 
     self.settings = parameters[0];
     self.klipperViewModel = parameters[1];
@@ -31,56 +32,122 @@ $(function () {
       "cache-control": "no-cache",
     });
 
-    self.process = function (config) {
-      self.config = config;
-      self.CfgFilename(config.file);
-      self.CfgContent(config.content);
+    $('#klipper_editor').on('shown.bs.modal', function () {
+      editor.focus();
+      self.setEditorDivSize();
+      $(window).on('resize', function(){
+        self.klipperViewModel.sleep(500).then(
+          function () {
+            self.setEditorDivSize();
+          }
+        );
+      });
+    });
 
+    self.closeEditor = function () {
+      if (editor_dirty===true) {
+        showConfirmationDialog({
+          message: gettext(
+              "Your file seems to have changed."
+          ),
+          question: gettext("Do you really want to close it?"),
+          cancel: gettext("No"),
+          proceed: gettext("Yes"),
+          onproceed: function () {
+            var dialog = $("#klipper_editor");
+            dialog.modal('hide');
+          },
+          nofade: true
+        });
+      } else {
+        var dialog = $("#klipper_editor");
+        dialog.modal('hide');
+      }
+    }
+
+    self.addStyleAttribute = function ($element, styleAttribute) {
+      $element.attr('style', $element.attr('style') + '; ' + styleAttribute);
+    }
+
+    self.setEditorDivSize = function () {
+      var klipper_modal_body= $('#klipper_editor .modal-body');
+      var klipper_config= $('#plugin-klipper-config');
+
+      var height = $(window).height() - $('#klipper_editor .modal-header').outerHeight() - $('#klipper_editor .modal-footer').outerHeight() - 118;
+      self.addStyleAttribute(klipper_modal_body, 'height: ' + height + 'px !important;');
+      //self.addStyleAttribute(klipper_config, 'height: ' + height + 'px !important;');
+      klipper_config.css('height', height);
       if (editor) {
-        editor.session.setValue(config.content);
-        self.settings.settings.plugins.klipper.configuration.old_config(config.content);
-        editor.clearSelection();
+        editor.resize();
       }
     };
 
+    self.process = function (config) {
+      return new Promise(function (resolve) {
+        self.config = config;
+        self.CfgFilename(config.file);
+        self.CfgContent(config.content);
+
+        if (editor) {
+          editor.session.setValue(self.CfgContent());
+          editor_dirty=false;
+          editor.setFontSize(self.settings.settings.plugins.klipper.configuration.fontsize());
+          self.settings.settings.plugins.klipper.configuration.old_config(config.content);
+          editor.clearSelection();
+          self.klipperViewModel.sleep(500).then(
+            function() {
+              self.setEditorDivSize();
+              resolve("done");
+            }
+          );
+        }
+      });
+    }
+
     self.checkSyntax = function () {
       if (editor.session) {
-        self.klipperViewModel.consoleMessage("debug", "checkSyntax:");
+        self.klipperViewModel.consoleMessage("debug", "checkSyntax started");
 
         OctoPrint.plugins.klipper.checkCfg(editor.session.getValue())
           .done(function (response) {
             var msg = ""
             if (response.is_syntax_ok == true) {
               self.klipperViewModel.showPopUp("success", gettext("SyntaxCheck"), gettext("SyntaxCheck OK"));
+              self.editorFocusDelay(1000);
             } else {
               msg = gettext('Syntax NOK')
               showMessageDialog(
                 msg,
                 {
-                  title: gettext("SyntaxCheck")
+                  title: gettext("SyntaxCheck"),
+                  onclose: function () { self.editorFocusDelay(1000); }
                 }
-              )
+              );
             }
-
           });
       };
     };
 
     self.saveCfg = function () {
       if (editor.session) {
-        self.klipperViewModel.consoleMessage("debug", "Save:");
+        self.klipperViewModel.consoleMessage("debug", "SaveCfg start");
 
         OctoPrint.plugins.klipper.saveCfg(editor.session.getValue(), self.CfgFilename())
           .done(function (response) {
             var msg = ""
             if (response.saved === true) {
               self.klipperViewModel.showPopUp("success", gettext("Save Config"), gettext("File saved."));
+              editor_dirty = false;
+              if (self.settings.settings.plugins.klipper.configuration.restart_onsave()==true) {
+                self.klipperViewModel.requestRestart();
+              }
             } else {
               msg = gettext('File not saved!')
               showMessageDialog(
                 msg,
                 {
-                  title: gettext("Save Config")
+                  title: gettext("Save Config"),
+                  onclose: function () { self.editorFocusDelay(1000); }
                 }
               )
             }
@@ -138,7 +205,7 @@ $(function () {
 
       OctoPrint.plugins.klipper.getCfg(self.CfgFilename())
         .done(function (response) {
-          self.klipperViewModel.consoleMessage("debug", "reloadFromFile: " + response);
+          self.klipperViewModel.consoleMessage("debug", "reloadFromFile done");
           if (response.response.text != "") {
             var msg = response.response.text
             showMessageDialog(
@@ -152,6 +219,7 @@ $(function () {
             if (editor) {
               editor.session.setValue(response.response.config);
               editor.clearSelection();
+              editor.focus();
             }
           }
         })
@@ -166,32 +234,6 @@ $(function () {
         });
     };
 
-    self.configBound = function (config) {
-      config.withSilence = function () {
-        this.notifySubscribers = function () {
-          if (!this.isSilent) {
-            ko.subscribable.fn.notifySubscribers.apply(this, arguments);
-          }
-        }
-
-        this.silentUpdate = function (newValue) {
-          this.isSilent = true;
-          this(newValue);
-          this.isSilent = false;
-        };
-
-        return this;
-      }
-
-      obKlipperConfig = config.withSilence();
-      if (editor) {
-        editor.setValue(obKlipperConfig());
-        editor.setFontSize(self.settings.settings.plugins.klipper.configuration.fontsize());
-        editor.resize();
-        editor.clearSelection();
-      }
-      return obKlipperConfig;
-    };
 
     self.onStartup = function () {
       ace.config.set("basePath", "plugin/klipper/static/js/lib/ace/");
@@ -205,17 +247,22 @@ $(function () {
         vScrollBarAlwaysVisible: false,
         autoScrollEditorIntoView: true,
         showPrintMargin: false,
-        maxLines: "Infinity",
-        minLines: 100
         //maxLines: "Infinity"
       });
 
       editor.session.on('change', function (delta) {
-        if (obKlipperConfig) {
-          obKlipperConfig.silentUpdate(editor.getValue());
-          editor.resize();
-        }
+        self.CfgContent(editor.getValue());
+        editor_dirty = true;
+        editor.resize();
       });
+    };
+
+    self.editorFocusDelay = function (delay) {
+      self.klipperViewModel.sleep(delay).then(
+        function () {
+          editor.focus();
+        }
+      );
     };
   }
 

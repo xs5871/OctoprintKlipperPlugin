@@ -38,6 +38,7 @@ $(function () {
         self.settings.settings.plugins.klipper.configuration.fontsize(9)
       }
     }
+
     // initialize list helper
     self.configs = new ItemListHelper(
       "klipperCfgFiles",
@@ -70,15 +71,28 @@ $(function () {
 
     self.onStartupComplete = function () {
       self.listCfgFiles();
+      self.loadBaseConfig();
     };
 
     self.listCfgFiles = function () {
-      self.klipperViewModel.consoleMessage("debug", "listCfgFiles:");
+      self.klipperViewModel.consoleMessage("debug", "listCfgFiles started");
 
       OctoPrint.plugins.klipper.listCfg().done(function (response) {
-        self.klipperViewModel.consoleMessage("debug", "listCfgFiles: " + response);
+        self.klipperViewModel.consoleMessage("debug", "listCfgFiles done");
         self.configs.updateItems(response.files);
         self.configs.resetPage();
+      });
+    };
+
+    self.loadBaseConfig = function () {
+      if (!self.klipperViewModel.hasRight("CONFIG")) return;
+
+      OctoPrint.plugins.klipper.getCfg("printer.cfg").done(function (response) {
+        var config = {
+          content: response.response.config,
+          file: "printer.cfg",
+        };
+        self.klipperEditorViewModel.process(config).then();
       });
     };
 
@@ -190,7 +204,7 @@ $(function () {
     };
 
     self.showBackupsDialog = function () {
-      self.klipperViewModel.consoleMessage("debug", "showBackupsDialog:");
+      self.klipperViewModel.consoleMessage("debug", "showBackupsDialog");
       self.klipperBackupViewModel.listBakFiles();
       var dialog = $("#klipper_backups_dialog");
       dialog.modal({
@@ -198,21 +212,29 @@ $(function () {
       });
     };
 
+    self.showEditor = function () {
+      if (!self.klipperViewModel.hasRight("CONFIG")) return;
+
+      var editorDialog = $("#klipper_editor");
+      editorDialog.modal({
+        show: "true",
+        width: "90%",
+        backdrop: "static",
+      });
+    }
+
     self.newFile = function () {
       if (!self.klipperViewModel.hasRight("CONFIG")) return;
       var config = {
         content: "",
         file: "Change Filename",
       };
-      self.klipperEditorViewModel.process(config);
-      var editorDialog = $("#klipper_editor");
-      editorDialog.modal({
-        show: "true",
-        backdrop: "static",
-      });
+      self.klipperEditorViewModel.process(config).then(
+        function() { self.showEditor(); }
+      );
     };
 
-    self.showEditUserDialog = function (file) {
+    self.openConfig = function (file) {
       if (!self.klipperViewModel.hasRight("CONFIG")) return;
 
       OctoPrint.plugins.klipper.getCfg(file).done(function (response) {
@@ -220,23 +242,11 @@ $(function () {
           content: response.response.config,
           file: file,
         };
-        self.klipperEditorViewModel.process(config);
+        self.klipperEditorViewModel.process(config).then(
+          function() { self.showEditor(); }
+        );
 
-        var editorDialog = $("#klipper_editor");
-        editorDialog.modal({
-          show: "true",
-          backdrop: "static",
-        });
-      });
-    };
 
-    self.showEditor = function () {
-      if (!self.klipperViewModel.hasRight("CONFIG")) return;
-
-      var editorDialog = $("#klipper_editor");
-        editorDialog.modal({
-          show: "true",
-          backdrop: "static",
       });
     };
 
@@ -302,7 +312,20 @@ $(function () {
       if (plugin == "klipper" && data.type == "reload" && data.subtype == "configlist") {
         self.klipperViewModel.consoleMessage("debug", "onDataUpdaterPluginMessage klipper reload configlist");
         self.listCfgFiles();
+      } else if (plugin == "klipper" && data.type == "start" && data.subtype == "config") {
+        self.klipperViewModel.consoleMessage("debug", "onDataUpdaterPluginMessage klipper start config");
+        self.startConfig(data.title, data.payload);
       }
+    };
+
+    self.startConfig = function (file, content) {
+      if (!self.klipperViewModel.hasRight("CONFIG")) return;
+      filename = file || "";
+      var config = {
+        content: content,
+        file: filename,
+      };
+      self.klipperEditorViewModel.process(config).then();
     };
   }
 

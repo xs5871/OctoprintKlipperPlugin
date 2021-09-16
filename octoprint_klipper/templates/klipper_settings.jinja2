@@ -67,12 +67,13 @@
           <select data-bind="value: settings.settings.plugins.klipper.configuration.reload_command">
             <option value="RESTART">RESTART</option>
             <option value="FIRMWARE_RESTART">FIRMWARE_RESTART</option>
-            <option value="manually">Manually</option>
           </select>
-          <span class="help-block">
-            {{ _('The command that is executed when the Klipper configuration changed and needs to be reloaded.<br />
-            Set this to "Manually" if you don\'t want to immediately restart klipper.') }}
+          <span class="help-block" style="margin-top:5px;">
+            {{ _('The command that is executed if you want to restart klipper.') }}
           </span>
+          <label class="checkbox" title="{{ _('Reload klipper on editor save?') }}"><input type="checkbox"
+            data-bind="checked: settings.settings.plugins.klipper.configuration.restart_onsave" /> {{ _('Reload klipper on editor save?') }}
+          </label>
         </div>
       </div>
       <div class="control-group">
@@ -246,7 +247,7 @@
               <i class="far fa-file"></i> {{ _('New File') }}
             </button>
             <button class="btn btn-small" data-bind="click: showEditor" title="{{ _('Open last config') }}">
-              <i class="fas fa-file-code"></i> {{ _('Show Editor') }}
+              <i class="fas fa-file-code"></i> {{ _('Open last Editor') }}
             </button>
             <button class="btn btn-small" data-bind="click: listCfgFiles" title="{{ _('Refresh file list') }}">
               <i class="icon-refresh"></i> {{ _('Refresh Files') }}
@@ -297,7 +298,7 @@
                     data-bind="css: {disabled: !$root.klipperViewModel.hasRightKo('CONFIG')()}, attr: { href: ($root.klipperViewModel.hasRightKo('CONFIG')()) ? $data.url : 'javascript:void(0)'}"></a>
                   &nbsp;|&nbsp;
                   <a href="javascript:void(0)" class="fas fa-pencil-alt" title="{{ _('Edit') }}"
-                    data-bind="css: {disabled: !$root.klipperViewModel.hasRightKo('CONFIG')()}, click: function() { $parent.showEditUserDialog($data.name);}"></a>
+                    data-bind="css: {disabled: !$root.klipperViewModel.hasRightKo('CONFIG')()}, click: function() { $parent.openConfig($data.name);}"></a>
                 </td>
               </tr>
             </tbody>

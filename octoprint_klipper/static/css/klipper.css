@@ -256,47 +256,40 @@ div#settings_plugin_klipper div.tab-content div#conf.tab-pane div.control-group 
 
 @media (max-width: 979px) {
 
-  div#klipper_editor.modal {
+  /* div#klipper_editor.modal {
     height: unset !important;
+  } */
+
+  div#klipper_editor .modal-footer .btn {
+    margin-bottom: 1px;
+    margin-left: 5px;
   }
 
 }
 
-#klipper_editor {
-  
-  display: flex;
-  flex-flow: column;
-}
 
 .octoprint-container.UICMainCont.container-fluid {
   margin-top:0px !important;
 }
 
+div#klipper_editor .modal-header div button.btn + button.btn {
+  margin-right: 12px;
+}
+
 div#klipper_editor .modal-body {
   overflow: auto;
-  display: flex;
-  flex-flow: column;
 }
 
 .klipper-btn-group {
   display: inline-block;
 }
 
-div#klipper_editor .modal-body label.checkbox {
-  display: unset;
-}
-
-div#klipper_editor .modal-body input[type="text"] {
+div#klipper_editor .modal-footer input[type="text"] {
   margin-bottom: 0px !important;
 }
 
-div#klipper_editor .modal-body input[type="checkbox"] {
-  float: unset;
-  margin-left: unset;
-  vertical-align: unset;
-}
 
-div#klipper_editor .modal-body .editor-controls {
+div#klipper_editor .modal-footer .editor-controls {
 	flex: 0 auto;
 	display: flex;
 	align-items: center;
@@ -308,29 +301,17 @@ div#klipper_editor div.conf-editor {
   width: calc(100% - 4px);
   margin-top: 5px;
   overflow: auto;
-  flex-grow : 1;
 }
 
 div#klipper_editor div.conf-editor div#plugin-klipper-config {
   font-family: monospace;
   overflow: auto;
-}
-
-.ace_editor {
-  margin: auto;
-  height: 200px;
   width: 100%;
+  margin: auto;
 }
-
-/* div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content div#conf.tab-pane.active button.btn.btn-small ,div#klipper_editor button.btn.btn-small{
-   width: 30%;
-   display: inline-block;
-   margin: 0px 2px 2px 2px;
-} */
 
 /*checkboxes*/
-div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content div.tab-pane.active input.inline-checkbox,
-div#klipper_editor input.inline-checkbox {
+div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content div.tab-pane.active input.inline-checkbox {
   vertical-align: -0.2em;
 }
 
@@ -341,10 +322,6 @@ div#klipper_editor .inline {
 
 div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content div.tab-pane.active div.controls input.controls-checkbox {
   margin-top: 8px;
-}
-
-div#settings_plugin_klipper div#basic label.checkbox {
-  padding-left: 0px;
 }
 
 /*macros*/
