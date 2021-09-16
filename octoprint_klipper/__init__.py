@@ -33,11 +33,6 @@ from octoprint.server.util.flask import restricted_access
 import flask
 from flask_babel import gettext
 
-try:
-    import configparser
-except ImportError:
-    import ConfigParser as configparser
-
 if sys.version_info[0] < 3:
     import StringIO
 
