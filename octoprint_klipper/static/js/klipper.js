@@ -51,27 +51,12 @@ $(function () {
       });
     };
 
-    self.onStartupComplete = function () {
-      var klipper_editor = $('#klipper_editor')
-      var modalOverflow = $(window).height() - 10 < klipper_editor.height();
-      
-      klipper_editor.css('display', 'none');
-			if (modalOverflow) {
-				klipper_editor
-					.css('margin-top', 0)
-					.addClass('modal-overflow');
-			} else {
-				klipper_editor
-					.css('margin-top', 0 - klipper_editor.height() / 2)
-					.removeClass('modal-overflow');
-			}
-    };
-
     self.showEditorDialog = function () {
       if (!self.hasRight("CONFIG")) return;
       var editorDialog = $("#klipper_editor");
       editorDialog.modal({
         show: "true",
+        width: "90%",
         backdrop: "static",
       });
     }
@@ -162,6 +147,8 @@ $(function () {
           case "PopUp":
             self.showPopUp(data.subtype, data.title, data.payload);
             break;
+          case "start":
+            break;
           case "reload":
             break;
           case "console":
@@ -245,6 +232,25 @@ $(function () {
       }
     };
 
+    self.requestRestart = function () {
+      if (!self.loginState.hasPermission(self.access.permissions.PLUGIN_KLIPPER_CONFIG)) return;
+
+      var request = function () {
+        OctoPrint.plugins.klipper.restartKlipper().done(function () {
+          self.consoleMessage("debug", "requestRestart");
+        });
+      };
+
+      var html = "<h4>" + gettext("All ongoing Prints will be stopped!") + "</h4>";
+
+      showConfirmationDialog({
+        title: gettext("Klipper restart?"),
+        html: html,
+        proceed: gettext("Proceed"),
+        onproceed: request,
+      });
+    };
+
     // OctoKlipper settings link
     self.openOctoKlipperSettings = function (profile_type) {
       if (!self.hasRight("CONFIG")) return;
@@ -255,6 +261,10 @@ $(function () {
         var query = "#klipper-settings a[data-profile-type='" + profile_type + "']";
         $(query).click();
       }
+    };
+
+    self.sleep = function (ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
     };
   }
 
