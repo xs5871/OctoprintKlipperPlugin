@@ -113,33 +113,34 @@ def save_cfg(self, content, filename="printer.cfg"):
 
     if sys.version_info[0] < 3:
         content = content.encode('utf-8')
-    check_parse = self._settings.get(["configuration", "parse_check"])
-    logger.log_debug(self, "check_parse on filesave: {}".format(check_parse))
+
     configpath = os.path.expanduser(self._settings.get(["configuration", "configpath"]))
+    if filename[-4:] != ".cfg":
+        filename += ".cfg"
     filepath = os.path.join(configpath, filename)
 
     logger.log_debug(self, "save filepath: {}".format(filepath))
 
     self._settings.set(["configuration", "temp_config"], content)
-    check = True
-    if check_parse:
-        check=check_cfg(self, content)
-    if check == True:
-        try:
-            logger.log_debug(self, "Writing Klipper config to {}".format(filepath))
-            with open(filepath, "w") as f:
-                f.write(content)
-        except IOError:
-            logger.log_error(self, "Error: Couldn't open Klipper config file: {}".format(filepath))
-            return False
-        else:
-            logger.log_debug(self, "Writen Klipper config to {}".format(filepath))
-            return True
-        finally:
-            f.close()
-            copy_cfg_to_backup(self, filepath)
-    else:
+
+    check_parse = self._settings.get(["configuration", "parse_check"])
+    logger.log_debug(self, "check_parse on filesave: {}".format(check_parse))
+    if check_parse and not check_cfg(self, content):
         return False
+
+    try:
+        logger.log_debug(self, "Writing Klipper config to {}".format(filepath))
+        with open(filepath, "w") as f:
+            f.write(content)
+    except IOError:
+        logger.log_error(self, "Error: Couldn't open Klipper config file: {}".format(filepath))
+        return False
+    else:
+        logger.log_debug(self, "Writen Klipper config to {}".format(filepath))
+        return True
+    finally:
+        f.close()
+        copy_cfg_to_backup(self, filepath)
 
 def check_cfg(self, data):
     """Checks the given data on parsing errors.
@@ -158,37 +159,46 @@ def check_cfg(self, data):
             dataToValidated.readfp(buf)
         else:
             dataToValidated.read_string(data)
-        is_float_ok(self, dataToValidated)
     except configparser.Error as error:
-        error.message = error.message.replace("\\n","")
-        if sys.version_info[0] < 3:
-            error.message = error.message.replace("file: u","Klipper Configuration", 1)
-            error.message = error.message.replace("'","", 2)
-            error.message = error.message.replace("u'","'", 1)
-
-        else:
-            error.message = error.message.replace("file:","Klipper Configuration", 1)
-            error.message = error.message.replace("'","", 2)
-        logger.log_error(
-            self,
-            "Error: Invalid Klipper config file:\n"
-            + "{}".format(str(error))
-        )
-        util.send_message(self, "PopUp", "warning", "OctoKlipper: Invalid Config data\n",
-                            "\n"
-                            + str(error))
-
+        show_error_message(self, error)
+        logger.log_debug(self, 'check_cfg: NOK!')
         return False
     else:
+        if not is_float_ok(self, dataToValidated):
+            logger.log_debug(self, "check_cfg: NOK!")
+            return False
+        logger.log_debug(self, "check_cfg: OK")
         return True
+
+def show_error_message(self, error):
+    error.message = error.message.replace('\\n', '')
+    if sys.version_info[0] < 3:
+        error.message = error.message.replace('file: u', 'Klipper Configuration', 1)
+        error.message = error.message.replace("'", '', 2)
+        error.message = error.message.replace("u'", "'", 1)
+    else:
+        error.message = error.message.replace('file:', 'Klipper Configuration', 1)
+        error.message = error.message.replace("'", '', 2)
+    logger.log_error(
+        self,
+        ('Error: Invalid Klipper config file:\n' + '{}'.format(str(error))),
+    )
+
+    util.send_message(
+        self, 'PopUp', 'warning', 'Invalid Config data\n', ('\n' + str(error))
+    )
 
 def is_float_ok(self, dataToValidated):
 
-    sections_search_list = ["bltouch",
-                            "probe"]
-    value_search_list = ["x_offset",
-                        "y_offset",
-                        "z_offset"]
+    sections_search_list = [
+        "bltouch",
+        "probe"
+    ]
+    value_search_list = [
+        "x_offset",
+        "y_offset",
+        "z_offset"
+    ]
     try:
         # cycle through sections and then values
         for y in sections_search_list:
@@ -205,7 +215,7 @@ def is_float_ok(self, dataToValidated):
             self,
             "PopUp",
             "warning",
-            "OctoKlipper: Invalid Config data\n",
+            "Invalid Config data\n",
             "\n"
             + "Invalid Value for <b>" + x + "</b> in Section: <b>" + y + "</b>\n"
             + "{}".format(str(error))

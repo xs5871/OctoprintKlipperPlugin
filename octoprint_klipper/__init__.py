@@ -33,11 +33,6 @@ from octoprint.server.util.flask import restricted_access
 import flask
 from flask_babel import gettext
 
-try:
-    import configparser
-except ImportError:
-    import ConfigParser as configparser
-
 if sys.version_info[0] < 3:
     import StringIO
 
@@ -139,6 +134,7 @@ class KlipperPlugin(
                 old_config="",
                 logpath="/tmp/klippy.log",
                 reload_command="RESTART",
+                restart_onsave=False,
                 shortStatus_navbar=True,
                 shortStatus_sidebar=True,
                 parse_check=False,
@@ -146,40 +142,7 @@ class KlipperPlugin(
             )
         )
 
-    def on_settings_load(self):
-        data = octoprint.plugin.SettingsPlugin.on_settings_load(self)
-
-        configpath = os.path.expanduser(
-            self._settings.get(["configuration", "configpath"])
-        )
-        standardconfigfile = os.path.join(configpath, "printer.cfg")
-        data["config"] = cfgUtils.get_cfg(self, standardconfigfile)
-        util.send_message(self, "reload", "config", "", data["config"])
-            # send the configdata to frontend to update ace editor
-        return data
-
     def on_settings_save(self, data):
-        if "config" in data:
-            if cfgUtils.save_cfg(self, data["config"], "printer.cfg"):
-                #load the reload command from changed data if it is not existing load the saved setting
-                if util.key_exist(data, "configuration", "reload_command"):
-                    reload_command = os.path.expanduser(
-                        data["configuration"]["reload_command"]
-                    )
-                else:
-                    reload_command = self._settings.get(["configuration", "reload_command"])
-
-                if reload_command != "manually":
-                    # Restart klippy to reload config
-                    self._printer.commands(reload_command)
-                    logger.log_info(self, "Restarting Klipper.")
-                # we dont want to write the klipper conf to the octoprint settings
-            else:
-                # save not sure. saving to the octoprintconfig:
-                self._settings.set(["configuration", "temp_config"], data)
-            data.pop("config", None)
-
-        # save the rest of changed settings into config.yaml of octoprint
         old_debug_logging = self._settings.get_boolean(["configuration", "debug_logging"])
 
         octoprint.plugin.SettingsPlugin.on_settings_save(self, data)
@@ -205,6 +168,10 @@ class KlipperPlugin(
         )
 
     def get_settings_version(self):
+        # Settings_Versionhistory:
+        # 3 = add shortstatus on navbar. migrate the navbar setting for this
+        # 4 = -change of configpath to only path without filename
+        #     -add setting for restart checkbox on editor save
         return 4
 
 
@@ -213,35 +180,43 @@ class KlipperPlugin(
         settings = self._settings
         if current is None:
             self.migrate_old_settings(settings)
+
         if current is not None and current < 3:
-            self.migrate_configuration(
+            self.migrate_settings_configuration(
                 settings,
                 "shortStatus_navbar",
                 "navbar",
             )
 
         if current is not None and current < 4:
-            self.migrate_configuration(
+            self.migrate_settings_configuration(
                 settings,
                 "old_config",
                 "temp_config",
             )
 
-            setting_path = settings.get(["configuration", "configpath"])
-            if setting_path.find("printer.cfg")!=-1:
-                new_setting_path = setting_path.replace("printer.cfg","")
-                logger.log_info(self, "migrate setting for 'configuration/configpath': " + setting_path + " -> " + new_setting_path)
-                settings.set(["configuration", "configpath"], new_setting_path)
+            cfg_path = settings.get(["configuration", "configpath"])
+            if cfg_path.find("printer.cfg") != -1:
+                new_cfg_path = cfg_path.replace("printer.cfg","")
+                logger.log_info(self, "migrate setting for 'configuration/configpath': " + cfg_path + " -> " + new_cfg_path)
+                settings.set(["configuration", "configpath"], new_cfg_path)
+
+            if settings.get(["configuration", "reload_command"]) != "manually" :
+                logger.log_info(self, "migrate setting for 'configuration/restart_onsave': False -> True")
+                settings.set(["configuration", "restart_onsave"], True)
+
 
     def migrate_old_settings(self, settings):
-
+        '''
+        For Old settings
+        '''
         self.migrate_settings(settings, "serialport", "connection", "port")
         self.migrate_settings(settings, "replace_connection_panel", "connection", "replace_connection_panel")
         self.migrate_settings(settings, "probeHeight", "probe", "height")
         self.migrate_settings(settings, "probeLift", "probe", "lift")
         self.migrate_settings(settings, "probeSpeedXy", "probe", "speed_xy")
         self.migrate_settings(settings, "probeSpeedZ", "probe", "speed_z")
-        self.migrate_settings(settings, "configPath", "configpath")
+        self.migrate_settings(settings, "configPath", "configuration", "configpath")
 
         if settings.has(["probePoints"]):
             points = settings.get(["probePoints"])
@@ -250,6 +225,14 @@ class KlipperPlugin(
             settings.remove(["probePoints"])
 
     def migrate_settings(self, settings, old, new, new2="") -> None:
+        """migrate setting to setting with additional group
+
+        Args:
+            settings (any): instance of self._settings
+            old (str): the old setting to migrate
+            new (str): group or only new setting if there is no new2
+            new2 (str, optional): the new setting to migrate to. Defaults to "".
+        """        ''''''
         if settings.has([old]):
             if new2 != "":
                 logger.log_info(self, "migrate setting for '" + old + "' -> '" + new + "/" + new2 + "'")
@@ -574,6 +557,20 @@ class KlipperPlugin(
         if saved == True:
             util.send_message(self, "reload", "configlist", "", "")
         return flask.jsonify(saved = saved)
+
+    # restart klipper
+    @octoprint.plugin.BlueprintPlugin.route("/restart", methods=["POST"])
+    @restricted_access
+    @Permissions.PLUGIN_KLIPPER_CONFIG.require(403)
+    def restart_klipper(self):
+        reload_command = self._settings.get(["configuration", "reload_command"])
+
+        if reload_command != "manually":
+
+            # Restart klippy to reload config
+            self._printer.commands(reload_command)
+            logger.log_info(self, "Restarting Klipper.")
+        return NO_CONTENT
 # APIs end
 
 
@@ -608,7 +605,7 @@ __plugin_settings_overlay__ = {
         'actions': [{
             'action': 'octoklipper_restart',
             'command': 'sudo service klipper restart',
-            'name': 'Restart Klipper',
+            'name': gettext('Restart Klipper'),
             'confirm': '<h3><center><b>' + gettext("You are about to restart Klipper!") + '<br>' + gettext("This will stop ongoing prints!") + '</b></center></h3><br>Command = "sudo service klipper restart"'
         }]
     }

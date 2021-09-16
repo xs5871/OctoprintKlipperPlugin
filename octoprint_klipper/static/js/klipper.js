@@ -37,12 +37,16 @@ $(function () {
     self.logMessages = ko.observableArray();
 
     self.showPopUp = function (popupType, popupTitle, message) {
-      var title = popupType.toUpperCase() + ":  " + popupTitle;
+      var title = "OctoKlipper: <br />" + popupTitle + "<br />";
+      var hide = false;
+      if (popupType == "success") {
+        hide = true
+      }
       new PNotify({
         title: title,
         text: message,
         type: popupType,
-        hide: false,
+        hide: hide,
         icon: true
       });
     };
@@ -52,6 +56,7 @@ $(function () {
       var editorDialog = $("#klipper_editor");
       editorDialog.modal({
         show: "true",
+        width: "90%",
         backdrop: "static",
       });
     }
@@ -142,6 +147,8 @@ $(function () {
           case "PopUp":
             self.showPopUp(data.subtype, data.title, data.payload);
             break;
+          case "start":
+            break;
           case "reload":
             break;
           case "console":
@@ -225,6 +232,25 @@ $(function () {
       }
     };
 
+    self.requestRestart = function () {
+      if (!self.loginState.hasPermission(self.access.permissions.PLUGIN_KLIPPER_CONFIG)) return;
+
+      var request = function () {
+        OctoPrint.plugins.klipper.restartKlipper().done(function () {
+          self.consoleMessage("debug", "requestRestart");
+        });
+      };
+
+      var html = "<h4>" + gettext("All ongoing Prints will be stopped!") + "</h4>";
+
+      showConfirmationDialog({
+        title: gettext("Klipper restart?"),
+        html: html,
+        proceed: gettext("Proceed"),
+        onproceed: request,
+      });
+    };
+
     // OctoKlipper settings link
     self.openOctoKlipperSettings = function (profile_type) {
       if (!self.hasRight("CONFIG")) return;
@@ -235,6 +261,10 @@ $(function () {
         var query = "#klipper-settings a[data-profile-type='" + profile_type + "']";
         $(query).click();
       }
+    };
+
+    self.sleep = function (ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
     };
   }
 

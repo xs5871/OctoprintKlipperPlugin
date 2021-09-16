@@ -150,7 +150,6 @@ ul#klipper-settings {
 }
 
 div#klipper_backups_dialog {
-  min-height: 300px;
   display: flex;
   flex-flow: column;
   min-height: 400px;
@@ -255,51 +254,42 @@ div#settings_plugin_klipper div.tab-content div#conf.tab-pane div.control-group 
   margin: 5;
 }
 
-div#klipper_editor {
-  min-height: 300px;
-  display: flex;
-  flex-flow: column;
-}
-
 @media (max-width: 979px) {
 
-  div#klipper_editor.modal {
+  /* div#klipper_editor.modal {
     height: unset !important;
+  } */
+
+  div#klipper_editor .modal-footer .btn {
+    margin-bottom: 1px;
+    margin-left: 5px;
   }
 
 }
 
-div#klipper_editor .modal-header {
-  height: 6px;
+
+.octoprint-container.UICMainCont.container-fluid {
+  margin-top:0px !important;
+}
+
+div#klipper_editor .modal-header div button.btn + button.btn {
+  margin-right: 12px;
 }
 
 div#klipper_editor .modal-body {
   overflow: auto;
-  min-height: 250px;
-  display: flex;
-  flex-flow: column;
-  flex-grow: 1;
 }
 
 .klipper-btn-group {
   display: inline-block;
 }
 
-div#klipper_editor .modal-body label.checkbox {
-  display: unset;
-}
-
-div#klipper_editor .modal-body input[type="text"] {
+div#klipper_editor .modal-footer input[type="text"] {
   margin-bottom: 0px !important;
 }
 
-div#klipper_editor .modal-body input[type="checkbox"] {
-  float: unset;
-  margin-left: unset;
-  vertical-align: unset;
-}
 
-div#klipper_editor .modal-body .editor-controls {
+div#klipper_editor .modal-footer .editor-controls {
 	flex: 0 auto;
 	display: flex;
 	align-items: center;
@@ -311,29 +301,17 @@ div#klipper_editor div.conf-editor {
   width: calc(100% - 4px);
   margin-top: 5px;
   overflow: auto;
-  flex-grow : 1;
 }
 
 div#klipper_editor div.conf-editor div#plugin-klipper-config {
   font-family: monospace;
   overflow: auto;
-}
-
-.ace_editor {
-  margin: auto;
-  height: 200px;
   width: 100%;
+  margin: auto;
 }
-
-/* div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content div#conf.tab-pane.active button.btn.btn-small ,div#klipper_editor button.btn.btn-small{
-   width: 30%;
-   display: inline-block;
-   margin: 0px 2px 2px 2px;
-} */
 
 /*checkboxes*/
-div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content div.tab-pane.active input.inline-checkbox,
-div#klipper_editor input.inline-checkbox {
+div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content div.tab-pane.active input.inline-checkbox {
   vertical-align: -0.2em;
 }
 
@@ -347,7 +325,7 @@ div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content
 }
 
 /*macros*/
-div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content div#macros.tab-pane.active div div#item.control-group label.control-label {
+div#settings_plugin_klipper div#macros label.control-label {
   width: 80px;
 }
 
