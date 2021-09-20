@@ -160,7 +160,7 @@ ace.define("ace/mode/klipper_config_highlight_rules",[], function(require, expor
                 caseInsensitive: true
             }, {
                 token: "support.type",
-                regex: /[\^~!]*(?:z:)?[a-zA-Z]{1,2}\d{1,2}(?:\.\d{1,2})?/,
+                regex: /[\^~!]*(?:z:)?[a-zA-Z]{1,4}(?:gpio)?\d{1,2}(?:\.\d{1,2})?/,
                 caseInsensitive: true
             }],
             "#config_line_start_gcode": [{
@@ -192,8 +192,8 @@ ace.define("ace/mode/klipper_config_highlight_rules",[], function(require, expor
                 }]
             }],
             "#config_line": [{
-                token: ["variable.name", "variable.name"],
-                regex: /(?!gcode|sensor_type|rpi:)(\w+)(\s*[:]\s*)/,
+                token: ["variable.name", "variable.name", "variable.name", "variable.name"],
+                regex: /(?!gcode|sensor_type|rpi:)(\w+)(\s*[:]\s*\w+[:])|(?!gcode|sensor_type|rpi:)(\w+)(\s*[:]\s*)/,
                 push: [{
                     token: "text",
                     regex: /$/,
