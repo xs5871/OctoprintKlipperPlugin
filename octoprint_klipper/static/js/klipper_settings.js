@@ -86,11 +86,12 @@ $(function () {
 
     self.loadBaseConfig = function () {
       if (!self.klipperViewModel.hasRight("CONFIG")) return;
-
-      OctoPrint.plugins.klipper.getCfg("printer.cfg").done(function (response) {
+      var baseconfig = self.settings.settings.plugins.klipper.configuration.baseconfig();
+      self.klipperViewModel.consoleMessage("debug", "loadBaseConfig:" + baseconfig);
+      OctoPrint.plugins.klipper.getCfg(baseconfig).done(function (response) {
         var config = {
           content: response.response.config,
-          file: "printer.cfg",
+          file: baseconfig,
         };
         self.klipperEditorViewModel.process(config).then();
       });

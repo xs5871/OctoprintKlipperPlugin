@@ -185,24 +185,7 @@ $(function () {
       }
     };
 
-    self.loadLastSession = function () {
-      if (self.settings.settings.plugins.klipper.configuration.old_config() != "") {
-        self.klipperViewModel.consoleMessage(
-          "info",
-          "lastSession:" +
-          self.settings.settings.plugins.klipper.configuration.old_config()
-        );
-        if (editor.session) {
-          editor.session.setValue(
-            self.settings.settings.plugins.klipper.configuration.old_config()
-          );
-          editor.clearSelection();
-        }
-      }
-    };
-
     self.reloadFromFile = function () {
-
       OctoPrint.plugins.klipper.getCfg(self.CfgFilename())
         .done(function (response) {
           self.klipperViewModel.consoleMessage("debug", "reloadFromFile done");

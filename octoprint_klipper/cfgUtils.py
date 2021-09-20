@@ -71,7 +71,7 @@ def get_cfg(self, file):
         cfg_path = os.path.expanduser(
             self._settings.get(["configuration", "configpath"])
         )
-        file = os.path.join(cfg_path, "printer.cfg")
+        file = os.path.join(cfg_path, self._settings.get(["configuration", "baseconfig"]))
     if util.file_exist(self, file):
         logger.log_debug(self, "get_cfg_files Path: " + file)
         try:
@@ -95,7 +95,7 @@ def get_cfg(self, file):
         response['text'] = gettext("File not found!")
         return response
 
-def save_cfg(self, content, filename="printer.cfg"):
+def save_cfg(self, content, filename):
     """Save the configuration file to given file.
 
     Args:
@@ -115,13 +115,15 @@ def save_cfg(self, content, filename="printer.cfg"):
         content = content.encode('utf-8')
 
     configpath = os.path.expanduser(self._settings.get(["configuration", "configpath"]))
+    if filename == "":
+        filename = self._settings.get(["configuration", "baseconfig"])
     if filename[-4:] != ".cfg":
         filename += ".cfg"
     filepath = os.path.join(configpath, filename)
 
     logger.log_debug(self, "save filepath: {}".format(filepath))
 
-    self._settings.set(["configuration", "temp_config"], content)
+    self._settings.set(["configuration", "old_config"], content)
 
     check_parse = self._settings.get(["configuration", "parse_check"])
     logger.log_debug(self, "check_parse on filesave: {}".format(check_parse))

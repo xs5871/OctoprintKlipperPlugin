@@ -131,6 +131,7 @@ class KlipperPlugin(
             configuration=dict(
                 debug_logging=False,
                 configpath="~/",
+                baseconfig="printer.cfg",
                 old_config="",
                 logpath="/tmp/klippy.log",
                 reload_command="RESTART",
@@ -171,9 +172,11 @@ class KlipperPlugin(
         # Settings_Versionhistory:
         # 3 = add shortstatus on navbar. migrate the navbar setting for this
         # 4 = -change of configpath to only path without filename
-        #     -add setting for restart checkbox on editor save
+        #     -parse configpath into path and baseconfig if not standard printer.cfg
+        #     -switch setting for 'restart on editor save' to true if it was not set to manually
+        #     -remove old_config
+        #     -remove config on root settingsdirectory
         return 4
-
 
     #migrate Settings
     def on_settings_migrate(self, target, current):
@@ -189,22 +192,9 @@ class KlipperPlugin(
             )
 
         if current is not None and current < 4:
-            self.migrate_settings_configuration(
-                settings,
-                "old_config",
-                "temp_config",
+            self.migrate_settings_4(
+                settings
             )
-
-            cfg_path = settings.get(["configuration", "configpath"])
-            if cfg_path.find("printer.cfg") != -1:
-                new_cfg_path = cfg_path.replace("printer.cfg","")
-                logger.log_info(self, "migrate setting for 'configuration/configpath': " + cfg_path + " -> " + new_cfg_path)
-                settings.set(["configuration", "configpath"], new_cfg_path)
-
-            if settings.get(["configuration", "reload_command"]) != "manually" :
-                logger.log_info(self, "migrate setting for 'configuration/restart_onsave': False -> True")
-                settings.set(["configuration", "restart_onsave"], True)
-
 
     def migrate_old_settings(self, settings):
         '''
@@ -247,6 +237,32 @@ class KlipperPlugin(
             logger.log_info(self, "migrate setting for 'configuration/" + old + "' -> 'configuration/" + new + "'")
             settings.set(["configuration", new], settings.get(["configuration", old]))
             settings.remove(["configuration", old])
+
+    def migrate_settings_4(self, settings):
+
+        cfg_path = settings.get(["configuration", "configpath"])
+        if cfg_path.find("printer.cfg") != -1:
+            new_cfg_path = cfg_path.replace("printer.cfg","")
+            logger.log_info(self, "migrate setting for 'configuration/configpath': " + cfg_path + " -> " + new_cfg_path)
+            settings.set(["configuration", "configpath"], new_cfg_path)
+        else:
+            new_cfg_path, baseconfig = os.path.split(cfg_path)
+            logger.log_info(self, "migrate setting for 'configuration/configpath': " + cfg_path + " -> " + new_cfg_path)
+            logger.log_info(self, "migrate setting for 'configuration/baseconfig': printer.cfg -> " + baseconfig)
+            settings.set(["configuration", "configpath"], new_cfg_path)
+            settings.set(["configuration", "baseconfig"], baseconfig)
+
+        if settings.get(["configuration", "reload_command"]) != "manually" :
+            logger.log_info(self, "migrate setting for 'configuration/restart_onsave': False -> True")
+            settings.set(["configuration", "restart_onsave"], True)
+
+        if settings.has(["config"]):
+            logger.log_info(self, "remove old setting for 'config'")
+            settings.remove(["config"])
+
+        if settings.has(["configuration", "old_config"]):
+            logger.log_info(self, "remove old setting for 'configuration/old_config'")
+            settings.remove(["configuration", "old_config"])
 
 
     # -- Template Plugin
