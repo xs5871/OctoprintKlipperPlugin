@@ -56,6 +56,9 @@ $(function () {
             var dialog = $("#klipper_editor");
             dialog.modal('hide');
           },
+          oncancel: function () {
+            self.editorFocusDelay(1000);
+          },
           nofade: true
         });
       } else {
@@ -133,6 +136,7 @@ $(function () {
         OctoPrint.plugins.klipper.saveCfg(editor.session.getValue(), self.CfgFilename())
           .done(function (response) {
             var msg = ""
+            self.loadedConfig = editor.session.getValue();
             if (response.saved === true) {
               self.klipperViewModel.showPopUp("success", gettext("Save Config"), gettext("File saved."));
               if (self.settings.settings.plugins.klipper.configuration.restart_onsave()==true) {
