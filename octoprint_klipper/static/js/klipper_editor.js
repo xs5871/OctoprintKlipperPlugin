@@ -16,16 +16,14 @@
 $(function () {
   function KlipperEditorViewModel(parameters) {
     var self = this;
-    var obKlipperConfig = null;
     var editor = null;
-    var editor_dirty = false;
 
     self.settings = parameters[0];
     self.klipperViewModel = parameters[1];
 
     self.CfgFilename = ko.observable("");
     self.CfgContent = ko.observable("");
-    self.config = []
+    self.loadedConfig = "";
 
     self.header = OctoPrint.getRequestHeaders({
       "content-type": "application/json",
@@ -36,7 +34,7 @@ $(function () {
       editor.focus();
       self.setEditorDivSize();
       $(window).on('resize', function(){
-        self.klipperViewModel.sleep(500).then(
+        self.klipperViewModel.sleep(200).then(
           function () {
             self.setEditorDivSize();
           }
@@ -45,7 +43,8 @@ $(function () {
     });
 
     self.closeEditor = function () {
-      if (editor_dirty===true) {
+      self.CfgContent(editor.getValue());
+      if (self.loadedConfig != self.CfgContent()) {
         showConfirmationDialog({
           message: gettext(
               "Your file seems to have changed."
@@ -84,13 +83,12 @@ $(function () {
 
     self.process = function (config) {
       return new Promise(function (resolve) {
-        self.config = config;
+        self.loadedConfig = config.content;
         self.CfgFilename(config.file);
         self.CfgContent(config.content);
 
         if (editor) {
           editor.session.setValue(self.CfgContent());
-          editor_dirty=false;
           editor.setFontSize(self.settings.settings.plugins.klipper.configuration.fontsize());
           self.settings.settings.plugins.klipper.configuration.old_config(config.content);
           editor.clearSelection();
@@ -137,7 +135,6 @@ $(function () {
             var msg = ""
             if (response.saved === true) {
               self.klipperViewModel.showPopUp("success", gettext("Save Config"), gettext("File saved."));
-              editor_dirty = false;
               if (self.settings.settings.plugins.klipper.configuration.restart_onsave()==true) {
                 self.klipperViewModel.requestRestart();
               }
@@ -235,7 +232,6 @@ $(function () {
 
       editor.session.on('change', function (delta) {
         self.CfgContent(editor.getValue());
-        editor_dirty = true;
         editor.resize();
       });
     };
