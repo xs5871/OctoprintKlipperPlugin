@@ -7,9 +7,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: OctoKlipper 0.3.9rc1\n"
+"Project-Id-Version: OctoKlipper 0.3.9rc2\n"
 "Report-Msgid-Bugs-To: i18n@octoprint.org\n"
-"POT-Creation-Date: 2021-09-21 02:03+0200\n"
+"POT-Creation-Date: 2021-10-03 23:33+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -131,60 +131,69 @@ msgstr ""
 msgid "Deleting of %(filename)s failed, continuing..."
 msgstr ""
 
-#: octoprint_klipper/static/js/klipper_editor.js:50
+#: octoprint_klipper/static/js/klipper_editor.js:65
+msgid "Closing without saving"
+msgstr ""
+
+#: octoprint_klipper/static/js/klipper_editor.js:66
 msgid "Your file seems to have changed."
 msgstr ""
 
-#: octoprint_klipper/static/js/klipper_editor.js:53
+#: octoprint_klipper/static/js/klipper_editor.js:68
 msgid "Do you really want to close it?"
 msgstr ""
 
-#: octoprint_klipper/static/js/klipper_editor.js:54
-msgid "No"
+#: octoprint_klipper/static/js/klipper_editor.js:69
+#: octoprint_klipper/templates/klipper_graph_dialog.jinja2:27
+msgid "Close"
 msgstr ""
 
-#: octoprint_klipper/static/js/klipper_editor.js:55
-msgid "Yes"
+#: octoprint_klipper/static/js/klipper_editor.js:69
+msgid "Do not close"
 msgstr ""
 
-#: octoprint_klipper/static/js/klipper_editor.js:115
-#: octoprint_klipper/static/js/klipper_editor.js:122
+#: octoprint_klipper/static/js/klipper_editor.js:69
+msgid "Save & Close"
+msgstr ""
+
+#: octoprint_klipper/static/js/klipper_editor.js:130
+#: octoprint_klipper/static/js/klipper_editor.js:137
 msgid "SyntaxCheck"
 msgstr ""
 
-#: octoprint_klipper/static/js/klipper_editor.js:115
+#: octoprint_klipper/static/js/klipper_editor.js:130
 msgid "SyntaxCheck OK"
 msgstr ""
 
-#: octoprint_klipper/static/js/klipper_editor.js:118
+#: octoprint_klipper/static/js/klipper_editor.js:133
 msgid "Syntax NOK"
 msgstr ""
 
-#: octoprint_klipper/static/js/klipper_editor.js:139
-#: octoprint_klipper/static/js/klipper_editor.js:149
+#: octoprint_klipper/static/js/klipper_editor.js:157
+#: octoprint_klipper/static/js/klipper_editor.js:169
 #: octoprint_klipper/templates/klipper_editor.jinja2:37
 #: octoprint_klipper/templates/klipper_editor.jinja2:38
 msgid "Save Config"
 msgstr ""
 
-#: octoprint_klipper/static/js/klipper_editor.js:139
+#: octoprint_klipper/static/js/klipper_editor.js:157
 msgid "File saved."
 msgstr ""
 
-#: octoprint_klipper/static/js/klipper_editor.js:145
+#: octoprint_klipper/static/js/klipper_editor.js:167
 msgid "File not saved!"
 msgstr ""
 
-#: octoprint_klipper/static/js/klipper_editor.js:197
-#: octoprint_klipper/static/js/klipper_editor.js:214
+#: octoprint_klipper/static/js/klipper_editor.js:217
+#: octoprint_klipper/static/js/klipper_editor.js:234
 msgid "Reload File"
 msgstr ""
 
-#: octoprint_klipper/static/js/klipper_editor.js:201
+#: octoprint_klipper/static/js/klipper_editor.js:221
 msgid "Reload Config"
 msgstr ""
 
-#: octoprint_klipper/static/js/klipper_editor.js:201
+#: octoprint_klipper/static/js/klipper_editor.js:221
 msgid "File reloaded."
 msgstr ""
 
@@ -346,10 +355,6 @@ msgstr ""
 
 #: octoprint_klipper/templates/klipper_graph_dialog.jinja2:26
 msgid "Analyze Log"
-msgstr ""
-
-#: octoprint_klipper/templates/klipper_graph_dialog.jinja2:27
-msgid "Close"
 msgstr ""
 
 #: octoprint_klipper/templates/klipper_graph_dialog.jinja2:35

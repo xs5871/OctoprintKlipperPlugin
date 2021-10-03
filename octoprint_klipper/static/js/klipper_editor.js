@@ -17,6 +17,7 @@ $(function () {
   function KlipperEditorViewModel(parameters) {
     var self = this;
     var editor = null;
+    var editordialog = $("#klipper_editor");
 
     self.settings = parameters[0];
     self.klipperViewModel = parameters[1];
@@ -30,7 +31,7 @@ $(function () {
       "cache-control": "no-cache",
     });
 
-    $('#klipper_editor').on('shown.bs.modal', function () {
+    editordialog.on('shown.bs.modal', function () {
       editor.focus();
       self.setEditorDivSize();
       $(window).on('resize', function(){
@@ -42,28 +43,41 @@ $(function () {
       });
     });
 
+    self.close_selection = function (index) {
+      switch (index) {
+        case 0:
+          editordialog.modal('hide');
+          break;
+        case 1:
+          self.editorFocusDelay(1000);
+          break;
+        case 2:
+          self.saveCfg({closing: true});
+          break;
+      }
+    }
+
     self.closeEditor = function () {
       self.CfgContent(editor.getValue());
       if (self.loadedConfig != self.CfgContent()) {
-        showConfirmationDialog({
-          message: gettext(
-              "Your file seems to have changed."
-          ),
-          question: gettext("Do you really want to close it?"),
-          cancel: gettext("No"),
-          proceed: gettext("Yes"),
-          onproceed: function () {
-            var dialog = $("#klipper_editor");
-            dialog.modal('hide');
+
+        var opts = {
+          title: gettext("Closing without saving"),
+          message: gettext("Your file seems to have changed.")
+            + "<br />"
+            + gettext("Do you really want to close it?"),
+          selections: [gettext("Close"), gettext("Do not close"), gettext("Save & Close")],
+          maycancel: false,
+          onselect: function (index) {
+              if (index > -1) {
+                  self.close_selection(index);
+              }
           },
-          oncancel: function () {
-            self.editorFocusDelay(1000);
-          },
-          nofade: true
-        });
+        };
+
+          showSelectionDialog(opts);
       } else {
-        var dialog = $("#klipper_editor");
-        dialog.modal('hide');
+        editordialog.modal('hide');
       }
     }
 
@@ -129,23 +143,28 @@ $(function () {
       };
     };
 
-    self.saveCfg = function () {
+    self.saveCfg= function (options) {
+      var options = options || {};
+      var closing = options.closing || false;
+
       if (editor.session) {
         self.klipperViewModel.consoleMessage("debug", "SaveCfg start");
 
         OctoPrint.plugins.klipper.saveCfg(editor.session.getValue(), self.CfgFilename())
           .done(function (response) {
-            var msg = ""
-            self.loadedConfig = editor.session.getValue();
+
             if (response.saved === true) {
               self.klipperViewModel.showPopUp("success", gettext("Save Config"), gettext("File saved."));
+              self.loadedConfig = editor.session.getValue();
+              if (closing) {
+                editordialog.modal('hide');
+              }
               if (self.settings.settings.plugins.klipper.configuration.restart_onsave()==true) {
                 self.klipperViewModel.requestRestart();
               }
             } else {
-              msg = gettext('File not saved!')
               showMessageDialog(
-                msg,
+                gettext('File not saved!'),
                 {
                   title: gettext("Save Config"),
                   onclose: function () { self.editorFocusDelay(1000); }
