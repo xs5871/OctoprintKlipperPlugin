@@ -355,18 +355,18 @@ class KlipperPlugin(
 
     def on_event(self, event, payload):
         if event == "UserLoggedIn":
-            util.update_status(self, "info", "Klipper: Standby")
+            logger.log_info(self, "Klipper: Standby")
         if event == "Connecting":
-            util.update_status(self, "info", "Klipper: Connecting ...")
+            logger.log_info(self, "Klipper: Connecting ...")
         elif event == "Connected":
-            util.update_status(self, "info", "Klipper: Connected to host")
+            logger.log_info(self, "Klipper: Connected to host")
             logger.log_info(
                 self,
                 "Connected to host via {} @{}bps".format(payload["port"], payload["baudrate"]))
         elif event == "Disconnected":
-            util.update_status(self, "info", "Klipper: Disconnected from host")
+            logger.log_info(self, "Klipper: Disconnected from host")
+
         elif event == "Error":
-            util.update_status(self, "error", "Klipper: Error")
             logger.log_error(self, payload["error"])
 
     def processAtCommand(self, comm_instance, phase, command, parameters, tags=None, *args, **kwargs):
@@ -398,7 +398,6 @@ class KlipperPlugin(
             self._parsing_response = True
         elif "!!" in line:
             msg = line.strip('!')
-            util.update_status(self, "error", msg)
             logger.log_error(self, msg)
             self.write_parsing_response_buffer()
         else:

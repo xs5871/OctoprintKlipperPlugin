@@ -33,6 +33,7 @@ $(function () {
     self.access = parameters[5];
 
     self.shortStatus_navbar = ko.observable();
+    self.shortStatus_navbar_hover = ko.observable();
     self.shortStatus_sidebar = ko.observable();
     self.logMessages = ko.observableArray();
 
@@ -142,12 +143,11 @@ $(function () {
     };
 
     self.onDataUpdaterPluginMessage = function (plugin, data) {
+
       if (plugin == "klipper") {
         switch (data.type) {
           case "PopUp":
             self.showPopUp(data.subtype, data.title, data.payload);
-            break;
-          case "start":
             break;
           case "reload":
             break;
@@ -155,27 +155,45 @@ $(function () {
             self.consoleMessage(data.subtype, data.payload);
             break;
           case "status":
-            if (data.payload.length > 36) {
-              var shortText = data.payload.substring(0, 31) + " [..]";
-              self.shortStatus_navbar(shortText);
-            } else {
-              self.shortStatus_navbar(data.payload);
-            }
-            self.shortStatus_sidebar(data.payload);
+            self.shortStatus(data.payload, data.subtype);
             break;
           default:
             self.logMessage(data.time, data.subtype, data.payload);
+            self.shortStatus(data.payload, data.subtype)
             self.consoleMessage(data.subtype, data.payload);
         }
       }
     };
 
+
+    self.shortStatus = function(msg, type) {
+
+      var baseText = gettext("Go to OctoKlipper Tab");
+      if (msg.length > 36) {
+        var shortText = msg.substring(0, 31) + " [..]";
+        self.shortStatus_navbar(shortText);
+        self.shortStatus_navbar_hover(msg);
+      } else {
+        self.shortStatus_navbar(msg);
+        self.shortStatus_navbar_hover(baseText);
+      }
+
+      self.shortStatus_sidebar(msg);
+    };
+
+
     self.logMessage = function (timestamp, type = "info", message) {
+
       if (!timestamp) {
         var today = new Date();
         var timestamp =
           today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
       }
+
+      if (type == "error") {
+        self.showPopUp(type, "Error:", message);
+      }
+
       self.logMessages.push({
         time: timestamp,
         type: type,
