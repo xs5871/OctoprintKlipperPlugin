@@ -369,6 +369,14 @@ class KlipperPlugin(
             util.update_status(self, "error", "Klipper: Error")
             logger.log_error(self, payload["error"])
 
+    def processAtCommand(self, comm_instance, phase, command, parameters, tags=None, *args, **kwargs):
+        if command != "SWITCHCONFIG":
+            return
+
+        config = parameters
+        logger.log_info(self, "SWITCHCONFIG detected config:{}".format(config))
+        return None
+
     # -- GCODE Hook
 
     def on_parse_gcode(self, comm, line, *args, **kwargs):
@@ -484,7 +492,7 @@ class KlipperPlugin(
                 raise
         return NO_CONTENT
 
-    # Get a list of all backuped configfiles
+    # Get a list of all backed up configfiles
     @octoprint.plugin.BlueprintPlugin.route("/backup/list", methods=["GET"])
     @restricted_access
     @Permissions.PLUGIN_KLIPPER_CONFIG.require(403)
@@ -492,7 +500,7 @@ class KlipperPlugin(
         files = cfgUtils.list_cfg_files(self, "backup")
         return flask.jsonify(files = files)
 
-    # restore a backuped configfile
+    # restore a backed up configfile
     @octoprint.plugin.BlueprintPlugin.route("/backup/restore/<filename>", methods=["GET"])
     @restricted_access
     @Permissions.PLUGIN_KLIPPER_CONFIG.require(403)
@@ -571,7 +579,7 @@ class KlipperPlugin(
         Filecontent = data.get("DataToSave", [])
         saved = cfgUtils.save_cfg(self, Filecontent, filename)
         if saved == True:
-            util.send_message(self, "reload", "configlist", "", "")
+            util.send_message(self, type = "reload", subtype = "configlist")
         return flask.jsonify(saved = saved)
 
     # restart klipper
@@ -634,6 +642,7 @@ def __plugin_load__():
     __plugin_hooks__ = {
         "octoprint.server.http.routes": __plugin_implementation__.route_hook,
         "octoprint.access.permissions": __plugin_implementation__.get_additional_permissions,
+        "octoprint.comm.protocol.atcommand.sending": __plugin_implementation__.processAtCommand,
         "octoprint.comm.protocol.gcode.received": __plugin_implementation__.on_parse_gcode,
         "octoprint.plugin.softwareupdate.check_config": __plugin_implementation__.get_update_information
     }

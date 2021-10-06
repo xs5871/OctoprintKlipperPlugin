@@ -15,6 +15,7 @@ except ImportError:
 if sys.version_info[0] < 3:
     import StringIO
 
+
 def list_cfg_files(self, path: str) -> list:
     """Generate list of config files.
 
@@ -52,6 +53,7 @@ def list_cfg_files(self, path: str) -> list:
         ))
         logger.log_debug(self, "list_cfg_files " + str(len(files)) + ": " + f)
     return files
+
 
 def get_cfg(self, file):
     """Get the content of a configuration file.
@@ -94,6 +96,7 @@ def get_cfg(self, file):
     else:
         response['text'] = gettext("File not found!")
         return response
+
 
 def save_cfg(self, content, filename):
     """Save the configuration file to given file.
@@ -138,11 +141,12 @@ def save_cfg(self, content, filename):
         logger.log_error(self, "Error: Couldn't open Klipper config file: {}".format(filepath))
         return False
     else:
-        logger.log_debug(self, "Writen Klipper config to {}".format(filepath))
+        logger.log_debug(self, "Written Klipper config to {}".format(filepath))
         return True
     finally:
         f.close()
         copy_cfg_to_backup(self, filepath)
+
 
 def check_cfg(self, data):
     """Checks the given data on parsing errors.
@@ -172,6 +176,7 @@ def check_cfg(self, data):
         logger.log_debug(self, "check_cfg: OK")
         return True
 
+
 def show_error_message(self, error):
     error.message = error.message.replace('\\n', '')
     if sys.version_info[0] < 3:
@@ -187,8 +192,13 @@ def show_error_message(self, error):
     )
 
     util.send_message(
-        self, 'PopUp', 'warning', 'Invalid Config data\n', ('\n' + str(error))
+        self,
+        type = 'PopUp',
+        subtype = 'warning',
+        title = 'Invalid Config data\n',
+        payload = ('\n' + str(error))
     )
+
 
 def is_float_ok(self, dataToValidated):
 
@@ -215,16 +225,17 @@ def is_float_ok(self, dataToValidated):
         )
         util.send_message(
             self,
-            "PopUp",
-            "warning",
-            "Invalid Config data\n",
-            "\n"
-            + "Invalid Value for <b>" + x + "</b> in Section: <b>" + y + "</b>\n"
-            + "{}".format(str(error))
+            type = "PopUp",
+            subtype = "warning",
+            title = "Invalid Config data\n",
+            payload = "\n"
+                + "Invalid Value for <b>" + x + "</b> in Section: <b>" + y + "</b>\n"
+                + "{}".format(str(error))
         )
         return False
     else:
         return True
+
 
 def copy_cfg(self, file, dst):
     """Copy the config file to the destination.
@@ -254,6 +265,7 @@ def copy_cfg(self, file, dst):
             )
             return True
     return False
+
 
 def copy_cfg_to_backup(self, src):
     """Copy the config file to backup directory of OctoKlipper.
@@ -292,8 +304,6 @@ def copy_cfg_to_backup(self, src):
         )
         return False
     else:
-        logger.log_debug(self, "CfgBackup " + dst + " writen")
+        logger.log_debug(self, "CfgBackup " + dst + " written")
         return True
-
-
 
