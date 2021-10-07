@@ -93,6 +93,7 @@ $(function () {
       var dialog = $("#klipper_graph_dialog");
       dialog.modal({
         show: "true",
+        width: "90%",
         minHeight: "500px",
         maxHeight: "600px",
       });

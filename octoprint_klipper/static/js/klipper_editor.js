@@ -31,16 +31,12 @@ $(function () {
       "cache-control": "no-cache",
     });
 
-    editordialog.on('shown.bs.modal', function () {
-      editor.focus();
-      self.setEditorDivSize();
-      $(window).on('resize', function(){
-        self.klipperViewModel.sleep(200).then(
-          function () {
-            self.setEditorDivSize();
-          }
-        );
-      });
+    $(window).on('resize', function() {
+      self.klipperViewModel.sleep(200).then(
+        function () {
+          self.setEditorDivSize();
+        }
+      );
     });
 
     self.close_selection = function (index) {
@@ -82,7 +78,7 @@ $(function () {
     }
 
     self.addStyleAttribute = function ($element, styleAttribute) {
-      $element.attr('style', $element.attr('style') + '; ' + styleAttribute);
+      $element.attr('style', styleAttribute);
     }
 
     self.setEditorDivSize = function () {
@@ -91,7 +87,6 @@ $(function () {
 
       var height = $(window).height() - $('#klipper_editor .modal-header').outerHeight() - $('#klipper_editor .modal-footer').outerHeight() - 118;
       self.addStyleAttribute(klipper_modal_body, 'height: ' + height + 'px !important;');
-      //self.addStyleAttribute(klipper_config, 'height: ' + height + 'px !important;');
       klipper_config.css('height', height);
       if (editor) {
         editor.resize();

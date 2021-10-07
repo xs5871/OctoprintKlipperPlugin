@@ -4,7 +4,7 @@
   border: 1px solid #aaa;
   width: 98%;
   text-align: center;
-  word-break: break-all;
+  word-break: break-word;
   margin: auto;
 }
 
@@ -337,10 +337,6 @@ div#settings_plugin_klipper div#macros label.control-label {
   color: #333;
   padding-bottom: 2px;
   padding-top: 2px;
-}
-
-#klipper_graph_dialog {
-  width: 90%;
 }
 
 #klipper_graph_dialog .full-sized-box {
