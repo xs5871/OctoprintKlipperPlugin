@@ -378,6 +378,10 @@ class KlipperPlugin(
         return None
 
     # -- GCODE Hook
+    def process_sent_GCODE(self, comm_instance, phase, cmd, cmd_type, gcode, *args, **kwargs):
+        if cmd == "SAVE_CONFIG":
+            logger.log_info(self, "SAVE_CONFIG detected")
+            util.send_message(self, type = "reload", subtype = "config")
 
     def on_parse_gcode(self, comm, line, *args, **kwargs):
 
@@ -642,6 +646,7 @@ def __plugin_load__():
         "octoprint.server.http.routes": __plugin_implementation__.route_hook,
         "octoprint.access.permissions": __plugin_implementation__.get_additional_permissions,
         "octoprint.comm.protocol.atcommand.sending": __plugin_implementation__.processAtCommand,
+        "octoprint.comm.protocol.gcode.sent": __plugin_implementation__.process_sent_GCODE,
         "octoprint.comm.protocol.gcode.received": __plugin_implementation__.on_parse_gcode,
         "octoprint.plugin.softwareupdate.check_config": __plugin_implementation__.get_update_information
     }

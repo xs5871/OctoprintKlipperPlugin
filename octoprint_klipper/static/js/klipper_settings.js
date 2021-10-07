@@ -31,6 +31,10 @@ $(function () {
 
     self.markedForFileRemove = ko.observableArray([]);
 
+    $(document).on('shown.bs.modal','#klipper_editor', function () {
+      self.klipperEditorViewModel.onShown();
+    });
+
     self.checkFontsize = function () {
       if (self.settings.settings.plugins.klipper.configuration.fontsize() > 20) {
         self.settings.settings.plugins.klipper.configuration.fontsize(20)
@@ -312,20 +316,7 @@ $(function () {
       if (plugin == "klipper" && data.type == "reload" && data.subtype == "configlist") {
         self.klipperViewModel.consoleMessage("debug", "onDataUpdaterPluginMessage klipper reload configlist");
         self.listCfgFiles();
-      } else if (plugin == "klipper" && data.type == "start" && data.subtype == "config") {
-        self.klipperViewModel.consoleMessage("debug", "onDataUpdaterPluginMessage klipper start config");
-        self.startConfig(data.title, data.payload);
       }
-    };
-
-    self.startConfig = function (file, content) {
-      if (!self.klipperViewModel.hasRight("CONFIG")) return;
-      filename = file || "";
-      var config = {
-        content: content,
-        file: filename,
-      };
-      self.klipperEditorViewModel.process(config).then();
     };
   }
 

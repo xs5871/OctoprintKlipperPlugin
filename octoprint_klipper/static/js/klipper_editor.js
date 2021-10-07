@@ -25,6 +25,7 @@ $(function () {
     self.CfgFilename = ko.observable("");
     self.CfgContent = ko.observable("");
     self.loadedConfig = "";
+    self.CfgChangedExtern = false;
 
     self.header = OctoPrint.getRequestHeaders({
       "content-type": "application/json",
@@ -38,6 +39,12 @@ $(function () {
         }
       );
     });
+
+    self.onShown = function () {
+      self.checkExternChange();
+      editor.focus();
+      self.setEditorDivSize();
+    }
 
     self.close_selection = function (index) {
       switch (index) {
@@ -101,6 +108,7 @@ $(function () {
 
         if (editor) {
           editor.session.setValue(self.CfgContent());
+          self.CfgChangedExtern = false;
           editor.setFontSize(self.settings.settings.plugins.klipper.configuration.fontsize());
           self.settings.settings.plugins.klipper.configuration.old_config(config.content);
           editor.clearSelection();
@@ -112,6 +120,43 @@ $(function () {
           );
         }
       });
+    }
+
+    self.onDataUpdaterPluginMessage = function (plugin, data) {
+      if (plugin == "klipper" && data.type == "reload" && data.subtype == "config") {
+        self.klipperViewModel.consoleMessage("debug", "onDataUpdaterPluginMessage klipper reload baseconfig");
+        self.ConfigChangedAfterSave();
+      }
+    };
+
+    self.ConfigChangedAfterSave = function () {
+      if (!self.klipperViewModel.hasRight("CONFIG")) return;
+
+      if (self.CfgFilename() == self.settings.settings.plugins.klipper.configuration.baseconfig()) {
+        self.CfgChangedExtern = true;
+        self.checkExternChange();
+      }
+    };
+
+    self.checkExternChange = function() {
+      var baseconfig = self.settings.settings.plugins.klipper.configuration.baseconfig();
+      if (self.CfgChangedExtern && self.CfgFilename() == baseconfig) {
+        if (editordialog.is(":visible")) {
+
+          var perform = function () {
+            self.reloadFromFile();
+          }
+
+          var html = "<p>" + gettext("Reload Configfile after SAVE_CONFIG?") + "</p>";
+
+          showConfirmationDialog({
+            title: gettext("Externally changed config") + " " + baseconfig,
+            html: html,
+            proceed: gettext("Proceed"),
+            onproceed: perform,
+          });
+        }
+      }
     }
 
     self.checkSyntax = function () {
@@ -214,8 +259,10 @@ $(function () {
             )
           } else {
             self.klipperViewModel.showPopUp("success", gettext("Reload Config"), gettext("File reloaded."));
+            self.CfgChangedExtern = false;
             if (editor) {
               editor.session.setValue(response.response.config);
+              self.loadedConfig = response.response.config;
               editor.clearSelection();
               editor.focus();
             }
