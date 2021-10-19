@@ -34,8 +34,11 @@
         <button class="btn btn-small" data-bind="click: checkSyntax" title="{{ _('Check Syntax') }}">
           <i class="fas fa-spell-check"></i> {{ _('Check Syntax') }}
         </button>
+        <button class="btn btn-small" data-bind="click: function() { $root.saveCfg({closing: true}) }" title="{{ _('Save Config and Close') }}">
+          <i class="fas fa-save"></i> {{ _('Save & Close') }}
+        </button>
         <button class="btn btn-small" data-bind="click: saveCfg" title="{{ _('Save Config') }}">
-          <i class="fas fa-save"></i> {{ _('Save Config') }}
+          <i class="fas fa-save"></i> {{ _('Save') }}
         </button>
       </div>
     </div>
