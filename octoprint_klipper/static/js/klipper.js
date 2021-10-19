@@ -254,20 +254,43 @@ $(function () {
     self.requestRestart = function () {
       if (!self.loginState.hasPermission(self.access.permissions.PLUGIN_KLIPPER_CONFIG)) return;
 
-      var request = function () {
-        OctoPrint.plugins.klipper.restartKlipper().done(function () {
-          self.consoleMessage("debug", "requestRestart");
+      var request = function (index) {
+        OctoPrint.plugins.klipper.restartKlipper().done(function (response) {
+          self.consoleMessage("debug", "restartingKlipper");
+          self.showPopUp("success", gettext("Reloaded Klipper"), "command: " + response.command);
         });
+        if (index == 1) {
+          self.settings
+            .saveData({
+                plugins: {
+                    klipper: {
+                      configuration: {
+                        confirm_reload: false
+                      }
+                    }
+                }
+            });
+        }
       };
 
-      var html = "<h4>" + gettext("All ongoing Prints will be stopped!") + "</h4>";
+      var html = "<h4>" +
+                  gettext("All ongoing Prints will be stopped!") +
+                  "</h4>";
 
-      showConfirmationDialog({
-        title: gettext("Klipper restart?"),
-        html: html,
-        proceed: gettext("Proceed"),
-        onproceed: request,
-      });
+      if (self.settings.settings.plugins.klipper.configuration.confirm_reload() == true) {
+        showConfirmationDialog({
+          title: gettext("Reload Klipper?"),
+          html: html,
+          proceed: [gettext("Reload"), gettext("Reload and don't show again.")],
+          onproceed: function (idx) {
+            if (idx > -1) {
+                request(idx);
+            }
+          },
+        });
+      } else {
+        request(0);
+      }
     };
 
     // OctoKlipper settings link

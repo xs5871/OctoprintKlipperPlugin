@@ -78,7 +78,10 @@
             {{ _('The command that is executed if you want to restart klipper.') }}
           </span>
           <label class="checkbox" title="{{ _('Reload klipper on editor save?') }}"><input type="checkbox"
-            data-bind="checked: settings.settings.plugins.klipper.configuration.restart_onsave" /> {{ _('Reload klipper on editor save?') }}
+            data-bind="checked: settings.settings.plugins.klipper.configuration.restart_onsave" /> {{ _('Reload Klipper on editor save?') }}
+          </label>
+          <label class="checkbox" title="{{ _('Show Confirmation before reloading Klipper?') }}"><input type="checkbox"
+            data-bind="checked: settings.settings.plugins.klipper.configuration.confirm_reload" /> {{ _('Confirmation before reloading Klipper?') }}
           </label>
         </div>
       </div>
