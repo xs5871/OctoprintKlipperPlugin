@@ -315,8 +315,7 @@ div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content
   vertical-align: -0.2em;
 }
 
-div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content div.tab-pane.active label.inline,
-div#klipper_editor .inline {
+.klipper-inline {
   display: inline;
 }
 

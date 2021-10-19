@@ -183,7 +183,7 @@ $(function () {
       };
     };
 
-    self.saveCfg= function (options) {
+    self.saveCfg = function (options) {
       var options = options || {};
       var closing = options.closing || false;
 
