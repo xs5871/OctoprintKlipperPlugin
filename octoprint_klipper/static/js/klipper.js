@@ -251,6 +251,36 @@ $(function () {
       }
     };
 
+    self.saveOption = function(dir, option, value) {
+      if (! (_.includes(["fontsize", "confirm_reload"], option)) ) {
+        return;
+      }
+
+      if (option && dir) {
+        let data = {
+          plugins: {
+            klipper:{
+              [dir]: {
+                [option]: value
+              }
+            }
+          }
+        };
+        OctoPrint.settings
+          .save(data);
+      } else if (option) {
+        let data = {
+              plugins: {
+                klipper:{
+                    [option]: value
+                }
+              }
+          };
+        OctoPrint.settings
+          .save(data);
+      }
+    }
+
     self.requestRestart = function () {
       if (!self.loginState.hasPermission(self.access.permissions.PLUGIN_KLIPPER_CONFIG)) return;
 
@@ -260,16 +290,7 @@ $(function () {
           self.showPopUp("success", gettext("Reloaded Klipper"), "command: " + response.command);
         });
         if (index == 1) {
-          self.settings
-            .saveData({
-                plugins: {
-                    klipper: {
-                      configuration: {
-                        confirm_reload: false
-                      }
-                    }
-                }
-            });
+          self.saveOption("configuration", "confirm_reload", false);
         }
       };
 

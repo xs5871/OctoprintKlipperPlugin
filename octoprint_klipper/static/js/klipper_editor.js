@@ -219,30 +219,39 @@ $(function () {
       self.settings.settings.plugins.klipper.configuration.fontsize(
         self.settings.settings.plugins.klipper.configuration.fontsize() - 1
       );
+
       if (self.settings.settings.plugins.klipper.configuration.fontsize() < 9) {
         self.settings.settings.plugins.klipper.configuration.fontsize(9);
       }
+
+      var fontsize = self.settings.settings.plugins.klipper.configuration.fontsize()
       if (editor) {
         editor.setFontSize(
-          self.settings.settings.plugins.klipper.configuration.fontsize()
+          fontsize
         );
         editor.resize();
       }
+
+      self.klipperViewModel.saveOption("configuration", "fontsize", fontsize);
     };
 
     self.plusFontsize = function () {
       self.settings.settings.plugins.klipper.configuration.fontsize(
         self.settings.settings.plugins.klipper.configuration.fontsize() + 1
       );
+
       if (self.settings.settings.plugins.klipper.configuration.fontsize() > 20) {
         self.settings.settings.plugins.klipper.configuration.fontsize(20);
       }
+
+      var fontsize = self.settings.settings.plugins.klipper.configuration.fontsize()
       if (editor) {
         editor.setFontSize(
-          self.settings.settings.plugins.klipper.configuration.fontsize()
+          fontsize
         );
         editor.resize();
       }
+      self.klipperViewModel.saveOption("configuration", "fontsize", fontsize);
     };
 
     self.reloadFromFile = function () {

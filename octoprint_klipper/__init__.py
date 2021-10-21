@@ -135,12 +135,12 @@ class KlipperPlugin(
                 old_config="",
                 logpath="/tmp/klippy.log",
                 reload_command="RESTART",
-                restart_onsave=False,
+                restart_onsave=True,
                 confirm_reload=True,
                 shortStatus_navbar=True,
                 shortStatus_sidebar=True,
                 parse_check=False,
-                fontsize=9
+                fontsize=12
             )
         )
 
