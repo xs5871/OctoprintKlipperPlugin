@@ -132,7 +132,6 @@ class KlipperPlugin(
                 debug_logging=False,
                 configpath="~/",
                 baseconfig="printer.cfg",
-                old_config="",
                 logpath="/tmp/klippy.log",
                 reload_command="RESTART",
                 restart_onsave=True,
@@ -242,16 +241,12 @@ class KlipperPlugin(
     def migrate_settings_4(self, settings):
 
         cfg_path = settings.get(["configuration", "configpath"])
-        if cfg_path.find("printer.cfg") != -1:
-            new_cfg_path = cfg_path.replace("printer.cfg","")
-            logger.log_info(self, "migrate setting for 'configuration/configpath': " + cfg_path + " -> " + new_cfg_path)
-            settings.set(["configuration", "configpath"], new_cfg_path)
-        else:
-            new_cfg_path, baseconfig = os.path.split(cfg_path)
-            logger.log_info(self, "migrate setting for 'configuration/configpath': " + cfg_path + " -> " + new_cfg_path)
-            logger.log_info(self, "migrate setting for 'configuration/baseconfig': printer.cfg -> " + baseconfig)
-            settings.set(["configuration", "configpath"], new_cfg_path)
-            settings.set(["configuration", "baseconfig"], baseconfig)
+
+        new_cfg_path, baseconfig = os.path.split(cfg_path)
+        logger.log_info(self, "migrate setting for 'configuration/configpath': " + cfg_path + " -> " + new_cfg_path)
+        logger.log_info(self, "migrate setting for 'configuration/baseconfig': printer.cfg -> " + baseconfig)
+        settings.set(["configuration", "configpath"], new_cfg_path)
+        settings.set(["configuration", "baseconfig"], baseconfig)
 
         if settings.get(["configuration", "reload_command"]) != "manually" :
             logger.log_info(self, "migrate setting for 'configuration/restart_onsave': False -> True")

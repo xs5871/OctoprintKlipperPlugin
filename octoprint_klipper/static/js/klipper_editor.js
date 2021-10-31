@@ -100,6 +100,7 @@ $(function () {
       }
     };
 
+    //initialize the modal window and return done when finished
     self.process = function (config) {
       return new Promise(function (resolve) {
         self.loadedConfig = config.content;
@@ -110,7 +111,6 @@ $(function () {
           editor.session.setValue(self.CfgContent());
           self.CfgChangedExtern = false;
           editor.setFontSize(self.settings.settings.plugins.klipper.configuration.fontsize());
-          self.settings.settings.plugins.klipper.configuration.old_config(config.content);
           editor.clearSelection();
           self.klipperViewModel.sleep(500).then(
             function() {
@@ -123,13 +123,15 @@ $(function () {
     }
 
     self.onDataUpdaterPluginMessage = function (plugin, data) {
+      //receive from backend after a SAVE_CONFIG
       if (plugin == "klipper" && data.type == "reload" && data.subtype == "config") {
         self.klipperViewModel.consoleMessage("debug", "onDataUpdaterPluginMessage klipper reload baseconfig");
-        self.ConfigChangedAfterSave();
+        self.ConfigChangedAfterSave_Config();
       }
     };
 
-    self.ConfigChangedAfterSave = function () {
+    //set externally changed config flag if the current file is the base config
+    self.ConfigChangedAfterSave_Config = function () {
       if (!self.klipperViewModel.hasRight("CONFIG")) return;
 
       if (self.CfgFilename() == self.settings.settings.plugins.klipper.configuration.baseconfig()) {
@@ -138,6 +140,7 @@ $(function () {
       }
     };
 
+    //check if the config was externally changed and ask for a reload
     self.checkExternChange = function() {
       var baseconfig = self.settings.settings.plugins.klipper.configuration.baseconfig();
       if (self.CfgChangedExtern && self.CfgFilename() == baseconfig) {
@@ -195,7 +198,7 @@ $(function () {
 
             if (response.saved === true) {
               self.klipperViewModel.showPopUp("success", gettext("Save Config"), gettext("File saved."));
-              self.loadedConfig = editor.session.getValue();
+              self.loadedConfig = editor.session.getValue(); //set loaded config to current for resetting dirtyEditor
               if (closing) {
                 editordialog.modal('hide');
               }

@@ -122,19 +122,18 @@ def save_cfg(self, content, filename):
         filename = self._settings.get(["configuration", "baseconfig"])
     if filename[-4:] != ".cfg":
         filename += ".cfg"
+
     filepath = os.path.join(configpath, filename)
-
     logger.log_debug(self, "save filepath: {}".format(filepath))
-
-    self._settings.set(["configuration", "old_config"], content)
 
     check_parse = self._settings.get(["configuration", "parse_check"])
     logger.log_debug(self, "check_parse on filesave: {}".format(check_parse))
+
     if check_parse and not check_cfg(self, content):
         return False
 
+    logger.log_debug(self, "Writing Klipper config to {}".format(filepath))
     try:
-        logger.log_debug(self, "Writing Klipper config to {}".format(filepath))
         with open(filepath, "w") as f:
             f.write(content)
     except IOError:
