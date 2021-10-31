@@ -30,6 +30,7 @@ $(function () {
     });
 
     self.markedForFileRemove = ko.observableArray([]);
+    self.PathToConfigs = ko.observable("");
 
     $(document).on('shown.bs.modal','#klipper_editor', function () {
       self.klipperEditorViewModel.onShown();
@@ -84,6 +85,7 @@ $(function () {
       OctoPrint.plugins.klipper.listCfg().done(function (response) {
         self.klipperViewModel.consoleMessage("debug", "listCfgFiles done");
         self.configs.updateItems(response.files);
+        self.PathToConfigs("Path: "+ response.path);
         self.configs.resetPage();
       });
     };

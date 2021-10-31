@@ -262,7 +262,9 @@
               <i class="icon-refresh"></i> {{ _('Refresh Files') }}
             </button>
             <button class="btn btn-small"
-              data-bind="click: removeMarkedFiles, enable: markedForFileRemove().length > 0">{{ _('Delete selected') }}</button>
+              data-bind="click: removeMarkedFiles, enable: markedForFileRemove().length > 0">{{ _('Delete selected') }}
+            </button>
+            <p class="klipper-inline" data-bind="text: PathToConfigs" title="{{ _('Path to the config files.')}}"></p>
           </div>
           <div class="pull-right">
             <div class="btn-group">

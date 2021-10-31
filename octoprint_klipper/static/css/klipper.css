@@ -97,6 +97,7 @@ ul#klipper-settings {
 #tab_plugin_klipper_main #left-side {
   flex: 3 1;
   padding-right: 10px;
+  padding-top: 5px;
 }
 
 #tab_plugin_klipper_main .span8 label {

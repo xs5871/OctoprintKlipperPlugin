@@ -551,7 +551,10 @@ class KlipperPlugin(
     @Permissions.PLUGIN_KLIPPER_CONFIG.require(403)
     def list_configs(self):
         files = cfgUtils.list_cfg_files(self, "")
-        return flask.jsonify(files = files, max_upload_size = MAX_UPLOAD_SIZE)
+        path = os.path.expanduser(
+            self._settings.get(["configuration", "configpath"])
+        )
+        return flask.jsonify(files = files, path = path, max_upload_size = MAX_UPLOAD_SIZE)
 
     # check syntax of a given data
     @octoprint.plugin.BlueprintPlugin.route("/config/check", methods=["POST"])
