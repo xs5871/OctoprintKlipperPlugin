@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OctoKlipper 0.3.8.2\n"
 "Report-Msgid-Bugs-To: i18n@octoprint.org\n"
-"POT-Creation-Date: 2021-10-31 12:53+0100\n"
+"POT-Creation-Date: 2021-10-31 13:49+0100\n"
 "PO-Revision-Date: 2021-05-13 17:32+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: de\n"
@@ -29,7 +29,7 @@ msgstr "Erlaubt Makros zu benutzen"
 
 #: octoprint_klipper/__init__.py:634
 msgid "Restart Klipper"
-msgstr "Neu start Klipper"
+msgstr "Klipper Neustart"
 
 #: octoprint_klipper/__init__.py:635
 msgid "You are about to restart Klipper!"
@@ -49,23 +49,24 @@ msgid "Go to OctoKlipper Tab"
 msgstr "Gehe zum OctoKlipper Reiter"
 
 #: octoprint_klipper/static/js/klipper.js:290
-msgid "Reloaded Klipper"
-msgstr "Klipper neu gestartet."
+msgid "Restarted Klipper"
+msgstr "Klipper neu gestartet"
 
 #: octoprint_klipper/static/js/klipper.js:298
 msgid "All ongoing Prints will be stopped!"
 msgstr "Alle laufende Drucke werden gestoppt!"
 
 #: octoprint_klipper/static/js/klipper.js:303
-msgid "Reload Klipper?"
-msgstr "Klipper neu starten nach speichern im Editor?"
+msgid "Restart Klipper?"
+msgstr "Klipper neu starten?"
 
 #: octoprint_klipper/static/js/klipper.js:305
-msgid "Reload"
-msgstr "Neu starten"
+#: octoprint_klipper/templates/klipper_tab_main.jinja2:39
+msgid "Restart"
+msgstr "Neustart"
 
 #: octoprint_klipper/static/js/klipper.js:305
-msgid "Reload and don't show again."
+msgid "Restart and don't show again."
 msgstr "Neu starten und nicht wieder anzeigen"
 
 #: octoprint_klipper/static/js/klipper_backup.js:126
@@ -557,7 +558,7 @@ msgid "Klipper Log File"
 msgstr "Klipper Logdatei"
 
 #: octoprint_klipper/templates/klipper_settings.jinja2:71
-msgid "Configuration Reload Command"
+msgid "Configuration Restart Command"
 msgstr "Konfiguration Neustart Befehl"
 
 #: octoprint_klipper/templates/klipper_settings.jinja2:78
@@ -565,19 +566,19 @@ msgid "The command that is executed if you want to restart klipper."
 msgstr "Der Befehl, der ausgeführt wird, um Klipper neu zu starten."
 
 #: octoprint_klipper/templates/klipper_settings.jinja2:80
-msgid "Reload klipper on editor save?"
+msgid "Restart klipper on editor save?"
 msgstr "Klipper neu starten nach speichern im Editor?"
 
 #: octoprint_klipper/templates/klipper_settings.jinja2:81
-msgid "Reload Klipper on editor save?"
+msgid "Restart Klipper on editor save?"
 msgstr "Klipper neu starten nach speichern im Editor?"
 
 #: octoprint_klipper/templates/klipper_settings.jinja2:83
-msgid "Show Confirmation before reloading Klipper?"
+msgid "Show Confirmation before restarting Klipper?"
 msgstr "Zeige Bestätigung vor Klipper Neustart?"
 
 #: octoprint_klipper/templates/klipper_settings.jinja2:84
-msgid "Confirmation before reloading Klipper?"
+msgid "Confirmation before restarting Klipper?"
 msgstr "Bestätigung vor Klipper Neustart?"
 
 #: octoprint_klipper/templates/klipper_settings.jinja2:89
@@ -736,10 +737,6 @@ msgstr "Öffne den Editor"
 #: octoprint_klipper/templates/klipper_tab_main.jinja2:33
 msgid "Show Editor"
 msgstr "Öffne Editor"
-
-#: octoprint_klipper/templates/klipper_tab_main.jinja2:39
-msgid "Restart"
-msgstr "Neustart"
 
 #: octoprint_klipper/templates/klipper_tab_main.jinja2:41
 msgid ""

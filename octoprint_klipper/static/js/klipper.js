@@ -287,7 +287,7 @@ $(function () {
       var request = function (index) {
         OctoPrint.plugins.klipper.restartKlipper().done(function (response) {
           self.consoleMessage("debug", "restartingKlipper");
-          self.showPopUp("success", gettext("Reloaded Klipper"), "command: " + response.command);
+          self.showPopUp("success", gettext("Restarted Klipper"), "command: " + response.command);
         });
         if (index == 1) {
           self.saveOption("configuration", "confirm_reload", false);
@@ -300,9 +300,9 @@ $(function () {
 
       if (self.settings.settings.plugins.klipper.configuration.confirm_reload() == true) {
         showConfirmationDialog({
-          title: gettext("Reload Klipper?"),
+          title: gettext("Restart Klipper?"),
           html: html,
-          proceed: [gettext("Reload"), gettext("Reload and don't show again.")],
+          proceed: [gettext("Restart"), gettext("Restart and don't show again.")],
           onproceed: function (idx) {
             if (idx > -1) {
                 request(idx);

@@ -68,7 +68,7 @@
         </div>
       </div>
       <div class="control-group border">
-        <label class="control-label">{{ _('Configuration Reload Command') }}</label>
+        <label class="control-label">{{ _('Configuration Restart Command') }}</label>
         <div class="controls">
           <select data-bind="value: settings.settings.plugins.klipper.configuration.reload_command">
             <option value="RESTART">RESTART</option>
@@ -77,11 +77,11 @@
           <span class="help-block" style="margin-top:5px;">
             {{ _('The command that is executed if you want to restart klipper.') }}
           </span>
-          <label class="checkbox" title="{{ _('Reload klipper on editor save?') }}"><input type="checkbox"
-            data-bind="checked: settings.settings.plugins.klipper.configuration.restart_onsave" /> {{ _('Reload Klipper on editor save?') }}
+          <label class="checkbox" title="{{ _('Restart klipper on editor save?') }}"><input type="checkbox"
+            data-bind="checked: settings.settings.plugins.klipper.configuration.restart_onsave" /> {{ _('Restart Klipper on editor save?') }}
           </label>
-          <label class="checkbox" title="{{ _('Show Confirmation before reloading Klipper?') }}"><input type="checkbox"
-            data-bind="checked: settings.settings.plugins.klipper.configuration.confirm_reload" /> {{ _('Confirmation before reloading Klipper?') }}
+          <label class="checkbox" title="{{ _('Show Confirmation before restarting Klipper?') }}"><input type="checkbox"
+            data-bind="checked: settings.settings.plugins.klipper.configuration.confirm_reload" /> {{ _('Confirmation before restarting Klipper?') }}
           </label>
         </div>
       </div>
