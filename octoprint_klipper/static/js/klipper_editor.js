@@ -172,7 +172,7 @@ $(function () {
           title: gettext("Save faulty Configuration?"),
           html: html,
           cancel: gettext("Do not save!"),
-          proceed: [gettext("Save anyway!"), gettext("Save anyway and don't show this again.")],
+          proceed: [gettext("Save anyway!"), gettext("Save anyway and don't ask this again.")],
           onproceed: function (idx) {
             if (idx == 0) {
               resolve(true);

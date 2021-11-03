@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OctoKlipper 0.3.8.2\n"
 "Report-Msgid-Bugs-To: i18n@octoprint.org\n"
-"POT-Creation-Date: 2021-10-31 13:49+0100\n"
+"POT-Creation-Date: 2021-11-03 11:12+0100\n"
 "PO-Revision-Date: 2021-05-13 17:32+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: de\n"
@@ -27,15 +27,15 @@ msgstr "Erlaubt Klipper zu konfigurieren"
 msgid "Allows to use klipper macros"
 msgstr "Erlaubt Makros zu benutzen"
 
-#: octoprint_klipper/__init__.py:634
+#: octoprint_klipper/__init__.py:635
 msgid "Restart Klipper"
 msgstr "Klipper Neustart"
 
-#: octoprint_klipper/__init__.py:635
+#: octoprint_klipper/__init__.py:636
 msgid "You are about to restart Klipper!"
 msgstr "Sie sind dabei Klipper neu zu starten!"
 
-#: octoprint_klipper/__init__.py:635
+#: octoprint_klipper/__init__.py:636
 msgid "This will stop ongoing prints!"
 msgstr "Dies wird angehende Aufträge abbrechen!"
 
@@ -66,8 +66,8 @@ msgid "Restart"
 msgstr "Neustart"
 
 #: octoprint_klipper/static/js/klipper.js:305
-msgid "Restart and don't show again."
-msgstr "Neu starten und nicht wieder anzeigen"
+msgid "Restart and don't ask this again."
+msgstr "Neu starten und dies nicht wieder nachfragen."
 
 #: octoprint_klipper/static/js/klipper_backup.js:126
 #: octoprint_klipper/static/js/klipper_settings.js:117
@@ -184,49 +184,69 @@ msgstr "Speichern & Schließen"
 
 #: octoprint_klipper/static/js/klipper_editor.js:153
 msgid "Reload Configfile after SAVE_CONFIG?"
-msgstr "Konfig neuladen nach SAVE_CONFIG?"
+msgstr "Konfiguration neuladen nach SAVE_CONFIG?"
 
 #: octoprint_klipper/static/js/klipper_editor.js:156
 msgid "Externally changed config"
 msgstr "Extern geänderte Konfiguration"
 
-#: octoprint_klipper/static/js/klipper_editor.js:173
-#: octoprint_klipper/static/js/klipper_editor.js:180
+#: octoprint_klipper/static/js/klipper_editor.js:168
+msgid "Your configuration seems to be faulty."
+msgstr "Ihre Konfiguration sieht fehlerhaft aus."
+
+#: octoprint_klipper/static/js/klipper_editor.js:172
+msgid "Save faulty Configuration?"
+msgstr "Speichere fehlerhafte Konfiguration?"
+
+#: octoprint_klipper/static/js/klipper_editor.js:174
+msgid "Do not save!"
+msgstr "Datei nicht speichern!"
+
+#: octoprint_klipper/static/js/klipper_editor.js:175
+msgid "Save anyway!"
+msgstr "Speichere trotzdem!"
+
+#: octoprint_klipper/static/js/klipper_editor.js:175
+msgid "Save anyway and don't ask this again."
+msgstr "Speichere trotzdem und dies nicht wieder nachfragen."
+
+#: octoprint_klipper/static/js/klipper_editor.js:199
 msgid "SyntaxCheck"
 msgstr "Syntaxprüfung"
 
-#: octoprint_klipper/static/js/klipper_editor.js:173
+#: octoprint_klipper/static/js/klipper_editor.js:199
 msgid "SyntaxCheck OK"
 msgstr "Syntaxprüfung OK"
 
-#: octoprint_klipper/static/js/klipper_editor.js:176
-msgid "Syntax NOK"
-msgstr "Syntax ist nicht ok!"
-
-#: octoprint_klipper/static/js/klipper_editor.js:200
-#: octoprint_klipper/static/js/klipper_editor.js:212
+#: octoprint_klipper/static/js/klipper_editor.js:226
+#: octoprint_klipper/static/js/klipper_editor.js:238
+#: octoprint_klipper/static/js/klipper_editor.js:254
 #: octoprint_klipper/templates/klipper_editor.jinja2:40
 msgid "Save Config"
 msgstr "Speichere Konfig"
 
-#: octoprint_klipper/static/js/klipper_editor.js:200
+#: octoprint_klipper/static/js/klipper_editor.js:226
 msgid "File saved."
 msgstr "Datei gespeichert."
 
-#: octoprint_klipper/static/js/klipper_editor.js:210
+#: octoprint_klipper/static/js/klipper_editor.js:236
 msgid "File not saved!"
 msgstr "Datei nicht gespeichert."
 
-#: octoprint_klipper/static/js/klipper_editor.js:269
-#: octoprint_klipper/static/js/klipper_editor.js:288
+#: octoprint_klipper/static/js/klipper_editor.js:252
+msgid "Faulty config not saved!"
+msgstr "Fehlerhafte Datei nicht gespeichert!"
+
+#: octoprint_klipper/static/js/klipper_editor.js:315
+#: octoprint_klipper/static/js/klipper_editor.js:333
 msgid "Reload File"
 msgstr "Datei neuladen"
 
-#: octoprint_klipper/static/js/klipper_editor.js:273
+#: octoprint_klipper/static/js/klipper_editor.js:319
 msgid "Reload Config"
 msgstr "Datei neuladen"
 
-#: octoprint_klipper/static/js/klipper_editor.js:273
+#: octoprint_klipper/static/js/klipper_editor.js:319
 msgid "File reloaded."
 msgstr "Datei neugeladen."
 

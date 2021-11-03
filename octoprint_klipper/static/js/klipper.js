@@ -302,7 +302,7 @@ $(function () {
         showConfirmationDialog({
           title: gettext("Restart Klipper?"),
           html: html,
-          proceed: [gettext("Restart"), gettext("Restart and don't show this again.")],
+          proceed: [gettext("Restart"), gettext("Restart and don't ask this again.")],
           onproceed: function (idx) {
             if (idx > -1) {
                 request(idx);

@@ -7,9 +7,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: OctoKlipper 0.3.9rc3\n"
+"Project-Id-Version: OctoKlipper 0.3.9rc4\n"
 "Report-Msgid-Bugs-To: i18n@octoprint.org\n"
-"POT-Creation-Date: 2021-10-31 13:49+0100\n"
+"POT-Creation-Date: 2021-11-03 11:12+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -26,15 +26,15 @@ msgstr ""
 msgid "Allows to use klipper macros"
 msgstr ""
 
-#: octoprint_klipper/__init__.py:634
+#: octoprint_klipper/__init__.py:635
 msgid "Restart Klipper"
 msgstr ""
 
-#: octoprint_klipper/__init__.py:635
+#: octoprint_klipper/__init__.py:636
 msgid "You are about to restart Klipper!"
 msgstr ""
 
-#: octoprint_klipper/__init__.py:635
+#: octoprint_klipper/__init__.py:636
 msgid "This will stop ongoing prints!"
 msgstr ""
 
@@ -65,7 +65,7 @@ msgid "Restart"
 msgstr ""
 
 #: octoprint_klipper/static/js/klipper.js:305
-msgid "Restart and don't show again."
+msgid "Restart and don't ask this again."
 msgstr ""
 
 #: octoprint_klipper/static/js/klipper_backup.js:126
@@ -183,43 +183,63 @@ msgstr ""
 msgid "Externally changed config"
 msgstr ""
 
-#: octoprint_klipper/static/js/klipper_editor.js:173
-#: octoprint_klipper/static/js/klipper_editor.js:180
+#: octoprint_klipper/static/js/klipper_editor.js:168
+msgid "Your configuration seems to be faulty."
+msgstr ""
+
+#: octoprint_klipper/static/js/klipper_editor.js:172
+msgid "Save faulty Configuration?"
+msgstr ""
+
+#: octoprint_klipper/static/js/klipper_editor.js:174
+msgid "Do not save!"
+msgstr ""
+
+#: octoprint_klipper/static/js/klipper_editor.js:175
+msgid "Save anyway!"
+msgstr ""
+
+#: octoprint_klipper/static/js/klipper_editor.js:175
+msgid "Save anyway and don't ask this again."
+msgstr ""
+
+#: octoprint_klipper/static/js/klipper_editor.js:199
 msgid "SyntaxCheck"
 msgstr ""
 
-#: octoprint_klipper/static/js/klipper_editor.js:173
+#: octoprint_klipper/static/js/klipper_editor.js:199
 msgid "SyntaxCheck OK"
 msgstr ""
 
-#: octoprint_klipper/static/js/klipper_editor.js:176
-msgid "Syntax NOK"
-msgstr ""
-
-#: octoprint_klipper/static/js/klipper_editor.js:200
-#: octoprint_klipper/static/js/klipper_editor.js:212
+#: octoprint_klipper/static/js/klipper_editor.js:226
+#: octoprint_klipper/static/js/klipper_editor.js:238
+#: octoprint_klipper/static/js/klipper_editor.js:254
 #: octoprint_klipper/templates/klipper_editor.jinja2:40
 msgid "Save Config"
 msgstr ""
 
-#: octoprint_klipper/static/js/klipper_editor.js:200
+#: octoprint_klipper/static/js/klipper_editor.js:226
 msgid "File saved."
 msgstr ""
 
-#: octoprint_klipper/static/js/klipper_editor.js:210
+#: octoprint_klipper/static/js/klipper_editor.js:236
 msgid "File not saved!"
 msgstr ""
 
-#: octoprint_klipper/static/js/klipper_editor.js:269
-#: octoprint_klipper/static/js/klipper_editor.js:288
+#: octoprint_klipper/static/js/klipper_editor.js:252
+msgid "Faulty config not saved!"
+msgstr ""
+
+#: octoprint_klipper/static/js/klipper_editor.js:315
+#: octoprint_klipper/static/js/klipper_editor.js:333
 msgid "Reload File"
 msgstr ""
 
-#: octoprint_klipper/static/js/klipper_editor.js:273
+#: octoprint_klipper/static/js/klipper_editor.js:319
 msgid "Reload Config"
 msgstr ""
 
-#: octoprint_klipper/static/js/klipper_editor.js:273
+#: octoprint_klipper/static/js/klipper_editor.js:319
 msgid "File reloaded."
 msgstr ""
 
