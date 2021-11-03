@@ -21,6 +21,7 @@ import octoprint.plugin.core
 import glob
 import os
 import sys
+import io
 from octoprint.util.comm import parse_firmware_line
 from octoprint.access.permissions import Permissions, ADMIN_GROUP, USER_GROUP
 from .modules import KlipperLogAnalyzer
@@ -141,16 +142,33 @@ class KlipperPlugin(
         configpath = os.path.expanduser(
             self._settings.get(["configuration", "configpath"])
         )
-
         try:
-            f = open(configpath, "r")
-            data["config"] = f.read()
-            f.close()
+            with io.open(configpath, "r", encoding="utf8") as f:
+                data["config"] = f.read()
+                f.close()
         except IOError:
             self.log_error(
                 "Error: Klipper config file not found at: {}".format(
                     configpath)
             )
+        except UnicodeDecodeError as e:
+            self.log_debug(
+                "Loading config with utf-8 failed. Trying to load config file with ISO-8859-1 now."
+            )
+            try:
+                with io.open(configpath, "r", encoding="ISO-8859-1") as f:
+                    data["config"] = f.read()
+                    f.close()
+            except UnicodeDecodeError as e:
+                self.log_error(
+                    "Error: Klipper config file cannot be decoded: {}".format(e)
+                )
+            else:
+                self.log_debug(
+                    "Loading config with ISO-8859-1 finished."
+                )
+                self.send_message("reload", "config", "", data["config"])
+                # send the configdata to frontend to update ace editor
         else:
             self.send_message("reload", "config", "", data["config"])
             # send the configdata to frontend to update ace editor
@@ -183,11 +201,9 @@ class KlipperPlugin(
                 )
             if self.file_exist(configpath) and (self._parsing_check_response or not check_parse):
                 try:
-                    f = open(configpath, "w")
-                    f.write(data["config"])
-                    f.close()
-
-
+                    with io.open(configpath, "w", encoding="utf-8") as f:
+                        f.write(data["config"])
+                        f.close()
                     self.log_debug("Writing Klipper config to {}".format(configpath))
                 except IOError:
                     self.log_error("Error: Couldn't write Klipper config file: {}".format(configpath))
@@ -446,21 +462,38 @@ class KlipperPlugin(
             configpath = os.path.expanduser(
                 self._settings.get(["configuration", "configpath"])
             )
-
             try:
-                f = open(configpath, "r")
-                data["config"] = f.read()
-                f.close()
+                with io.open(configpath, "r", encoding="utf-8") as f:
+                    data["config"] = f.read()
+                    f.close()
             except IOError:
                 self.log_error(
                     "Error: Klipper config file not found at: {}".format(
                         configpath)
                 )
+            except UnicodeDecodeError as e:
+                self.log_debug(
+                         "Loading config with utf-8 failed. Trying to load config file with ISO-8859-1 now."
+                    )
+                try:
+                    with io.open(configpath, "r", encoding="ISO-8859-1") as f:
+                        data["config"] = f.read()
+                        f.close()
+                except UnicodeDecodeError as e:
+                    self.log_error(
+                        "Error: Klipper config file cannot be decoded: {}".format(e)
+                    )
+                else:
+                    self.log_debug(
+                        "Loading config with ISO-8859-1 finished."
+                    )
+                    self._settings.set(["config"], data["config"])
+                    if sys.version_info[0] < 3:
+                        data["config"] = data["config"].decode('utf-8')
+                    return flask.jsonify(data=data["config"])
             else:
 
                 self._settings.set(["config"], data["config"])
-                # self.send_message("reload", "config", "", data["config"])
-                # send the configdata to frontend to update ace editor
                 if sys.version_info[0] < 3:
                     data["config"] = data["config"].decode('utf-8')
                 return flask.jsonify(data=data["config"])
