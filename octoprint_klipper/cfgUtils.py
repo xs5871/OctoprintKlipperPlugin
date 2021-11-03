@@ -124,13 +124,6 @@ def save_cfg(self, content, filename):
         filename += ".cfg"
 
     filepath = os.path.join(configpath, filename)
-    logger.log_debug(self, "save filepath: {}".format(filepath))
-
-    check_parse = self._settings.get(["configuration", "parse_check"])
-    logger.log_debug(self, "check_parse on filesave: {}".format(check_parse))
-
-    if check_parse and not check_cfg(self, content):
-        return False
 
     logger.log_debug(self, "Writing Klipper config to {}".format(filepath))
     try:
@@ -147,7 +140,7 @@ def save_cfg(self, content, filename):
         copy_cfg_to_backup(self, filepath)
 
 
-def check_cfg(self, data):
+def check_cfg_ok(self, data):
     """Checks the given data on parsing errors.
 
     Args:
@@ -188,14 +181,6 @@ def show_error_message(self, error):
     logger.log_error(
         self,
         ('Error: Invalid Klipper config file:\n' + '{}'.format(str(error))),
-    )
-
-    util.send_message(
-        self,
-        type = 'PopUp',
-        subtype = 'warning',
-        title = 'Invalid Config data\n',
-        payload = ('\n' + str(error))
     )
 
 

@@ -252,7 +252,7 @@ $(function () {
     };
 
     self.saveOption = function(dir, option, value) {
-      if (! (_.includes(["fontsize", "confirm_reload"], option)) ) {
+      if (! (_.includes(["fontsize", "confirm_reload", "parse_check"], option)) ) {
         return;
       }
 
@@ -302,7 +302,7 @@ $(function () {
         showConfirmationDialog({
           title: gettext("Restart Klipper?"),
           html: html,
-          proceed: [gettext("Restart"), gettext("Restart and don't show again.")],
+          proceed: [gettext("Restart"), gettext("Restart and don't show this again.")],
           onproceed: function (idx) {
             if (idx > -1) {
                 request(idx);

@@ -44,7 +44,7 @@ $(function () {
       self.checkExternChange();
       editor.focus();
       self.setEditorDivSize();
-    }
+    };
 
     self.close_selection = function (index) {
       switch (index) {
@@ -58,7 +58,7 @@ $(function () {
           self.saveCfg({closing: true});
           break;
       }
-    }
+    };
 
     self.closeEditor = function () {
       self.CfgContent(editor.getValue());
@@ -82,11 +82,11 @@ $(function () {
       } else {
         editordialog.modal('hide');
       }
-    }
+    };
 
     self.addStyleAttribute = function ($element, styleAttribute) {
       $element.attr('style', styleAttribute);
-    }
+    };
 
     self.setEditorDivSize = function () {
       var klipper_modal_body= $('#klipper_editor .modal-body');
@@ -120,7 +120,7 @@ $(function () {
           );
         }
       });
-    }
+    };
 
     self.onDataUpdaterPluginMessage = function (plugin, data) {
       //receive from backend after a SAVE_CONFIG
@@ -160,30 +160,55 @@ $(function () {
           });
         }
       }
-    }
+    };
+
+    self.askSaveFaulty = function () {
+      return new Promise(function (resolve) {
+        var html = "<h5>" +
+        gettext("Your configuration seems to be faulty.") +
+        "</h5>";
+
+        showConfirmationDialog({
+          title: gettext("Save faulty Configuration?"),
+          html: html,
+          cancel: gettext("Do not save!"),
+          proceed: [gettext("Save anyway!"), gettext("Save anyway and don't show this again.")],
+          onproceed: function (idx) {
+            if (idx == 0) {
+              resolve(true);
+            } else {
+              self.klipperViewModel.saveOption("configuration", "parse_check", false);
+              resolve(true);
+            }
+          },
+          oncancel: function () {
+            resolve(false);
+          }
+        });
+      });
+    };
 
     self.checkSyntax = function () {
-      if (editor.session) {
-        self.klipperViewModel.consoleMessage("debug", "checkSyntax started");
+      return new Promise((resolve, reject) => {
+        if (editor.session) {
+          self.klipperViewModel.consoleMessage("debug", "checkSyntax started");
 
-        OctoPrint.plugins.klipper.checkCfg(editor.session.getValue())
-          .done(function (response) {
-            var msg = ""
-            if (response.is_syntax_ok == true) {
-              self.klipperViewModel.showPopUp("success", gettext("SyntaxCheck"), gettext("SyntaxCheck OK"));
-              self.editorFocusDelay(1000);
-            } else {
-              msg = gettext('Syntax NOK')
-              showMessageDialog(
-                msg,
-                {
-                  title: gettext("SyntaxCheck"),
-                  onclose: function () { self.editorFocusDelay(1000); }
-                }
-              );
-            }
-          });
-      };
+          OctoPrint.plugins.klipper.checkCfg(editor.session.getValue())
+            .done(function (response) {
+              if (response.is_syntax_ok == true) {
+                self.klipperViewModel.showPopUp("success", gettext("SyntaxCheck"), gettext("SyntaxCheck OK"));
+                self.editorFocusDelay(1000);
+                resolve(true);
+              } else {
+                self.editorFocusDelay(1000);
+                resolve(false);
+              }
+            })
+            .fail(function () {
+              reject(false);
+            });
+        } else { reject(false); }
+      });
     };
 
     self.saveCfg = function (options) {
@@ -193,28 +218,54 @@ $(function () {
       if (editor.session) {
         self.klipperViewModel.consoleMessage("debug", "SaveCfg start");
 
-        OctoPrint.plugins.klipper.saveCfg(editor.session.getValue(), self.CfgFilename())
-          .done(function (response) {
+        var saveRequest = function () {
+          OctoPrint.plugins.klipper.saveCfg(editor.session.getValue(), self.CfgFilename())
+            .done(function (response) {
 
-            if (response.saved === true) {
-              self.klipperViewModel.showPopUp("success", gettext("Save Config"), gettext("File saved."));
-              self.loadedConfig = editor.session.getValue(); //set loaded config to current for resetting dirtyEditor
-              if (closing) {
-                editordialog.modal('hide');
-              }
-              if (self.settings.settings.plugins.klipper.configuration.restart_onsave()==true) {
-                self.klipperViewModel.requestRestart();
-              }
-            } else {
-              showMessageDialog(
-                gettext('File not saved!'),
-                {
-                  title: gettext("Save Config"),
-                  onclose: function () { self.editorFocusDelay(1000); }
+              if (response.saved === true) {
+                self.klipperViewModel.showPopUp("success", gettext("Save Config"), gettext("File saved."));
+                self.loadedConfig = editor.session.getValue(); //set loaded config to current for resetting dirtyEditor
+                if (closing) {
+                  editordialog.modal('hide');
                 }
-              )
-            }
-          });
+                if (self.settings.settings.plugins.klipper.configuration.restart_onsave() == true) {
+                  self.klipperViewModel.requestRestart();
+                }
+              } else {
+                showMessageDialog(
+                  gettext('File not saved!'),
+                  {
+                    title: gettext("Save Config"),
+                    onclose: function () { self.editorFocusDelay(1000); }
+                  }
+                );
+              }
+            });
+        };
+
+        if (self.settings.settings.plugins.klipper.configuration.parse_check() == true) {
+          self.checkSyntax().then((syntaxOK) => {
+              if (syntaxOK === false) {
+                self.askSaveFaulty().then((areWeSaving) => {
+                  if (areWeSaving === false) {
+                    showMessageDialog(
+                      gettext('Faulty config not saved!'),
+                      {
+                        title: gettext("Save Config"),
+                        onclose: function () { self.editorFocusDelay(1000); }
+                      }
+                    );
+                  } else {
+                    saveRequest();
+                  }
+                });
+              } else {
+                saveRequest();
+              }
+            });
+        } else {
+          saveRequest();
+        }
       }
     };
 
@@ -227,11 +278,9 @@ $(function () {
         self.settings.settings.plugins.klipper.configuration.fontsize(9);
       }
 
-      var fontsize = self.settings.settings.plugins.klipper.configuration.fontsize()
+      var fontsize = self.settings.settings.plugins.klipper.configuration.fontsize();
       if (editor) {
-        editor.setFontSize(
-          fontsize
-        );
+        editor.setFontSize(fontsize);
         editor.resize();
       }
 
@@ -247,11 +296,9 @@ $(function () {
         self.settings.settings.plugins.klipper.configuration.fontsize(20);
       }
 
-      var fontsize = self.settings.settings.plugins.klipper.configuration.fontsize()
+      var fontsize = self.settings.settings.plugins.klipper.configuration.fontsize();
       if (editor) {
-        editor.setFontSize(
-          fontsize
-        );
+        editor.setFontSize(fontsize);
         editor.resize();
       }
       self.klipperViewModel.saveOption("configuration", "fontsize", fontsize);
@@ -262,13 +309,12 @@ $(function () {
         .done(function (response) {
           self.klipperViewModel.consoleMessage("debug", "reloadFromFile done");
           if (response.response.text != "") {
-            var msg = response.response.text
             showMessageDialog(
-              msg,
+              response.response.text,
               {
                 title: gettext("Reload File")
               }
-            )
+            );
           } else {
             self.klipperViewModel.showPopUp("success", gettext("Reload Config"), gettext("File reloaded."));
             self.CfgChangedExtern = false;
@@ -281,13 +327,12 @@ $(function () {
           }
         })
         .fail(function (response) {
-          var msg = response
           showMessageDialog(
-            msg,
+            response,
             {
               title: gettext("Reload File")
             }
-          )
+          );
         });
     };
 

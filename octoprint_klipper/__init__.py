@@ -106,6 +106,7 @@ class KlipperPlugin(
         ]
 
     def get_settings_defaults(self):
+        # TODO #69 put some settings on the localStorage
         return dict(
             connection=dict(
                 port="/tmp/printer",
@@ -563,7 +564,7 @@ class KlipperPlugin(
     def check_config(self):
         data = flask.request.json
         data_to_check = data.get("DataToCheck", [])
-        response = cfgUtils.check_cfg(self, data_to_check)
+        response = cfgUtils.check_cfg_ok(self, data_to_check)
         return flask.jsonify(is_syntax_ok = response)
 
     # save a configfile
