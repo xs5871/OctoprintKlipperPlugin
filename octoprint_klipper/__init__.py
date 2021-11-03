@@ -186,8 +186,6 @@ class KlipperPlugin(
             else:
                 check_parse = self._settings.get(["configuration", "parse_check"])
 
-            if sys.version_info[0] < 3:
-                data["config"] = data["config"].encode('utf-8')
 
             # check for configpath if it was changed during changing of the configfile
             if self.key_exist(data, "configuration", "configpath"):
@@ -220,7 +218,7 @@ class KlipperPlugin(
                         # Restart klippy to reload config
                         self._printer.commands(reload_command)
                         self.log_info("Restarting Klipper.")
-                    # we dont want to write the klipper conf to the octoprint settings
+                    # we don't want to write the klipper conf to the octoprint settings
                     data.pop("config", None)
 
         # save the rest of changed settings into config.yaml of octoprint
@@ -488,14 +486,10 @@ class KlipperPlugin(
                         "Loading config with ISO-8859-1 finished."
                     )
                     self._settings.set(["config"], data["config"])
-                    if sys.version_info[0] < 3:
-                        data["config"] = data["config"].decode('utf-8')
                     return flask.jsonify(data=data["config"])
             else:
 
                 self._settings.set(["config"], data["config"])
-                if sys.version_info[0] < 3:
-                    data["config"] = data["config"].decode('utf-8')
                 return flask.jsonify(data=data["config"])
         elif command == "checkConfig":
             if "config" in data:
