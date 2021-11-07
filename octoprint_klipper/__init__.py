@@ -215,7 +215,7 @@ class KlipperPlugin(
             settings.set(["probe", "points"], points_new)
             settings.remove(["probePoints"])
 
-    def migrate_settings(self, settings, old, new, new2="") -> None:
+    def migrate_settings(self, settings, old, new, new2=""):
         """migrate setting to setting with additional group
 
         Args:

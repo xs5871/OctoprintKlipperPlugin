@@ -85,7 +85,7 @@ $(function () {
       OctoPrint.plugins.klipper.listCfg().done(function (response) {
         self.klipperViewModel.consoleMessage("debug", "listCfgFiles done");
         self.configs.updateItems(response.files);
-        self.PathToConfigs("Path: "+ response.path);
+        self.PathToConfigs(gettext("Path: ") + response.path);
         self.configs.resetPage();
       });
     };

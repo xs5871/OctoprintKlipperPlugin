@@ -7,9 +7,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: OctoKlipper 0.3.9rc4\n"
+"Project-Id-Version: OctoKlipper 0.3.9rc5\n"
 "Report-Msgid-Bugs-To: i18n@octoprint.org\n"
-"POT-Creation-Date: 2021-11-03 11:12+0100\n"
+"POT-Creation-Date: 2021-11-07 22:51+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -38,37 +38,59 @@ msgstr ""
 msgid "This will stop ongoing prints!"
 msgstr ""
 
-#: octoprint_klipper/cfgUtils.py:97
+#: octoprint_klipper/cfgUtils.py:86
+msgid "Error: Klipper config file not found at:"
+msgstr ""
+
+#: octoprint_klipper/cfgUtils.py:89
+msgid "IOError:"
+msgstr ""
+
+#: octoprint_klipper/cfgUtils.py:96
+msgid "Decode Error:"
+msgstr ""
+
+#: octoprint_klipper/cfgUtils.py:100
+msgid "Please convert your config files to utf-8!"
+msgstr ""
+
+#: octoprint_klipper/cfgUtils.py:102
+msgid ""
+"Or you can also paste your config \n"
+"into the Editor and save it."
+msgstr ""
+
+#: octoprint_klipper/cfgUtils.py:109
 msgid "File not found!"
 msgstr ""
 
-#: octoprint_klipper/static/js/klipper.js:172
+#: octoprint_klipper/static/js/klipper.js:185
 #: octoprint_klipper/templates/klipper_sidebar.jinja2:11
 msgid "Go to OctoKlipper Tab"
 msgstr ""
 
-#: octoprint_klipper/static/js/klipper.js:290
+#: octoprint_klipper/static/js/klipper.js:305
 msgid "Restarted Klipper"
 msgstr ""
 
-#: octoprint_klipper/static/js/klipper.js:298
+#: octoprint_klipper/static/js/klipper.js:313
 msgid "All ongoing Prints will be stopped!"
 msgstr ""
 
-#: octoprint_klipper/static/js/klipper.js:303
+#: octoprint_klipper/static/js/klipper.js:318
 msgid "Restart Klipper?"
 msgstr ""
 
-#: octoprint_klipper/static/js/klipper.js:305
+#: octoprint_klipper/static/js/klipper.js:320
 #: octoprint_klipper/templates/klipper_tab_main.jinja2:39
 msgid "Restart"
 msgstr ""
 
-#: octoprint_klipper/static/js/klipper.js:305
+#: octoprint_klipper/static/js/klipper.js:320
 msgid "Restart and don't ask this again."
 msgstr ""
 
-#: octoprint_klipper/static/js/klipper_backup.js:126
+#: octoprint_klipper/static/js/klipper_backup.js:110
 #: octoprint_klipper/static/js/klipper_settings.js:117
 #, python-format
 msgid ""
@@ -76,74 +98,74 @@ msgid ""
 "details.</p>"
 msgstr ""
 
-#: octoprint_klipper/static/js/klipper_backup.js:129
+#: octoprint_klipper/static/js/klipper_backup.js:113
 #: octoprint_klipper/static/js/klipper_settings.js:120
 msgid "Could not remove config"
 msgstr ""
 
-#: octoprint_klipper/static/js/klipper_backup.js:138
+#: octoprint_klipper/static/js/klipper_backup.js:122
 #, python-format
-msgid "You are about to delete backuped config file \"%(name)s\"."
+msgid "You are about to delete backed config file \"%(name)s\"."
 msgstr ""
 
-#: octoprint_klipper/static/js/klipper_backup.js:154
+#: octoprint_klipper/static/js/klipper_backup.js:138
 msgid "This will overwrite any file with the same name on the configpath."
 msgstr ""
 
-#: octoprint_klipper/static/js/klipper_backup.js:157
+#: octoprint_klipper/static/js/klipper_backup.js:141
 msgid "Are you sure you want to restore now?"
 msgstr ""
 
-#: octoprint_klipper/static/js/klipper_backup.js:159
+#: octoprint_klipper/static/js/klipper_backup.js:143
 #: octoprint_klipper/static/js/klipper_editor.js:158
 msgid "Proceed"
 msgstr ""
 
-#: octoprint_klipper/static/js/klipper_backup.js:184
+#: octoprint_klipper/static/js/klipper_backup.js:168
 #, python-format
-msgid "You are about to restore %(count)d backuped config files."
+msgid "You are about to restore %(count)d backed config files."
 msgstr ""
 
-#: octoprint_klipper/static/js/klipper_backup.js:199
+#: octoprint_klipper/static/js/klipper_backup.js:183
 #, python-format
-msgid "You are about to delete %(count)d backuped config files."
+msgid "You are about to delete %(count)d backed config files."
 msgstr ""
 
-#: octoprint_klipper/static/js/klipper_backup.js:209
+#: octoprint_klipper/static/js/klipper_backup.js:193
 msgid "Restoring klipper config files"
 msgstr ""
 
-#: octoprint_klipper/static/js/klipper_backup.js:211
+#: octoprint_klipper/static/js/klipper_backup.js:195
 #, python-format
-msgid "Restoring %(count)d backuped config files..."
+msgid "Restoring %(count)d backed config files..."
 msgstr ""
 
-#: octoprint_klipper/static/js/klipper_backup.js:220
+#: octoprint_klipper/static/js/klipper_backup.js:204
 #, python-format
 msgid "Restored %(filename)s..."
 msgstr ""
 
-#: octoprint_klipper/static/js/klipper_backup.js:231
+#: octoprint_klipper/static/js/klipper_backup.js:215
 #, python-format
 msgid "Restoring of %(filename)s failed, continuing..."
 msgstr ""
 
-#: octoprint_klipper/static/js/klipper_backup.js:264
+#: octoprint_klipper/static/js/klipper_backup.js:248
 msgid "Deleting backup files"
 msgstr ""
 
-#: octoprint_klipper/static/js/klipper_backup.js:265
+#: octoprint_klipper/static/js/klipper_backup.js:249
 #, python-format
-msgid "Deleting %(count)d backup files..."
+msgid "Deleting %(count)d backed files..."
 msgstr ""
 
-#: octoprint_klipper/static/js/klipper_backup.js:273
+#: octoprint_klipper/static/js/klipper_backup.js:257
 #: octoprint_klipper/static/js/klipper_settings.js:176
 #, python-format
 msgid "Deleted %(filename)s..."
 msgstr ""
 
-#: octoprint_klipper/static/js/klipper_backup.js:279
+#: octoprint_klipper/static/js/klipper_backup.js:263
 #: octoprint_klipper/static/js/klipper_settings.js:186
 #, python-format
 msgid "Deleting of %(filename)s failed, continuing..."
@@ -211,36 +233,47 @@ msgstr ""
 msgid "SyntaxCheck OK"
 msgstr ""
 
-#: octoprint_klipper/static/js/klipper_editor.js:226
-#: octoprint_klipper/static/js/klipper_editor.js:238
-#: octoprint_klipper/static/js/klipper_editor.js:254
+#: octoprint_klipper/static/js/klipper_editor.js:231
+msgid "Faulty config not saved!"
+msgstr ""
+
+#: octoprint_klipper/static/js/klipper_editor.js:233
+#: octoprint_klipper/static/js/klipper_editor.js:255
+#: octoprint_klipper/static/js/klipper_editor.js:372
+#: octoprint_klipper/static/js/klipper_editor.js:384
 #: octoprint_klipper/templates/klipper_editor.jinja2:40
 msgid "Save Config"
 msgstr ""
 
-#: octoprint_klipper/static/js/klipper_editor.js:226
-msgid "File saved."
+#: octoprint_klipper/static/js/klipper_editor.js:253
+#: octoprint_klipper/static/js/klipper_editor.js:329
+msgid "No filename set"
 msgstr ""
 
-#: octoprint_klipper/static/js/klipper_editor.js:236
-msgid "File not saved!"
-msgstr ""
-
-#: octoprint_klipper/static/js/klipper_editor.js:252
-msgid "Faulty config not saved!"
-msgstr ""
-
-#: octoprint_klipper/static/js/klipper_editor.js:315
-#: octoprint_klipper/static/js/klipper_editor.js:333
+#: octoprint_klipper/static/js/klipper_editor.js:305
+#: octoprint_klipper/static/js/klipper_editor.js:323
+#: octoprint_klipper/static/js/klipper_editor.js:331
 msgid "Reload File"
 msgstr ""
 
-#: octoprint_klipper/static/js/klipper_editor.js:319
+#: octoprint_klipper/static/js/klipper_editor.js:309
 msgid "Reload Config"
 msgstr ""
 
-#: octoprint_klipper/static/js/klipper_editor.js:319
+#: octoprint_klipper/static/js/klipper_editor.js:309
 msgid "File reloaded."
+msgstr ""
+
+#: octoprint_klipper/static/js/klipper_editor.js:372
+msgid "File saved."
+msgstr ""
+
+#: octoprint_klipper/static/js/klipper_editor.js:382
+msgid "File not saved!"
+msgstr ""
+
+#: octoprint_klipper/static/js/klipper_settings.js:88
+msgid "Path: "
 msgstr ""
 
 #: octoprint_klipper/static/js/klipper_settings.js:129

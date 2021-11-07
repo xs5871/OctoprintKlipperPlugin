@@ -1,6 +1,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 import glob
 import os, time, sys
+import io
 import flask
 
 from . import util, logger
@@ -16,7 +17,7 @@ if sys.version_info[0] < 3:
     import StringIO
 
 
-def list_cfg_files(self, path: str) -> list:
+def list_cfg_files(self, path):
     """Generate list of config files.
 
     Args:
@@ -77,22 +78,33 @@ def get_cfg(self, file):
     if util.file_exist(self, file):
         logger.log_debug(self, "get_cfg_files Path: " + file)
         try:
-            with open(file, "r") as f:
+            with io.open(file, "r", encoding='utf-8') as f:
                 response['config'] = f.read()
         except IOError as Err:
             logger.log_error(
                 self,
-                "Error: Klipper config file not found at: {}".format(file)
-                + "\n IOError: {}".format(Err)
+                gettext("Error: Klipper config file not found at:")
+                + " {}".format(file)
+                + "\n"
+                + gettext("IOError:") + " {}".format(Err)
+            )
+            response['text'] = Err
+            return response
+        except UnicodeDecodeError as Err:
+            logger.log_error(
+                self,
+                gettext("Decode Error:")
+                +"\n"
+                + "{}".format(Err)
+                + "\n\n"
+                + gettext("Please convert your config files to utf-8!")
+                + "\n"
+                + gettext("Or you can also paste your config \ninto the Editor and save it.")
             )
             response['text'] = Err
             return response
         else:
-            if sys.version_info[0] < 3:
-                response['config'] = response.config.decode('utf-8')
             return response
-        finally:
-            f.close()
     else:
         response['text'] = gettext("File not found!")
         return response
@@ -114,8 +126,6 @@ def save_cfg(self, content, filename):
         "Save klipper config"
     )
 
-    if sys.version_info[0] < 3:
-        content = content.encode('utf-8')
 
     configpath = os.path.expanduser(self._settings.get(["configuration", "configpath"]))
     if filename == "":
@@ -127,7 +137,7 @@ def save_cfg(self, content, filename):
 
     logger.log_debug(self, "Writing Klipper config to {}".format(filepath))
     try:
-        with open(filepath, "w") as f:
+        with io.open(filepath, "w", encoding='utf-8') as f:
             f.write(content)
     except IOError:
         logger.log_error(self, "Error: Couldn't open Klipper config file: {}".format(filepath))
@@ -136,7 +146,6 @@ def save_cfg(self, content, filename):
         logger.log_debug(self, "Written Klipper config to {}".format(filepath))
         return True
     finally:
-        f.close()
         copy_cfg_to_backup(self, filepath)
 
 
@@ -290,4 +299,3 @@ def copy_cfg_to_backup(self, src):
     else:
         logger.log_debug(self, "CfgBackup " + dst + " written")
         return True
-

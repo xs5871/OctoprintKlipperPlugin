@@ -215,39 +215,18 @@ $(function () {
       var options = options || {};
       var closing = options.closing || false;
 
-      if (editor.session) {
-        self.klipperViewModel.consoleMessage("debug", "SaveCfg start");
+      if (self.CfgFilename() != "") {
+        if (editor.session) {
+          if (self.settings.settings.plugins.klipper.configuration.parse_check() == true) {
 
-        var saveRequest = function () {
-          OctoPrint.plugins.klipper.saveCfg(editor.session.getValue(), self.CfgFilename())
-            .done(function (response) {
-
-              if (response.saved === true) {
-                self.klipperViewModel.showPopUp("success", gettext("Save Config"), gettext("File saved."));
-                self.loadedConfig = editor.session.getValue(); //set loaded config to current for resetting dirtyEditor
-                if (closing) {
-                  editordialog.modal('hide');
-                }
-                if (self.settings.settings.plugins.klipper.configuration.restart_onsave() == true) {
-                  self.klipperViewModel.requestRestart();
-                }
-              } else {
-                showMessageDialog(
-                  gettext('File not saved!'),
-                  {
-                    title: gettext("Save Config"),
-                    onclose: function () { self.editorFocusDelay(1000); }
-                  }
-                );
-              }
-            });
-        };
-
-        if (self.settings.settings.plugins.klipper.configuration.parse_check() == true) {
-          self.checkSyntax().then((syntaxOK) => {
+            // check Syntax and wait for response
+            self.checkSyntax().then((syntaxOK) => {
               if (syntaxOK === false) {
+
+                // Ask if we should save a faulty config anyway
                 self.askSaveFaulty().then((areWeSaving) => {
                   if (areWeSaving === false) {
+                    // Not saving
                     showMessageDialog(
                       gettext('Faulty config not saved!'),
                       {
@@ -256,16 +235,26 @@ $(function () {
                       }
                     );
                   } else {
-                    saveRequest();
+                    // Save anyway
+                    self.saveRequest(closing);
                   }
                 });
               } else {
-                saveRequest();
+                // Syntax is ok
+                self.saveRequest(closing);
               }
             });
-        } else {
-          saveRequest();
+          } else {
+            self.saveRequest(closing);
+          }
         }
+      } else {
+        showMessageDialog(
+          gettext("No filename set"),
+          {
+            title: gettext("Save Config")
+          }
+        );
       }
     };
 
@@ -305,7 +294,8 @@ $(function () {
     };
 
     self.reloadFromFile = function () {
-      OctoPrint.plugins.klipper.getCfg(self.CfgFilename())
+      if (self.CfgFilename() != "") {
+        OctoPrint.plugins.klipper.getCfg(self.CfgFilename())
         .done(function (response) {
           self.klipperViewModel.consoleMessage("debug", "reloadFromFile done");
           if (response.response.text != "") {
@@ -334,8 +324,15 @@ $(function () {
             }
           );
         });
+      } else {
+        showMessageDialog(
+          gettext("No filename set"),
+          {
+            title: gettext("Reload File")
+          }
+        );
+      }
     };
-
 
     self.onStartup = function () {
       ace.config.set("basePath", "plugin/klipper/static/js/lib/ace/");
@@ -364,6 +361,32 @@ $(function () {
           editor.focus();
         }
       );
+    };
+
+    self.saveRequest = function (closing) {
+      self.klipperViewModel.consoleMessage("debug", "SaveCfg start");
+
+      OctoPrint.plugins.klipper.saveCfg(editor.session.getValue(), self.CfgFilename())
+        .done(function (response) {
+          if (response.saved === true) {
+            self.klipperViewModel.showPopUp("success", gettext("Save Config"), gettext("File saved."));
+            self.loadedConfig = editor.session.getValue(); //set loaded config to current for resetting dirtyEditor
+            if (closing) {
+              editordialog.modal('hide');
+            }
+            if (self.settings.settings.plugins.klipper.configuration.restart_onsave() == true) {
+              self.klipperViewModel.requestRestart();
+            }
+          } else {
+            showMessageDialog(
+              gettext('File not saved!'),
+              {
+                title: gettext("Save Config"),
+                onclose: function () { self.editorFocusDelay(1000); }
+              }
+            );
+          }
+        });
     };
   }
 
