@@ -32,7 +32,7 @@ def list_cfg_files(self, path):
         cfg_path = os.path.join(self.get_plugin_data_folder(), "configs", "*")
     else:
         cfg_path = os.path.expanduser(
-            self._settings.get(["configuration", "configpath"])
+            self._settings.get(["configuration", "config_path"])
         )
         cfg_path = os.path.join(cfg_path, "*.cfg")
     cfg_files = glob.glob(cfg_path)
@@ -127,7 +127,7 @@ def save_cfg(self, content, filename):
     )
 
 
-    configpath = os.path.expanduser(self._settings.get(["configuration", "configpath"]))
+    configpath = os.path.expanduser(self._settings.get(["configuration", "config_path"]))
     if filename == "":
         filename = self._settings.get(["configuration", "baseconfig"])
     if filename[-4:] != ".cfg":

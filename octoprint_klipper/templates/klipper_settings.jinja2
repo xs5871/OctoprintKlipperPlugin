@@ -52,7 +52,7 @@
       <div class="control-group">
         <label class="control-label">{{ _('Klipper Config Directory') }}</label>
         <div class="controls">
-          <input type="text" class="input-block-level" data-bind="value: settings.settings.plugins.klipper.configuration.configpath" />
+          <input type="text" class="input-block-level" data-bind="value: settings.settings.plugins.klipper.configuration.config_path" />
         </div>
       </div>
       <div class="control-group">
@@ -96,6 +96,12 @@
     </div>
     <!-- Macros -->
     <div class="tab-pane" id="macros">
+      <div class="control-group">
+        <span class="help-block">
+          {{ _('These macros are only meant to be used in OctoPrint.') }}
+          {{ _('They are not the ones that can be defined in the printer.cfg.') }}<br />
+        </span>
+      </div>
       <div class="control-group" style="margin-bottom: 0px;">
         <div class="controls" style="margin-left: 82px;">
           <div class="row-fluid">
@@ -160,9 +166,7 @@
     <div class="tab-pane" id="level">
       <div class="control-group">
         <span class="help-block">
-          {{ _('This feature assists in manually leveling you print bed by moving the head to the defined points in
-          sequence.<br />
-          If you use a piece of paper for leveling, set "Probe Height" to the paper thickness eg. "0.1".') }}
+          {{ _('This feature assists in manually leveling your print bed by moving the head to the defined points in sequence.<br />If you use a piece of paper for leveling, set "Probe Height" to the paper thickness eg. "0.1".') }}
         </span>
       </div>
       <div class="control-group">

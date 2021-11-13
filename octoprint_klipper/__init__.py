@@ -131,7 +131,7 @@ class KlipperPlugin(
             ),
             configuration=dict(
                 debug_logging=False,
-                configpath="~/",
+                config_path="~/",
                 baseconfig="printer.cfg",
                 logpath="/tmp/klippy.log",
                 reload_command="RESTART",
@@ -160,7 +160,7 @@ class KlipperPlugin(
         return dict(
             admin=[
                 ["connection", "port"],
-                ["configuration", "configpath"],
+                ["configuration", "config_path"],
                 ["configuration", "replace_connection_panel"]
             ],
             user=[
@@ -172,8 +172,8 @@ class KlipperPlugin(
     def get_settings_version(self):
         # Settings_Versionhistory:
         # 3 = add shortstatus on navbar. migrate the navbar setting for this
-        # 4 = -change of configpath to only path without filename
-        #     -parse configpath into path and baseconfig if not standard printer.cfg
+        # 4 = -change of configpath to config_path with only path without filename
+        #     -parse configpath into config_path and baseconfig
         #     -switch setting for 'restart on editor save' to true if it was not set to manually
         #     -remove old_config
         #     -remove config on root settingsdirectory
@@ -183,75 +183,37 @@ class KlipperPlugin(
     def on_settings_migrate(self, target, current):
         settings = self._settings
         if current is None:
-            self.migrate_old_settings(settings)
+            util.migrate_old_settings(settings)
 
         if current is not None and current < 3:
-            self.migrate_settings_configuration(
+            self.migrate_settings_3(settings)
+
+        if current is not None and current < 4:
+            self.migrate_settings_4(settings)
+
+    def migrate_settings_3(self, settings):
+        util.migrate_settings_configuration(
                 settings,
                 "shortStatus_navbar",
                 "navbar",
             )
 
-        if current is not None and current < 4:
-            self.migrate_settings_4(
-                settings
-            )
-
-    def migrate_old_settings(self, settings):
-        '''
-        For Old settings
-        '''
-        self.migrate_settings(settings, "serialport", "connection", "port")
-        self.migrate_settings(settings, "replace_connection_panel", "connection", "replace_connection_panel")
-        self.migrate_settings(settings, "probeHeight", "probe", "height")
-        self.migrate_settings(settings, "probeLift", "probe", "lift")
-        self.migrate_settings(settings, "probeSpeedXy", "probe", "speed_xy")
-        self.migrate_settings(settings, "probeSpeedZ", "probe", "speed_z")
-        self.migrate_settings(settings, "configPath", "configuration", "configpath")
-
-        if settings.has(["probePoints"]):
-            points = settings.get(["probePoints"])
-            points_new = [dict(name="", x=int(p["x"]), y=int(p["y"]), z=0) for p in points]
-            settings.set(["probe", "points"], points_new)
-            settings.remove(["probePoints"])
-
-    def migrate_settings(self, settings, old, new, new2=""):
-        """migrate setting to setting with additional group
-
-        Args:
-            settings (any): instance of self._settings
-            old (str): the old setting to migrate
-            new (str): group or only new setting if there is no new2
-            new2 (str, optional): the new setting to migrate to. Defaults to "".
-        """        ''''''
-        if settings.has([old]):
-            if new2 != "":
-                logger.log_info(self, "migrate setting for '" + old + "' -> '" + new + "/" + new2 + "'")
-                settings.set([new, new2], settings.get([old]))
-            else:
-                logger.log_info(self, "migrate setting for '" + old + "' -> '" + new + "'")
-                settings.set([new], settings.get([old]))
-            settings.remove([old])
-
-    def migrate_settings_configuration(self, settings, new, old):
-        if settings.has(["configuration", old]):
-            logger.log_info(self, "migrate setting for 'configuration/" + old + "' -> 'configuration/" + new + "'")
-            settings.set(["configuration", new], settings.get(["configuration", old]))
-            settings.remove(["configuration", old])
-
     def migrate_settings_4(self, settings):
-
-        cfg_path = settings.get(["configuration", "configpath"])
-
-        new_cfg_path, baseconfig = os.path.split(cfg_path)
-        logger.log_info(self, "migrate setting for 'configuration/configpath': " + cfg_path + " -> " + new_cfg_path)
-        logger.log_info(self, "migrate setting for 'configuration/baseconfig': printer.cfg -> " + baseconfig)
-        settings.set(["configuration", "configpath"], new_cfg_path)
-        settings.set(["configuration", "baseconfig"], baseconfig)
-
-        if settings.get(["configuration", "reload_command"]) != "manually" :
-            logger.log_info(self, "migrate setting for 'configuration/restart_onsave': False -> True")
-            settings.set(["configuration", "restart_onsave"], True)
+        if settings.has(["configuration", "configpath"]):
+            cfg_path = settings.get(["configuration", "configpath"])
+            new_cfg_path, baseconfig = os.path.split(cfg_path)
+            logger.log_info(self, "migrate setting for 'configuration/config_path': " + cfg_path + " -> " + new_cfg_path)
+            logger.log_info(self, "migrate setting for 'configuration/baseconfig': printer.cfg -> " + baseconfig)
+            settings.set(["configuration", "config_path"], new_cfg_path)
+            settings.set(["configuration", "baseconfig"], baseconfig)
+            settings.remove(["configuration", "configpath"])
+        if (
+            settings.has(["configuration", "reload_command"])
+            and settings.get(["configuration", "reload_command"]) == "manually"
+        ):
+            logger.log_info(self, "migrate setting for 'configuration/restart_onsave': True -> False")
+            settings.set(["configuration", "restart_onsave"], False)
+            settings.remove(["configuration", "reload_command"])
 
         if settings.has(["config"]):
             logger.log_info(self, "remove old setting for 'config'")
@@ -447,7 +409,7 @@ class KlipperPlugin(
         from octoprint.server.util.tornado import LargeResponseHandler, path_validation_factory
         from octoprint.util import is_hidden_path
         configpath = os.path.expanduser(
-                        self._settings.get(["configuration", "configpath"])
+                        self._settings.get(["configuration", "config_path"])
                     )
         bak_path = os.path.join(self.get_plugin_data_folder(), "configs", "")
 
@@ -506,7 +468,7 @@ class KlipperPlugin(
     @Permissions.PLUGIN_KLIPPER_CONFIG.require(403)
     def restore_backup(self, filename):
         configpath = os.path.expanduser(
-                        self._settings.get(["configuration", "configpath"])
+                        self._settings.get(["configuration", "config_path"])
                     )
         data_folder = self.get_plugin_data_folder()
         backupfile = os.path.realpath(os.path.join(data_folder, "configs", filename))
@@ -519,7 +481,7 @@ class KlipperPlugin(
     @Permissions.PLUGIN_KLIPPER_CONFIG.require(403)
     def get_config(self, filename):
         cfg_path = os.path.expanduser(
-            self._settings.get(["configuration", "configpath"])
+            self._settings.get(["configuration", "config_path"])
         )
         full_path = os.path.realpath(os.path.join(cfg_path, filename))
         response = cfgUtils.get_cfg(self, full_path)
@@ -531,7 +493,7 @@ class KlipperPlugin(
     @Permissions.PLUGIN_KLIPPER_CONFIG.require(403)
     def delete_config(self, filename):
         cfg_path = os.path.expanduser(
-            self._settings.get(["configuration", "configpath"])
+            self._settings.get(["configuration", "config_path"])
         )
         full_path = os.path.realpath(os.path.join(cfg_path, filename))
         if (
@@ -553,7 +515,7 @@ class KlipperPlugin(
     def list_configs(self):
         files = cfgUtils.list_cfg_files(self, "")
         path = os.path.expanduser(
-            self._settings.get(["configuration", "configpath"])
+            self._settings.get(["configuration", "config_path"])
         )
         return flask.jsonify(files = files, path = path, max_upload_size = MAX_UPLOAD_SIZE)
 

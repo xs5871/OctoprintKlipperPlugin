@@ -178,8 +178,8 @@ $(function () {
         self.shortStatus_navbar(msg);
         self.shortStatus_navbar_hover(baseText);
       }
-
-      self.shortStatus_sidebar(msg);
+      message = msg.replace(/\n/gi, "<br />");
+      self.shortStatus_sidebar(message);
     };
 
 

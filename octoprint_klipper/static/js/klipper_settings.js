@@ -94,14 +94,16 @@ $(function () {
       if (!self.klipperViewModel.hasRight("CONFIG")) return;
 
       var baseconfig = self.settings.settings.plugins.klipper.configuration.baseconfig();
-      self.klipperViewModel.consoleMessage("debug", "loadBaseConfig:" + baseconfig);
-      OctoPrint.plugins.klipper.getCfg(baseconfig).done(function (response) {
-        var config = {
-          content: response.response.config,
-          file: baseconfig,
-        };
-        self.klipperEditorViewModel.process(config).then();
-      });
+      if (baseconfig != "") {
+        self.klipperViewModel.consoleMessage("debug", "loadBaseConfig:" + baseconfig);
+        OctoPrint.plugins.klipper.getCfg(baseconfig).done(function (response) {
+          var config = {
+            content: response.response.config,
+            file: baseconfig,
+          };
+          self.klipperEditorViewModel.process(config).then();
+        });
+      }
     };
 
     self.removeCfg = function (config) {
