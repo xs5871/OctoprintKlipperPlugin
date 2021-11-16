@@ -19,7 +19,7 @@ This plugin assists in managing and monitoring the [Klipper](https://github.com/
 - PID Tuning Dialog.
 - Dialog to set a coordinate offset for future GCODE move commands.
 - Message log displaying messages from Klipper prepended with "//" and "!!".
-- Basic Klipper configuration editor
+- Klipper configuration editor
 - Performance graph displaying key parameters extracted from the Klipper logs.
 
 ## Installation
@@ -46,7 +46,7 @@ Also for the moment this plugin does what I wanted it to do, it is far from fini
 
 * The [devel](https://github.com/thelastWallE/OctoprintKlipperPlugin/tree/devel) branch is the branch to merge new features and bugfixes to.
 * The [rc](https://github.com/thelastWallE/OctoprintKlipperPlugin/tree/rc) branch is for Release Candidates and bugfixing them.
-* The [master](https://github.com/thelastWallE/OctoprintKlipperPlugin/tree/master) branch is for Stable Releases.  
+* The [master](https://github.com/thelastWallE/OctoprintKlipperPlugin/tree/master) branch is for Stable Releases.
 
 
 ## Screenshots

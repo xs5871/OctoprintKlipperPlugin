@@ -13,3 +13,6 @@ dist
 .vscode/**
 
 thunder-tests
+vscode.env
+.venv
+OctoKlipper.egg-info
