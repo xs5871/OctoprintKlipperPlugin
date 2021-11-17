@@ -37,6 +37,13 @@
             data-bind="checked: settings.settings.plugins.klipper.configuration.debug_logging" />
         </div>
       </div>
+      <div class="control-group">
+        <label class="control-label">{{ _('Hide Error PopUps') }}</label>
+        <div class="controls">
+          <input class="controls-checkbox" title="{{ _('Hide Error PopUps') }}" type="checkbox"
+            data-bind="checked: settings.settings.plugins.klipper.configuration.hide_error_popups" />
+        </div>
+      </div>
       <div class="control-group border">
         <label class="control-label">{{ _('Config Editor') }}</label>
         <div class="controls">

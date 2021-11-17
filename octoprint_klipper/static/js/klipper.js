@@ -37,19 +37,54 @@ $(function () {
     self.shortStatus_sidebar = ko.observable();
     self.logMessages = ko.observableArray();
 
+    self.popup = undefined;
+
+    self._showPopup = function (options) {
+      self._closePopup();
+      self.popup = new PNotify(options);
+    };
+
+    self._updatePopup = function (options) {
+      if (self.popup === undefined) {
+        self._showPopup(options);
+      } else {
+        self.popup.update(options);
+      }
+    };
+
+    self._closePopup = function () {
+      if (self.popup !== undefined) {
+        self.popup.remove();
+      }
+    };
+
     self.showPopUp = function (popupType, popupTitle, message) {
       var title = "OctoKlipper: <br />" + popupTitle + "<br />";
-      var hide = false;
-      if (popupType == "success") {
-        hide = true
-      }
-      new PNotify({
+      var options = undefined;
+      var errorOpts = {};
+
+      options = {
         title: title,
         text: message,
         type: popupType,
-        hide: hide,
+        hide: true,
         icon: true
-      });
+      };
+
+      if (popupType == "error") {
+
+        errorOpts = {
+          mouse_reset: true,
+          delay: 5000,
+          animation: "none"
+        };
+        FullOptions = Object.assign(options, errorOpts);
+        self._showPopup(FullOptions);
+      } else {
+        if (options !== undefined) {
+          new PNotify(options);
+        }
+      }
     };
 
     self.showEditorDialog = function () {
@@ -191,7 +226,7 @@ $(function () {
           today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
       }
 
-      if (type == "error") {
+      if (type == "error" && self.settings.settings.plugins.klipper.configuration.hide_error_popups() !== true) {
         self.showPopUp(type, "Error:", message);
       }
 

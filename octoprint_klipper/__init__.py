@@ -140,7 +140,8 @@ class KlipperPlugin(
                 shortStatus_navbar=True,
                 shortStatus_sidebar=True,
                 parse_check=False,
-                fontsize=12
+                fontsize=12,
+                hide_error_popups=False
             )
         )
 
