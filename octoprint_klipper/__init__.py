@@ -25,7 +25,7 @@ import sys
 from octoprint.server import NO_CONTENT
 from octoprint.util import is_hidden_path
 from octoprint.util import get_formatted_size
-from . import util, cfgUtils, logger
+from octoprint_klipper import util, cfgUtils, logger
 from octoprint.util.comm import parse_firmware_line
 from octoprint.access.permissions import Permissions, ADMIN_GROUP
 from .modules import KlipperLogAnalyzer

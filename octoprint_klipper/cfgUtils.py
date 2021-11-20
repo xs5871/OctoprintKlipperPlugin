@@ -4,7 +4,7 @@ import os, time, sys
 import io
 import flask
 
-from . import util, logger
+from octoprint_klipper import util, logger
 from flask_babel import gettext
 from shutil import copy, copyfile
 

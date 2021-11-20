@@ -1,4 +1,4 @@
-from . import util
+from octoprint_klipper import util
 
 def log_info(self, message):
     self._octoklipper_logger.info(message)

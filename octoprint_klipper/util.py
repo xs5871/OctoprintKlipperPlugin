@@ -1,4 +1,4 @@
-from . import logger
+from octoprint_klipper import logger
 
 def migrate_old_settings(self, settings):
     '''
