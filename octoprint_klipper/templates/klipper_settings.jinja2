@@ -21,6 +21,13 @@
             data-bind="checked: settings.settings.plugins.klipper.connection.replace_connection_panel">
         </div>
       </div>
+      <div class="control-group">
+        <label class="control-label">{{ _('Hide \'Open Editor\' Button\nin the Connection Panel') }}</label>
+        <div class="controls">
+          <input class="controls-checkbox" title="{{ _('Hide \'Open Editor\' Button\nin the Connection Panel') }}" type="checkbox"
+            data-bind="checked: settings.settings.plugins.klipper.connection.hide_editor_button">
+        </div>
+      </div>
       <div class="control-group border">
         <label class="control-label">{{ _('Show Short Messages') }}</label>
         <div class="controls">

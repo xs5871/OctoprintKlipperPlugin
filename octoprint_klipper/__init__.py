@@ -110,7 +110,8 @@ class KlipperPlugin(
         return dict(
             connection=dict(
                 port="/tmp/printer",
-                replace_connection_panel=True
+                replace_connection_panel=True,
+                hide_editor_button=False
             ),
             macros=[dict(
                 name="E-Stop",
