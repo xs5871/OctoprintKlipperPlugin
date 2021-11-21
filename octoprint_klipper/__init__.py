@@ -25,7 +25,8 @@ import sys
 from octoprint.server import NO_CONTENT
 from octoprint.util import is_hidden_path
 from octoprint.util import get_formatted_size
-from . import util, cfgUtils, logger
+from octoprint_klipper import cfgUtils
+from octoprint_klipper.util import *
 from octoprint.util.comm import parse_firmware_line
 from octoprint.access.permissions import Permissions, ADMIN_GROUP
 from .modules import KlipperLogAnalyzer
@@ -78,7 +79,7 @@ class KlipperPlugin(
             self._settings.global_set(
                 ["serial", "additionalPorts"], additional_ports)
             self._settings.save()
-            logger.log_info(
+            log_info(
                 self,
                 "Added klipper serial port {} to list of additional ports.".format(klipper_port)
             )
@@ -106,10 +107,12 @@ class KlipperPlugin(
         ]
 
     def get_settings_defaults(self):
+        # TODO #69 put some settings on the localStorage
         return dict(
             connection=dict(
                 port="/tmp/printer",
-                replace_connection_panel=True
+                replace_connection_panel=True,
+                hide_editor_button=False
             ),
             macros=[dict(
                 name="E-Stop",
@@ -130,15 +133,17 @@ class KlipperPlugin(
             ),
             configuration=dict(
                 debug_logging=False,
-                configpath="~/",
-                old_config="",
+                config_path="~/",
+                baseconfig="printer.cfg",
                 logpath="/tmp/klippy.log",
                 reload_command="RESTART",
-                restart_onsave=False,
+                restart_onsave=True,
+                confirm_reload=True,
                 shortStatus_navbar=True,
                 shortStatus_sidebar=True,
                 parse_check=False,
-                fontsize=9
+                fontsize=12,
+                hide_error_popups=False
             )
         )
 
@@ -158,7 +163,7 @@ class KlipperPlugin(
         return dict(
             admin=[
                 ["connection", "port"],
-                ["configuration", "configpath"],
+                ["configuration", "config_path"],
                 ["configuration", "replace_connection_panel"]
             ],
             user=[
@@ -170,83 +175,56 @@ class KlipperPlugin(
     def get_settings_version(self):
         # Settings_Versionhistory:
         # 3 = add shortstatus on navbar. migrate the navbar setting for this
-        # 4 = -change of configpath to only path without filename
-        #     -add setting for restart checkbox on editor save
+        # 4 = -change of configpath to config_path with only path without filename
+        #     -parse configpath into config_path and baseconfig
+        #     -switch setting for 'restart on editor save' to true if it was not set to manually
+        #     -remove old_config
+        #     -remove config on root settingsdirectory
         return 4
-
 
     #migrate Settings
     def on_settings_migrate(self, target, current):
         settings = self._settings
         if current is None:
-            self.migrate_old_settings(settings)
+            migrate_old_settings(settings)
 
         if current is not None and current < 3:
-            self.migrate_settings_configuration(
-                settings,
-                "shortStatus_navbar",
-                "navbar",
-            )
+            self.migrate_settings_3(settings)
 
         if current is not None and current < 4:
-            self.migrate_settings_configuration(
-                settings,
-                "old_config",
-                "temp_config",
-            )
+            self.migrate_settings_4(settings)
 
+    def migrate_settings_3(self, settings):
+        migrate_settings_configuration(
+            settings,
+            "shortStatus_navbar",
+            "navbar",
+        )
+
+    def migrate_settings_4(self, settings):
+        if settings.has(["configuration", "configpath"]):
             cfg_path = settings.get(["configuration", "configpath"])
-            if cfg_path.find("printer.cfg") != -1:
-                new_cfg_path = cfg_path.replace("printer.cfg","")
-                logger.log_info(self, "migrate setting for 'configuration/configpath': " + cfg_path + " -> " + new_cfg_path)
-                settings.set(["configuration", "configpath"], new_cfg_path)
+            new_cfg_path, baseconfig = os.path.split(cfg_path)
+            log_info(self, "migrate setting for 'configuration/config_path': " + cfg_path + " -> " + new_cfg_path)
+            log_info(self, "migrate setting for 'configuration/baseconfig': printer.cfg -> " + baseconfig)
+            settings.set(["configuration", "config_path"], new_cfg_path)
+            settings.set(["configuration", "baseconfig"], baseconfig)
+            settings.remove(["configuration", "configpath"])
+        if (
+            settings.has(["configuration", "reload_command"])
+            and settings.get(["configuration", "reload_command"]) == "manually"
+        ):
+            log_info(self, "migrate setting for 'configuration/restart_onsave': True -> False")
+            settings.set(["configuration", "restart_onsave"], False)
+            settings.remove(["configuration", "reload_command"])
 
-            if settings.get(["configuration", "reload_command"]) != "manually" :
-                logger.log_info(self, "migrate setting for 'configuration/restart_onsave': False -> True")
-                settings.set(["configuration", "restart_onsave"], True)
+        if settings.has(["config"]):
+            log_info(self, "remove old setting for 'config'")
+            settings.remove(["config"])
 
-
-    def migrate_old_settings(self, settings):
-        '''
-        For Old settings
-        '''
-        self.migrate_settings(settings, "serialport", "connection", "port")
-        self.migrate_settings(settings, "replace_connection_panel", "connection", "replace_connection_panel")
-        self.migrate_settings(settings, "probeHeight", "probe", "height")
-        self.migrate_settings(settings, "probeLift", "probe", "lift")
-        self.migrate_settings(settings, "probeSpeedXy", "probe", "speed_xy")
-        self.migrate_settings(settings, "probeSpeedZ", "probe", "speed_z")
-        self.migrate_settings(settings, "configPath", "configuration", "configpath")
-
-        if settings.has(["probePoints"]):
-            points = settings.get(["probePoints"])
-            points_new = [dict(name="", x=int(p["x"]), y=int(p["y"]), z=0) for p in points]
-            settings.set(["probe", "points"], points_new)
-            settings.remove(["probePoints"])
-
-    def migrate_settings(self, settings, old, new, new2="") -> None:
-        """migrate setting to setting with additional group
-
-        Args:
-            settings (any): instance of self._settings
-            old (str): the old setting to migrate
-            new (str): group or only new setting if there is no new2
-            new2 (str, optional): the new setting to migrate to. Defaults to "".
-        """        ''''''
-        if settings.has([old]):
-            if new2 != "":
-                logger.log_info(self, "migrate setting for '" + old + "' -> '" + new + "/" + new2 + "'")
-                settings.set([new, new2], settings.get([old]))
-            else:
-                logger.log_info(self, "migrate setting for '" + old + "' -> '" + new + "'")
-                settings.set([new], settings.get([old]))
-            settings.remove([old])
-
-    def migrate_settings_configuration(self, settings, new, old):
-        if settings.has(["configuration", old]):
-            logger.log_info(self, "migrate setting for 'configuration/" + old + "' -> 'configuration/" + new + "'")
-            settings.set(["configuration", new], settings.get(["configuration", old]))
-            settings.remove(["configuration", old])
+        if settings.has(["configuration", "old_config"]):
+            log_info(self, "remove old setting for 'configuration/old_config'")
+            settings.remove(["configuration", "old_config"])
 
 
     # -- Template Plugin
@@ -339,43 +317,54 @@ class KlipperPlugin(
 
     def on_event(self, event, payload):
         if event == "UserLoggedIn":
-            util.update_status(self, "info", "Klipper: Standby")
+            log_info(self, "Klipper: Standby")
         if event == "Connecting":
-            util.update_status(self, "info", "Klipper: Connecting ...")
+            log_info(self, "Klipper: Connecting ...")
         elif event == "Connected":
-            util.update_status(self, "info", "Klipper: Connected to host")
-            logger.log_info(
+            log_info(self, "Klipper: Connected to host")
+            log_info(
                 self,
                 "Connected to host via {} @{}bps".format(payload["port"], payload["baudrate"]))
         elif event == "Disconnected":
-            util.update_status(self, "info", "Klipper: Disconnected from host")
+            log_info(self, "Klipper: Disconnected from host")
+
         elif event == "Error":
-            util.update_status(self, "error", "Klipper: Error")
-            logger.log_error(self, payload["error"])
+            log_error(self, payload["error"])
+
+    def processAtCommand(self, comm_instance, phase, command, parameters, tags=None, *args, **kwargs):
+        if command != "SWITCHCONFIG":
+            return
+
+        config = parameters
+        log_info(self, "SWITCHCONFIG detected config:{}".format(config))
+        return None
 
     # -- GCODE Hook
+    def process_sent_GCODE(self, comm_instance, phase, cmd, cmd_type, gcode, *args, **kwargs):
+        if cmd == "SAVE_CONFIG":
+            log_info(self, "SAVE_CONFIG detected")
+            send_message(self, type = "reload", subtype = "config")
 
     def on_parse_gcode(self, comm, line, *args, **kwargs):
 
         if "FIRMWARE_VERSION" in line:
             printerInfo = parse_firmware_line(line)
             if "FIRMWARE_VERSION" in printerInfo:
-                logger.log_info(self, "Firmware version: {}".format(
+                log_info(self, "Firmware version: {}".format(
                     printerInfo["FIRMWARE_VERSION"]))
         elif "// probe" in line or "// Failed to verify BLTouch" in line:
             msg = line.strip('/')
-            logger.log_info(self, msg)
+            log_info(self, msg)
             self.write_parsing_response_buffer()
         elif "//" in line:
             # add lines with // to a buffer
             self._message = self._message + line.strip('/')
             if not self._parsing_response:
-                util.update_status(self, "info", self._message)
+                update_status(self, "info", self._message)
             self._parsing_response = True
         elif "!!" in line:
             msg = line.strip('!')
-            util.update_status(self, "error", msg)
-            logger.log_error(self, msg)
+            log_error(self, msg)
             self.write_parsing_response_buffer()
         else:
             self.write_parsing_response_buffer()
@@ -385,7 +374,7 @@ class KlipperPlugin(
         # write buffer with // lines after a gcode response without //
         if self._parsing_response:
             self._parsing_response = False
-            logger.log_info(self, self._message)
+            log_info(self, self._message)
             self._message = ""
 
     def get_api_commands(self):
@@ -400,7 +389,7 @@ class KlipperPlugin(
             logpath = os.path.expanduser(
                 self._settings.get(["configuration", "logpath"])
             )
-            if util.file_exist(self, logpath):
+            if file_exist(self, logpath):
                 for f in glob.glob(self._settings.get(["configuration", "logpath"]) + "*"):
                     filesize = os.path.getsize(f)
                     filemdate = time.strftime("%d.%m.%Y %H:%M",time.localtime(os.path.getctime(f)))
@@ -423,7 +412,7 @@ class KlipperPlugin(
         from octoprint.server.util.tornado import LargeResponseHandler, path_validation_factory
         from octoprint.util import is_hidden_path
         configpath = os.path.expanduser(
-                        self._settings.get(["configuration", "configpath"])
+                        self._settings.get(["configuration", "config_path"])
                     )
         bak_path = os.path.join(self.get_plugin_data_folder(), "configs", "")
 
@@ -468,7 +457,7 @@ class KlipperPlugin(
                 raise
         return NO_CONTENT
 
-    # Get a list of all backuped configfiles
+    # Get a list of all backed up configfiles
     @octoprint.plugin.BlueprintPlugin.route("/backup/list", methods=["GET"])
     @restricted_access
     @Permissions.PLUGIN_KLIPPER_CONFIG.require(403)
@@ -476,13 +465,13 @@ class KlipperPlugin(
         files = cfgUtils.list_cfg_files(self, "backup")
         return flask.jsonify(files = files)
 
-    # restore a backuped configfile
+    # restore a backed up configfile
     @octoprint.plugin.BlueprintPlugin.route("/backup/restore/<filename>", methods=["GET"])
     @restricted_access
     @Permissions.PLUGIN_KLIPPER_CONFIG.require(403)
     def restore_backup(self, filename):
         configpath = os.path.expanduser(
-                        self._settings.get(["configuration", "configpath"])
+                        self._settings.get(["configuration", "config_path"])
                     )
         data_folder = self.get_plugin_data_folder()
         backupfile = os.path.realpath(os.path.join(data_folder, "configs", filename))
@@ -495,7 +484,7 @@ class KlipperPlugin(
     @Permissions.PLUGIN_KLIPPER_CONFIG.require(403)
     def get_config(self, filename):
         cfg_path = os.path.expanduser(
-            self._settings.get(["configuration", "configpath"])
+            self._settings.get(["configuration", "config_path"])
         )
         full_path = os.path.realpath(os.path.join(cfg_path, filename))
         response = cfgUtils.get_cfg(self, full_path)
@@ -507,7 +496,7 @@ class KlipperPlugin(
     @Permissions.PLUGIN_KLIPPER_CONFIG.require(403)
     def delete_config(self, filename):
         cfg_path = os.path.expanduser(
-            self._settings.get(["configuration", "configpath"])
+            self._settings.get(["configuration", "config_path"])
         )
         full_path = os.path.realpath(os.path.join(cfg_path, filename))
         if (
@@ -528,7 +517,10 @@ class KlipperPlugin(
     @Permissions.PLUGIN_KLIPPER_CONFIG.require(403)
     def list_configs(self):
         files = cfgUtils.list_cfg_files(self, "")
-        return flask.jsonify(files = files, max_upload_size = MAX_UPLOAD_SIZE)
+        path = os.path.expanduser(
+            self._settings.get(["configuration", "config_path"])
+        )
+        return flask.jsonify(files = files, path = path, max_upload_size = MAX_UPLOAD_SIZE)
 
     # check syntax of a given data
     @octoprint.plugin.BlueprintPlugin.route("/config/check", methods=["POST"])
@@ -537,7 +529,7 @@ class KlipperPlugin(
     def check_config(self):
         data = flask.request.json
         data_to_check = data.get("DataToCheck", [])
-        response = cfgUtils.check_cfg(self, data_to_check)
+        response = cfgUtils.check_cfg_ok(self, data_to_check)
         return flask.jsonify(is_syntax_ok = response)
 
     # save a configfile
@@ -555,7 +547,7 @@ class KlipperPlugin(
         Filecontent = data.get("DataToSave", [])
         saved = cfgUtils.save_cfg(self, Filecontent, filename)
         if saved == True:
-            util.send_message(self, "reload", "configlist", "", "")
+            send_message(self, type = "reload", subtype = "configlist")
         return flask.jsonify(saved = saved)
 
     # restart klipper
@@ -569,8 +561,8 @@ class KlipperPlugin(
 
             # Restart klippy to reload config
             self._printer.commands(reload_command)
-            logger.log_info(self, "Restarting Klipper.")
-        return NO_CONTENT
+            log_info(self, "Restarting Klipper.")
+        return flask.jsonify(command = reload_command)
 # APIs end
 
 
@@ -618,6 +610,8 @@ def __plugin_load__():
     __plugin_hooks__ = {
         "octoprint.server.http.routes": __plugin_implementation__.route_hook,
         "octoprint.access.permissions": __plugin_implementation__.get_additional_permissions,
+        "octoprint.comm.protocol.atcommand.sending": __plugin_implementation__.processAtCommand,
+        "octoprint.comm.protocol.gcode.sent": __plugin_implementation__.process_sent_GCODE,
         "octoprint.comm.protocol.gcode.received": __plugin_implementation__.on_parse_gcode,
         "octoprint.plugin.softwareupdate.check_config": __plugin_implementation__.get_update_information
     }

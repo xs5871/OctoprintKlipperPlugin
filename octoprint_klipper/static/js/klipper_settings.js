@@ -30,6 +30,11 @@ $(function () {
     });
 
     self.markedForFileRemove = ko.observableArray([]);
+    self.PathToConfigs = ko.observable("");
+
+    $(document).on('shown.bs.modal','#klipper_editor', function () {
+      self.klipperEditorViewModel.onShown();
+    });
 
     self.checkFontsize = function () {
       if (self.settings.settings.plugins.klipper.configuration.fontsize() > 20) {
@@ -80,6 +85,7 @@ $(function () {
       OctoPrint.plugins.klipper.listCfg().done(function (response) {
         self.klipperViewModel.consoleMessage("debug", "listCfgFiles done");
         self.configs.updateItems(response.files);
+        self.PathToConfigs(gettext("Path: ") + response.path);
         self.configs.resetPage();
       });
     };
@@ -87,13 +93,17 @@ $(function () {
     self.loadBaseConfig = function () {
       if (!self.klipperViewModel.hasRight("CONFIG")) return;
 
-      OctoPrint.plugins.klipper.getCfg("printer.cfg").done(function (response) {
-        var config = {
-          content: response.response.config,
-          file: "printer.cfg",
-        };
-        self.klipperEditorViewModel.process(config).then();
-      });
+      var baseconfig = self.settings.settings.plugins.klipper.configuration.baseconfig();
+      if (baseconfig != "") {
+        self.klipperViewModel.consoleMessage("debug", "loadBaseConfig:" + baseconfig);
+        OctoPrint.plugins.klipper.getCfg(baseconfig).done(function (response) {
+          var config = {
+            content: response.response.config,
+            file: baseconfig,
+          };
+          self.klipperEditorViewModel.process(config).then();
+        });
+      }
     };
 
     self.removeCfg = function (config) {
@@ -245,8 +255,6 @@ $(function () {
         self.klipperEditorViewModel.process(config).then(
           function() { self.showEditor(); }
         );
-
-
       });
     };
 
@@ -312,20 +320,7 @@ $(function () {
       if (plugin == "klipper" && data.type == "reload" && data.subtype == "configlist") {
         self.klipperViewModel.consoleMessage("debug", "onDataUpdaterPluginMessage klipper reload configlist");
         self.listCfgFiles();
-      } else if (plugin == "klipper" && data.type == "start" && data.subtype == "config") {
-        self.klipperViewModel.consoleMessage("debug", "onDataUpdaterPluginMessage klipper start config");
-        self.startConfig(data.title, data.payload);
       }
-    };
-
-    self.startConfig = function (file, content) {
-      if (!self.klipperViewModel.hasRight("CONFIG")) return;
-      filename = file || "";
-      var config = {
-        content: content,
-        file: filename,
-      };
-      self.klipperEditorViewModel.process(config).then();
     };
   }
 

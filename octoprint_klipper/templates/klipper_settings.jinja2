@@ -21,6 +21,13 @@
             data-bind="checked: settings.settings.plugins.klipper.connection.replace_connection_panel">
         </div>
       </div>
+      <div class="control-group">
+        <label class="control-label">{{ _('Hide \'Open Editor\' Button\nin the Connection Panel') }}</label>
+        <div class="controls">
+          <input class="controls-checkbox" title="{{ _('Hide \'Open Editor\' Button\nin the Connection Panel') }}" type="checkbox"
+            data-bind="checked: settings.settings.plugins.klipper.connection.hide_editor_button">
+        </div>
+      </div>
       <div class="control-group border">
         <label class="control-label">{{ _('Show Short Messages') }}</label>
         <div class="controls">
@@ -35,6 +42,13 @@
         <div class="controls">
           <input class="controls-checkbox" title="{{ _('Enable debug logging') }}" type="checkbox"
             data-bind="checked: settings.settings.plugins.klipper.configuration.debug_logging" />
+        </div>
+      </div>
+      <div class="control-group">
+        <label class="control-label">{{ _('Hide Error PopUps') }}</label>
+        <div class="controls">
+          <input class="controls-checkbox" title="{{ _('Hide Error PopUps') }}" type="checkbox"
+            data-bind="checked: settings.settings.plugins.klipper.configuration.hide_error_popups" />
         </div>
       </div>
       <div class="control-group border">
@@ -52,7 +66,13 @@
       <div class="control-group">
         <label class="control-label">{{ _('Klipper Config Directory') }}</label>
         <div class="controls">
-          <input type="text" class="input-block-level" data-bind="value: settings.settings.plugins.klipper.configuration.configpath" />
+          <input type="text" class="input-block-level" data-bind="value: settings.settings.plugins.klipper.configuration.config_path" />
+        </div>
+      </div>
+      <div class="control-group">
+        <label class="control-label" title="{{ _('The filename of the base config that Klipper is loading. (default is printer.cfg)') }}">{{ _('Klipper Base Config Filename') }}</label>
+        <div class="controls">
+          <input type="text" class="input-block-level" data-bind="value: settings.settings.plugins.klipper.configuration.baseconfig" />
         </div>
       </div>
       <div class="control-group">
@@ -62,7 +82,7 @@
         </div>
       </div>
       <div class="control-group border">
-        <label class="control-label">{{ _('Configuration Reload Command') }}</label>
+        <label class="control-label">{{ _('Configuration Restart Command') }}</label>
         <div class="controls">
           <select data-bind="value: settings.settings.plugins.klipper.configuration.reload_command">
             <option value="RESTART">RESTART</option>
@@ -71,8 +91,11 @@
           <span class="help-block" style="margin-top:5px;">
             {{ _('The command that is executed if you want to restart klipper.') }}
           </span>
-          <label class="checkbox" title="{{ _('Reload klipper on editor save?') }}"><input type="checkbox"
-            data-bind="checked: settings.settings.plugins.klipper.configuration.restart_onsave" /> {{ _('Reload klipper on editor save?') }}
+          <label class="checkbox" title="{{ _('Restart klipper on editor save?') }}"><input type="checkbox"
+            data-bind="checked: settings.settings.plugins.klipper.configuration.restart_onsave" /> {{ _('Restart Klipper on editor save?') }}
+          </label>
+          <label class="checkbox" title="{{ _('Show Confirmation before restarting Klipper?') }}"><input type="checkbox"
+            data-bind="checked: settings.settings.plugins.klipper.configuration.confirm_reload" /> {{ _('Confirmation before restarting Klipper?') }}
           </label>
         </div>
       </div>
@@ -87,6 +110,12 @@
     </div>
     <!-- Macros -->
     <div class="tab-pane" id="macros">
+      <div class="control-group">
+        <span class="help-block">
+          {{ _('These macros are only meant to be used in OctoPrint.') }}
+          {{ _('They are not the ones that can be defined in the printer.cfg.') }}<br />
+        </span>
+      </div>
       <div class="control-group" style="margin-bottom: 0px;">
         <div class="controls" style="margin-left: 82px;">
           <div class="row-fluid">
@@ -151,9 +180,7 @@
     <div class="tab-pane" id="level">
       <div class="control-group">
         <span class="help-block">
-          {{ _('This feature assists in manually leveling you print bed by moving the head to the defined points in
-          sequence.<br />
-          If you use a piece of paper for leveling, set "Probe Height" to the paper thickness eg. "0.1".') }}
+          {{ _('This feature assists in manually leveling your print bed by moving the head to the defined points in sequence.<br />If you use a piece of paper for leveling, set "Probe Height" to the paper thickness eg. "0.1".') }}
         </span>
       </div>
       <div class="control-group">
@@ -253,7 +280,8 @@
               <i class="icon-refresh"></i> {{ _('Refresh Files') }}
             </button>
             <button class="btn btn-small"
-              data-bind="click: removeMarkedFiles, enable: markedForFileRemove().length > 0">{{ _('Delete selected') }}</button>
+              data-bind="click: removeMarkedFiles, enable: markedForFileRemove().length > 0">{{ _('Delete selected') }}
+            </button>
           </div>
           <div class="pull-right">
             <div class="btn-group">
@@ -272,6 +300,7 @@
             </div>
           </div>
         </div>
+        <p class="klipper-inline" data-bind="text: PathToConfigs" title="{{ _('Path to the config files.')}}"></p>
         <div class="scroll-y">
           <table class="table table-striped table-hover table-condensed table-hover table-fixed" id="klipper_cfg_files">
             <thead>

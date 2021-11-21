@@ -33,22 +33,58 @@ $(function () {
     self.access = parameters[5];
 
     self.shortStatus_navbar = ko.observable();
+    self.shortStatus_navbar_hover = ko.observable();
     self.shortStatus_sidebar = ko.observable();
     self.logMessages = ko.observableArray();
 
+    self.popup = undefined;
+
+    self._showPopup = function (options) {
+      self._closePopup();
+      self.popup = new PNotify(options);
+    };
+
+    self._updatePopup = function (options) {
+      if (self.popup === undefined) {
+        self._showPopup(options);
+      } else {
+        self.popup.update(options);
+      }
+    };
+
+    self._closePopup = function () {
+      if (self.popup !== undefined) {
+        self.popup.remove();
+      }
+    };
+
     self.showPopUp = function (popupType, popupTitle, message) {
       var title = "OctoKlipper: <br />" + popupTitle + "<br />";
-      var hide = false;
-      if (popupType == "success") {
-        hide = true
-      }
-      new PNotify({
+      var options = undefined;
+      var errorOpts = {};
+
+      options = {
         title: title,
         text: message,
         type: popupType,
-        hide: hide,
+        hide: true,
         icon: true
-      });
+      };
+
+      if (popupType == "error") {
+
+        errorOpts = {
+          mouse_reset: true,
+          delay: 5000,
+          animation: "none"
+        };
+        FullOptions = Object.assign(options, errorOpts);
+        self._showPopup(FullOptions);
+      } else {
+        if (options !== undefined) {
+          new PNotify(options);
+        }
+      }
     };
 
     self.showEditorDialog = function () {
@@ -92,6 +128,7 @@ $(function () {
       var dialog = $("#klipper_graph_dialog");
       dialog.modal({
         show: "true",
+        width: "90%",
         minHeight: "500px",
         maxHeight: "600px",
       });
@@ -142,12 +179,11 @@ $(function () {
     };
 
     self.onDataUpdaterPluginMessage = function (plugin, data) {
+
       if (plugin == "klipper") {
         switch (data.type) {
           case "PopUp":
             self.showPopUp(data.subtype, data.title, data.payload);
-            break;
-          case "start":
             break;
           case "reload":
             break;
@@ -155,27 +191,45 @@ $(function () {
             self.consoleMessage(data.subtype, data.payload);
             break;
           case "status":
-            if (data.payload.length > 36) {
-              var shortText = data.payload.substring(0, 31) + " [..]";
-              self.shortStatus_navbar(shortText);
-            } else {
-              self.shortStatus_navbar(data.payload);
-            }
-            self.shortStatus_sidebar(data.payload);
+            self.shortStatus(data.payload, data.subtype);
             break;
           default:
             self.logMessage(data.time, data.subtype, data.payload);
+            self.shortStatus(data.payload, data.subtype)
             self.consoleMessage(data.subtype, data.payload);
         }
       }
     };
 
+
+    self.shortStatus = function(msg, type) {
+
+      var baseText = gettext("Go to OctoKlipper Tab");
+      if (msg.length > 36) {
+        var shortText = msg.substring(0, 31) + " [..]";
+        self.shortStatus_navbar(shortText);
+        self.shortStatus_navbar_hover(msg);
+      } else {
+        self.shortStatus_navbar(msg);
+        self.shortStatus_navbar_hover(baseText);
+      }
+      message = msg.replace(/\n/gi, "<br />");
+      self.shortStatus_sidebar(message);
+    };
+
+
     self.logMessage = function (timestamp, type = "info", message) {
+
       if (!timestamp) {
         var today = new Date();
         var timestamp =
           today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
       }
+
+      if (type == "error" && self.settings.settings.plugins.klipper.configuration.hide_error_popups() !== true) {
+        self.showPopUp(type, "Error:", message);
+      }
+
       self.logMessages.push({
         time: timestamp,
         type: type,
@@ -232,23 +286,67 @@ $(function () {
       }
     };
 
+    self.saveOption = function(dir, option, value) {
+      if (! (_.includes(["fontsize", "confirm_reload", "parse_check"], option)) ) {
+        return;
+      }
+
+      if (option && dir) {
+        let data = {
+          plugins: {
+            klipper:{
+              [dir]: {
+                [option]: value
+              }
+            }
+          }
+        };
+        OctoPrint.settings
+          .save(data);
+      } else if (option) {
+        let data = {
+              plugins: {
+                klipper:{
+                    [option]: value
+                }
+              }
+          };
+        OctoPrint.settings
+          .save(data);
+      }
+    }
+
     self.requestRestart = function () {
       if (!self.loginState.hasPermission(self.access.permissions.PLUGIN_KLIPPER_CONFIG)) return;
 
-      var request = function () {
-        OctoPrint.plugins.klipper.restartKlipper().done(function () {
-          self.consoleMessage("debug", "requestRestart");
+      var request = function (index) {
+        OctoPrint.plugins.klipper.restartKlipper().done(function (response) {
+          self.consoleMessage("debug", "restartingKlipper");
+          self.showPopUp("success", gettext("Restarted Klipper"), "command: " + response.command);
         });
+        if (index == 1) {
+          self.saveOption("configuration", "confirm_reload", false);
+        }
       };
 
-      var html = "<h4>" + gettext("All ongoing Prints will be stopped!") + "</h4>";
+      var html = "<h4>" +
+                  gettext("All ongoing Prints will be stopped!") +
+                  "</h4>";
 
-      showConfirmationDialog({
-        title: gettext("Klipper restart?"),
-        html: html,
-        proceed: gettext("Proceed"),
-        onproceed: request,
-      });
+      if (self.settings.settings.plugins.klipper.configuration.confirm_reload() == true) {
+        showConfirmationDialog({
+          title: gettext("Restart Klipper?"),
+          html: html,
+          proceed: [gettext("Restart"), gettext("Restart and don't ask this again.")],
+          onproceed: function (idx) {
+            if (idx > -1) {
+                request(idx);
+            }
+          },
+        });
+      } else {
+        request(0);
+      }
     };
 
     // OctoKlipper settings link
