@@ -1,4 +1,34 @@
-from octoprint_klipper import logger
+def log_info(self, message):
+    self._octoklipper_logger.info(message)
+    send_message(
+        self,
+        type = "log",
+        subtype = "info",
+        title = message,
+        payload = message
+    )
+
+def log_debug(self, message):
+    self._octoklipper_logger.debug(message)
+    self._logger.info(message)
+    send_message(
+        self,
+        type = "console",
+        subtype = "debug",
+        title = message,
+        payload = message
+    )
+
+def log_error(self, error):
+    self._octoklipper_logger.error(error)
+    self._logger.error(error)
+    send_message(
+        self,
+        type = "log",
+        subtype = "error",
+        title = error,
+        payload = error
+    )
 
 def migrate_old_settings(self, settings):
     '''
@@ -29,10 +59,10 @@ def migrate_settings(self, settings, old, new, new2=""):
     """        ''''''
     if settings.has(old):
         if new2 != "":
-            logger.log_info(self, "migrate setting for '" + old + "' -> '" + new + "/" + new2 + "'")
+            log_info(self, "migrate setting for '" + old + "' -> '" + new + "/" + new2 + "'")
             settings.set([new, new2], settings.get(old))
         else:
-            logger.log_info(self, "migrate setting for '" + old + "' -> '" + new + "'")
+            log_info(self, "migrate setting for '" + old + "' -> '" + new + "'")
             settings.set([new], settings.get(old))
         settings.remove(old)
 
@@ -48,7 +78,7 @@ def migrate_settings_configuration(self, settings, new, old):
     """
 
     if settings.has(["configuration", old]):
-        logger.log_info(self, "migrate setting for 'configuration/" + old + "' -> 'configuration/" + new + "'")
+        log_info(self, "migrate setting for 'configuration/" + old + "' -> 'configuration/" + new + "'")
         settings.set(["configuration", new], settings.get(["configuration", old]))
         settings.remove(["configuration", old])
 
@@ -68,7 +98,7 @@ def file_exist(self, filepath):
     '''
     from os import path
     if not path.isfile(filepath):
-        logger.log_debug(self, "File: <br />" + filepath + "<br /> does not exist!")
+        log_debug(self, "File: <br />" + filepath + "<br /> does not exist!")
         send_message(
             self,
             type = "PopUp",
