@@ -136,6 +136,10 @@ ul#klipper-settings {
   flex: 3 auto;
 }
 
+.klipper-noresize {
+  resize: none;
+}
+
 .gap {
   justify-content: space-evenly;
 }
