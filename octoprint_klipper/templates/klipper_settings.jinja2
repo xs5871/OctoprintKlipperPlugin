@@ -168,12 +168,17 @@
         </span>
       </div>
       <div class="control-group">
-        <pre>
-          PID_CALIBRATE
-          HEATER={label:Heater, default:extruder, options:extruder|extruder1}
-          TARGET={label:Target Temperature, unit:°C, default:190}
-          WRITE_FILE={label:Write to File, default:0, options:0|1}
-        </pre>
+        <label class="control-label">{{ _('Command') }}</label>
+        <div class="controls" style="margin-left: 82px;">
+          <div class="row-fluid">
+            <div class="span12" style="margin-top:2px;">
+              <div style="position: relative;">
+                <textarea readonly style='cursor: text; mix-blend-mode: difference; font-family: "Lucida Console", "Courier New", monospace;' rows="2" class="block klipper-noresize">PID_CALIBRATE HEATER={label:Heater, default:extruder, options:extruder|extruder1} TARGET={label:Target Temperature, unit:°C, default:190} WRITE_FILE={label:Write to File, default:0, options:0|1}</textarea>
+                <i id="klipper-copyToClipboard" class="far fa-clone klipper-copyicon" data-original-title="{{ _('Copy to Clipboard') }}"></i>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <!-- Leveling -->

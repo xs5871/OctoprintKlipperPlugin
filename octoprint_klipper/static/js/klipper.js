@@ -361,6 +361,34 @@ $(function () {
       }
     };
 
+    // trigger tooltip a first time to "enable"
+    $("#klipper-copyToClipboard").tooltip('hide');
+
+    $("#klipper-copyToClipboard").click(function(event) {
+      const ele = $(this);
+      const Text = $(this).prev();
+      const icon = document.getElementById("klipper-copyToClipboard");
+
+      /* Copy the text inside the text field */
+      navigator.clipboard.writeText(Text[0].value).then(function () {
+        ele.attr('data-original-title', gettext("Copied"));
+        ele.tooltip('show');
+        icon.classList.add("klipper-animate");
+
+        self.sleep(300).then(function () {
+          icon.classList.remove("klipper-animate");
+          $("#klipper-copyToClipboard").attr('data-original-title', gettext("Copy to Clipboard"));
+        });
+      }, function (err) {
+        $("#klipper-copyToClipboard").attr('data-original-title', gettext("Error:") + err);
+        $("#klipper-copyToClipboard").tooltip('show');
+
+        self.sleep(300).then(function () {
+          $("#copyToClipboard").attr('data-original-title', gettext("Copy to Clipboard"));
+        });
+      });
+    });
+
     self.sleep = function (ms) {
       return new Promise(resolve => setTimeout(resolve, ms));
     };

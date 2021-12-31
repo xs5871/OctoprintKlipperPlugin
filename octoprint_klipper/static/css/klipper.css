@@ -136,6 +136,46 @@ ul#klipper-settings {
   flex: 3 auto;
 }
 
+.klipper-noresize {
+  resize: none;
+}
+
+.klipper-copyicon {
+  position: absolute;
+    top: 2.3em;
+    right: 2.5em;
+  margin-top: 4px;
+  margin-left: 4px;
+  width: 11px;
+  height: 13px;
+  cursor: pointer;
+}
+
+.klipper-animate {
+  animation-name: klipper-pulse;
+  animation-duration: 0.2s;
+  animation-direction: alternate;
+  animation-iteration-count: 2;
+  animation-timing-function: linear;
+}
+
+@keyframes klipper-pulse {
+	0% {
+		transform: scale(1);
+    color:rgba(221, 255, 220, 1)
+	}
+
+	75% {
+		transform: scale(1.1);
+    color:rgba(117, 255, 112, 1)
+	}
+
+	100% {
+		transform: scale(1.7);
+    color:rgba(9, 255, 0, 1)
+	}
+}
+
 .gap {
   justify-content: space-evenly;
 }
