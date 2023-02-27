@@ -186,7 +186,7 @@ class KlipperPlugin(
     def on_settings_migrate(self, target, current):
         settings = self._settings
         if current is None:
-            migrate_old_settings(settings)
+            migrate_old_settings(self, settings)
 
         if current is not None and current < 3:
             self.migrate_settings_3(settings)
@@ -196,6 +196,7 @@ class KlipperPlugin(
 
     def migrate_settings_3(self, settings):
         migrate_settings_configuration(
+            self,
             settings,
             "shortStatus_navbar",
             "navbar",
